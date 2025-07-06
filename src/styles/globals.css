@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS variables for dynamic theming */
+:root {
+  /* New vibrant brand colors */
+  --primary-color: #0f5bfb;    /* Electric Blue */
+  --secondary-color: #f12d8f;  /* Neon Magenta */
+  --accent-color: #ffa424;     /* Vibrant Orange */
+  --dark-color: #002643;       /* Deep Navy */
+  --light-gray: #f3f4f6;       /* Light Gray */
+  
+  /* Base typography */
+  --font-sans: 'Montserrat', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
+  
+  /* Transition timing */
+  --transition-base: 300ms;
+}
+
+/* Industry-specific color overrides - using new vibrant colors */
+.industry-hospitality {
+  --primary-color: #0f5bfb;
+  --secondary-color: #f12d8f;
+  --accent-color: #ffa424;
+}
+
+.industry-foodservice {
+  --primary-color: #0f5bfb;
+  --secondary-color: #f12d8f;
+  --accent-color: #ffa424;
+}
+
+.industry-healthcare {
+  --primary-color: #0f5bfb;
+  --secondary-color: #f12d8f;
+  --accent-color: #ffa424;
+}
+
+.industry-athletics {
+  --primary-color: #0f5bfb;
+  --secondary-color: #f12d8f;
+  --accent-color: #ffa424;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  color: #374151;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Custom component styles */
+.btn-primary {
+  @apply bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:opacity-90 hover:scale-105;
+  background-color: var(--primary-color);
+}
+
+.btn-secondary {
+  @apply border-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-opacity-10;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-secondary {
+  color: var(--secondary-color);
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+
+.bg-accent {
+  background-color: var(--accent-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(20px); 
+    opacity: 0; 
+  }
+  to { 
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Loading spinner */
+.spinner {
+  @apply inline-block w-6 h-6 border-2 border-gray-300 border-t-primary rounded-full animate-spin;
+  border-top-color: var(--primary-color);
+}
+
+/* Responsive images */
+.responsive-image {
+  @apply w-full h-auto object-cover;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
