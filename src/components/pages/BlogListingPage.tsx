@@ -4,18 +4,32 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useIndustryContext } from '../../contexts/IndustryContext';
-import { getIndustryName } from '../../types/Industry';
 import { blogPosts, blogCategories, type BlogPost } from '../../data/blogData';
 import { getIndustryPath } from '../../utils/subdomainDetection';
 
 export const BlogListingPage: React.FC = () => {
   const { config } = useIndustryContext();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'readTime'>('newest');
-  
-  const industryName = getIndustryName(config.industry);
   const industryPath = getIndustryPath();
+
+  // Map industry types to blog categories
+  const getDefaultCategory = () => {
+    switch (config.industry) {
+      case 'hospitality':
+        return 'Hospitality Marketing';
+      case 'healthcare':
+        return 'Health & Wellness Marketing';
+      case 'tech':
+        return 'Tech & AI Marketing';
+      case 'athletics':
+        return 'Sports & Media Marketing';
+      default:
+        return 'All';
+    }
+  };
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(getDefaultCategory());
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'readTime'>('newest');
 
   // Filter and sort blog posts
   const filteredAndSortedPosts = useMemo(() => {

@@ -2,6 +2,16 @@
 
 import { useEffect } from 'react';
 
+// Type for Network Information API
+interface NetworkInformation extends EventTarget {
+  saveData: boolean;
+  effectiveType: '2g' | '3g' | '4g' | 'slow-2g';
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+}
+
 export const useVideoPreloader = () => {
   useEffect(() => {
     // Preconnect to Vimeo
@@ -33,9 +43,9 @@ export const useVideoPreloader = () => {
     const iframes: HTMLIFrameElement[] = [];
     
     // Only preload if we're not on a slow connection
-    if ('connection' in navigator && (navigator as any).connection) {
-      const connection = (navigator as any).connection;
-      if (connection.saveData || connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+    if ('connection' in navigator && (navigator as NavigatorWithConnection).connection) {
+      const connection = (navigator as NavigatorWithConnection).connection;
+      if (connection && (connection.saveData || connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g')) {
         return; // Skip preloading on slow connections
       }
     }
@@ -44,7 +54,8 @@ export const useVideoPreloader = () => {
     const timeoutId = setTimeout(() => {
       videoUrls.forEach((url) => {
         const iframe = document.createElement('iframe');
-        iframe.src = `${url}?background=1&muted=1&quality=auto`;
+        // Use same parameters as actual video component for cache efficiency
+        iframe.src = `${url}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&responsive=1`;
         iframe.style.position = 'absolute';
         iframe.style.width = '1px';
         iframe.style.height = '1px';
@@ -56,7 +67,7 @@ export const useVideoPreloader = () => {
         document.body.appendChild(iframe);
         iframes.push(iframe);
       });
-    }, 2000); // Wait 2 seconds after component mount
+    }, 1000); // Reduced delay to 1 second for faster preloading
 
     // Cleanup
     return () => {
