@@ -15,30 +15,34 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & healthcare practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 
 const pathToIndustryMap: Record<string, IndustryType> = {
+  'hospitality': 'hospitality',
   'hotels': 'hospitality',
-  'restaurants': 'foodservice',
+  'restaurants': 'hospitality',
+  'health': 'healthcare',
   'dental': 'healthcare',
+  'healthcare': 'healthcare',
+  'tech': 'tech',
   'sports': 'athletics'
 };
 
@@ -61,7 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
             <div className="text-2xl font-bold mb-4">Inteligencia</div>
             <p className="text-gray-400 mb-4">Smart marketing solutions that drive real results.</p>
             <div className="border-t border-gray-800 mt-8 pt-8 text-gray-400">
-              <p>&copy; 2024 Inteligencia. All rights reserved.</p>
+              <p>&copy; 2025 Inteligencia. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -143,7 +147,7 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Inteligencia. All rights reserved.</p>
+          <p>&copy; 2025 Inteligencia. All rights reserved.</p>
         </div>
       </div>
     </footer>

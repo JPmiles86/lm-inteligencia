@@ -62,7 +62,7 @@ export class ContentService {
     configs: Record<IndustryType, Partial<IndustryConfig>>
   ): Promise<void> {
     // Update each industry configuration
-    const industries: IndustryType[] = ['hospitality', 'foodservice', 'healthcare', 'athletics'];
+    const industries: IndustryType[] = ['hospitality', 'healthcare', 'tech', 'athletics'];
     
     for (const industry of industries) {
       if (configs[industry]) {
@@ -164,7 +164,7 @@ export class ContentService {
    */
   static clearCache(tenantId: string): void {
     try {
-      const industries: IndustryType[] = ['hospitality', 'foodservice', 'healthcare', 'athletics', 'main'];
+      const industries: IndustryType[] = ['hospitality', 'healthcare', 'tech', 'athletics', 'main'];
       industries.forEach(industry => {
         const key = `inteligencia_config_${tenantId}_${industry}`;
         localStorage.removeItem(key);
@@ -222,7 +222,7 @@ export class ContentService {
    * Export all configurations to JSON
    */
   static async exportAllConfigs(tenantId: string): Promise<Record<IndustryType, IndustryConfig | null>> {
-    const industries: IndustryType[] = ['hospitality', 'foodservice', 'healthcare', 'athletics', 'main'];
+    const industries: IndustryType[] = ['hospitality', 'healthcare', 'tech', 'athletics', 'main'];
     const configs: Partial<Record<IndustryType, IndustryConfig | null>> = {};
 
     for (const industry of industries) {

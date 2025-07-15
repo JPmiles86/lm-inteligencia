@@ -12,10 +12,10 @@ interface UnifiedPageHeaderProps {
 }
 
 const industryDisplayNames: Record<IndustryTypeWithoutMain, string> = {
-  'hospitality': 'hotels',
-  'foodservice': 'food service',
-  'healthcare': 'healthcare',
-  'athletics': 'sports'
+  'hospitality': 'hospitality & lifestyle',
+  'healthcare': 'health & wellness',
+  'tech': 'tech & AI',
+  'athletics': 'sport & media'
 };
 
 export const UnifiedPageHeader: React.FC<UnifiedPageHeaderProps> = ({ 

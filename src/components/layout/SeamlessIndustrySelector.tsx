@@ -14,23 +14,23 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & dental practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 
@@ -38,8 +38,8 @@ const selectedTagline = "intelligent marketing solutions that drive real results
 
 const industryHoverColors: Record<IndustryType, string> = {
   'hospitality': '#0f5bfb',    // Electric Blue
-  'foodservice': '#f12d8f',    // Neon Magenta
   'healthcare': '#ffa424',     // Bright Orange
+  'tech': '#f12d8f',           // Neon Magenta
   'athletics': '#760b85',      // Futuristic Purple
   'main': '#374151'            // Gray
 };
@@ -79,9 +79,9 @@ export const SeamlessIndustrySelector: React.FC = () => {
     
     // Navigate without page refresh
     const pathMap: Record<IndustryType, string> = {
-      'hospitality': '/hotels',
-      'foodservice': '/restaurants',
-      'healthcare': '/dental',
+      'hospitality': '/hospitality',
+      'healthcare': '/health',
+      'tech': '/tech',
       'athletics': '/sports',
       'main': '/'
     };

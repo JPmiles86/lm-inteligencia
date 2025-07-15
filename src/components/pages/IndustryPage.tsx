@@ -8,6 +8,7 @@ import { HeroSection } from '../sections/HeroSection';
 import { ServicesSection } from '../sections/ServicesSection';
 import { TestimonialsSection } from '../sections/TestimonialsSection';
 import { VideoCTASection } from '../sections/VideoCTASection';
+import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
 import { getIndustryName } from '../../types/Industry';
 
 interface IndustryPageProps {
@@ -27,9 +28,17 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
         content={config.content.hero} 
       />
 
+      {/* Full Viewport Video Section */}
+      <VideoBackgroundSection 
+        desktopVideoUrl={config.content.hero.backgroundVideo || 'https://player.vimeo.com/video/1100417251'}
+        mobileVideoUrl={config.content.hero.backgroundVideoMobile || 'https://player.vimeo.com/video/1100417904'}
+      />
+
       {/* Services Section */}
       <ServicesSection 
         services={config.content.services} 
+        title={config.content.servicesTitle || 'Marketing That Moves The Metrics That Matter'}
+        subtitle={config.content.servicesSubtitle || 'AI-Driven Strategy for Your Business'}
         industryTheme={config.industry}
       />
 
@@ -69,7 +78,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
                 <div className="space-y-4">
                   {config.content.contact.email && (
                     <div className="flex items-center">
-                      <div className="mr-4" style={{ color: '#0f5bfb' }}>
+                      <div className="mr-4" style={{ color: '#f04a9b' }}>
                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
                           <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
@@ -84,7 +93,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
                   
                   {config.content.contact.phone && (
                     <div className="flex items-center">
-                      <div className="mr-4" style={{ color: '#0f5bfb' }}>
+                      <div className="mr-4" style={{ color: '#f04a9b' }}>
                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
                         </svg>
@@ -186,7 +195,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Inteligencia. All rights reserved.</p>
+            <p>&copy; 2025 Inteligencia. All rights reserved.</p>
           </div>
         </div>
       </footer>

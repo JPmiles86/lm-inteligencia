@@ -19,9 +19,13 @@ interface PageWrapperProps {
 // Create a mock context that pages expect
 const createMockContext = (config: IndustryConfig, industry: IndustryType) => {
   const pathToIndustryMap: Record<string, IndustryType> = {
+    hospitality: 'hospitality',
     hotels: 'hospitality',
-    restaurants: 'foodservice',
+    restaurants: 'hospitality',
+    health: 'healthcare',
     healthcare: 'healthcare',
+    dental: 'healthcare',
+    tech: 'tech',
     sports: 'athletics'
   };
   

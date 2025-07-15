@@ -13,32 +13,32 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & healthcare practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 
 const industryHoverColors: Record<IndustryType, string> = {
-  'hospitality': '#0f5bfb',
-  'foodservice': '#f12d8f',
-  'healthcare': '#ffa424',
-  'athletics': '#760b85',
-  'main': '#374151'
+  'hospitality': '#f04a9b',
+  'healthcare': '#f04a9b',
+  'tech': '#f04a9b',
+  'athletics': '#f04a9b',
+  'main': '#371657'
 };
 
 const selectedTagline = "intelligent marketing solutions that drive real results";
@@ -103,9 +103,9 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
     
     // Update URL without navigation
     const pathMap: Record<IndustryType, string> = {
-      'hospitality': '/hotels',
-      'foodservice': '/restaurants',
-      'healthcare': '/dental',
+      'hospitality': '/hospitality',
+      'healthcare': '/health',
+      'tech': '/tech',
       'athletics': '/sports',
       'main': '/'
     };
@@ -140,7 +140,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
       >
         {/* Logo with floating animation when decided */}
         <motion.img 
-          src="/LM_inteligencia/Inteligencia-logo-trans.png" 
+          src="/LM_inteligencia/Inteligencia-logo-new.png" 
           alt="Inteligencia logo" 
           className="mx-auto mb-16"
           style={{ width: '400px', height: 'auto', objectFit: 'contain' }}
@@ -160,7 +160,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
         {/* inteligencia text */}
         <motion.h1
           className="text-6xl mb-4"
-          style={{ color: '#1f1d32', fontFamily: 'Poppins, sans-serif', fontWeight: 400, letterSpacing: '-0.02em' }}
+          style={{ color: '#371657', fontFamily: 'Poppins, sans-serif', fontWeight: 400, letterSpacing: '-0.02em' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
@@ -171,7 +171,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
         {/* digital marketing text */}
         <motion.h2
           className="text-2xl mb-12"
-          style={{ color: '#1f1d32', fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}
+          style={{ color: '#371657', fontFamily: 'Poppins, sans-serif', fontWeight: 300 }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
@@ -229,7 +229,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
                   <div 
                     className="mb-2"
                     style={{ 
-                      color: isSelected && landingAreaState === 'decided' ? '#1f1d32' : '#1f1d32' 
+                      color: isSelected && landingAreaState === 'decided' ? '#371657' : '#371657' 
                     }}
                   >
                     {industry.title}

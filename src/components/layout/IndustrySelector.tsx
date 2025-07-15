@@ -14,23 +14,23 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & dental practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 

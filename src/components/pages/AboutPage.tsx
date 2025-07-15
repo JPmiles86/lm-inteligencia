@@ -32,9 +32,9 @@ export const AboutPage: React.FC = () => {
             <h1 className="text-5xl sm:text-6xl font-bold mb-6">
               {universalContent.aboutPage.hero.title}
             </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            <div className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto whitespace-pre-line">
               {universalContent.aboutPage.hero.subtitle}
-            </p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -49,29 +49,37 @@ export const AboutPage: React.FC = () => {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 mb-2">
                 {founderStory.title}
               </h2>
+              {founderStory.subtitle && (
+                <p className="text-xl text-gray-700 font-medium mb-2">
+                  {founderStory.subtitle}
+                </p>
+              )}
+              {founderStory.tagline && (
+                <p className="text-lg text-gray-600 italic mb-6">
+                  {founderStory.tagline}
+                </p>
+              )}
               <p className="text-lg text-gray-700 mb-6">
                 {founderStory.description}
               </p>
               <p className="text-lg text-gray-700 mb-6">
                 {founderStory.extendedStory}
               </p>
-              <p className="text-lg text-gray-700 mb-8">
+              <div className="text-lg text-gray-700 mb-8 whitespace-pre-line">
                 {founderStory.approach}
-              </p>
+              </div>
               
               {/* Laurie's Certifications */}
               <div className="space-y-3">
-                <h3 className="text-xl font-semibold text-gray-900">Certifications & Expertise</h3>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-600">
+                <h3 className="text-xl font-semibold text-gray-900">Degrees and Qualifications</h3>
+                <ul className="space-y-1 text-gray-600">
                   {founderStory.certifications.map((cert, index) => (
-                    <li key={index} className="flex items-center">
-                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {cert}
+                    <li key={index} className="flex items-start">
+                      <span className="text-gray-500 mr-2">•</span>
+                      <span>{cert}</span>
                     </li>
                   ))}
                 </ul>
@@ -93,14 +101,7 @@ export const AboutPage: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
-              {/* Office Image */}
-              <div className="mt-8 rounded-xl overflow-hidden shadow-lg">
-                <img
-                  src={aboutContent.officeImage}
-                  alt="Inteligencia Office"
-                  className="w-full h-48 object-cover"
-                />
-              </div>
+              {/* Office Image - Hidden per client request */}
             </motion.div>
           </div>
         </div>
@@ -123,16 +124,47 @@ export const AboutPage: React.FC = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {companyValues.map((value, index) => (
+            {/* Display first 4 values in first row */}
+            {companyValues.slice(0, 4).map((value, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow"
+                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center"
               >
-                <div className="text-4xl mb-4">{value.icon}</div>
+                <div className="flex justify-center mb-4">
+                  {typeof value.icon === 'string' && value.icon.length <= 2 ? (
+                    <div className="text-4xl">{value.icon}</div>
+                  ) : (
+                    <div className="w-12 h-12 text-primary" dangerouslySetInnerHTML={{ __html: value.icon }} />
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
+                <p className="text-gray-600">{value.description}</p>
+              </motion.div>
+            ))}
+          </div>
+          
+          {/* Display remaining 4 values in second row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-8">
+            {companyValues.slice(4).map((value, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center"
+              >
+                <div className="flex justify-center mb-4">
+                  {typeof value.icon === 'string' && value.icon.length <= 2 ? (
+                    <div className="text-4xl">{value.icon}</div>
+                  ) : (
+                    <div className="w-12 h-12 text-primary" dangerouslySetInnerHTML={{ __html: value.icon }} />
+                  )}
+                </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{value.title}</h3>
                 <p className="text-gray-600">{value.description}</p>
               </motion.div>
@@ -141,8 +173,8 @@ export const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 bg-white">
+      {/* Team Section - Hidden per client request, will be updated later */}
+      <section className="py-20 bg-white hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -202,7 +234,7 @@ export const AboutPage: React.FC = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -217,7 +249,7 @@ export const AboutPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href={`/${industryKey}/contact`}
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+                className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
               >
                 {universalContent.aboutPage.ctaSection.primaryButton}
               </a>

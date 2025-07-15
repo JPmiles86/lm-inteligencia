@@ -217,19 +217,19 @@ export const CaseStudiesPage: React.FC = () => {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">4</div>
+                <div className="text-3xl font-bold text-secondary mb-2">4</div>
                 <div className="text-gray-300">Industries</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">100+</div>
+                <div className="text-3xl font-bold text-secondary mb-2">100+</div>
                 <div className="text-gray-300">Success Stories</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">$2.8M</div>
+                <div className="text-3xl font-bold text-secondary mb-2">$2.8M</div>
                 <div className="text-gray-300">Revenue Generated</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">95%</div>
+                <div className="text-3xl font-bold text-secondary mb-2">95%</div>
                 <div className="text-gray-300">Client Retention</div>
               </div>
             </div>
@@ -293,7 +293,7 @@ export const CaseStudiesPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -308,7 +308,7 @@ export const CaseStudiesPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href={`/${industryKey}/contact`}
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+                className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
               >
                 Get Your Free Analysis
               </a>

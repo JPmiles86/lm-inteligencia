@@ -146,7 +146,7 @@ The Inteligencia website is currently a well-structured, multi-industry digital 
 2. ✅ "Restaurant Social Media Marketing: From Empty Tables to Full Reservations" (Featured)
 3. ✅ "HIPAA-Compliant Marketing: Growing Your Dental Practice Safely" (Featured)
 4. ✅ "Sports Facility Marketing: Building Thriving Athletic Communities"
-5. ✅ "2024 Digital Marketing Trends Every Business Owner Should Know"
+5. ✅ "2025 Digital Marketing Trends Every Business Owner Should Know"
 6. ✅ "Local SEO Mastery: Dominating Your Geographic Market"
 7. ✅ "Email Marketing Automation: Converting Leads into Loyal Customers"
 8. ✅ "The Complete Guide to Google Ads for Small Businesses"

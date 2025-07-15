@@ -1,6 +1,6 @@
 // Core industry types for the multi-industry platform
 
-export type IndustryType = 'hospitality' | 'foodservice' | 'healthcare' | 'athletics' | 'main';
+export type IndustryType = 'hospitality' | 'healthcare' | 'tech' | 'athletics' | 'main';
 
 export interface IndustryConfig {
   industry: IndustryType;
@@ -14,6 +14,8 @@ export interface IndustryConfig {
   };
   content: {
     hero: HeroContent;
+    servicesTitle?: string;
+    servicesSubtitle?: string;
     services: ServiceContent[];
     team: TeamContent[];
     testimonials: TestimonialContent[];
@@ -96,7 +98,7 @@ export interface IndustryConfig {
     caseStudiesViewAllCta?: string;
     // Video CTA Section
     videoCTA?: {
-      videoUrl: string;
+      videoUrl?: string;
       headline: string;
       subtitle: string;
       ctaText: string;
@@ -123,6 +125,8 @@ export interface UniversalContent {
     founderStory: {
       title: string;
       description: string;
+      subtitle?: string;
+      tagline?: string;
       extendedStory: string;
       approach: string;
       image: string;
@@ -144,6 +148,8 @@ export interface HeroContent {
   subtitle: string;
   backgroundType: 'image' | 'video';
   backgroundSrc: string;
+  backgroundVideo?: string;  // Vimeo video URL for desktop
+  backgroundVideoMobile?: string;  // Vimeo video URL for mobile
   ctaText: string;
   ctaLink: string;
   stats?: Array<{
@@ -157,6 +163,7 @@ export interface ServiceContent {
   description: string;
   features?: string[];
   icon: string;
+  image?: string;
   results?: string | undefined;
   pricing?: {
     startingPrice: string;
@@ -228,6 +235,8 @@ export interface AboutContent {
   founderStory: {
     title: string;
     description: string;
+    subtitle?: string;
+    tagline?: string;
     extendedStory: string;
     approach: string;
     image: string;
@@ -305,6 +314,8 @@ export interface TestimonialContent {
   author: string;
   position: string;
   company: string;
+  companyUrl?: string;
+  location?: string;
   image?: string;
   rating?: number;
 }
@@ -319,15 +330,14 @@ export interface PricingContent {
     recommended?: boolean;
     ctaText: string;
     ctaLink: string;
+    suitableFor?: string;
   }>;
   disclaimer?: string;
-  addOns?: {
-    title: string;
-    services: Array<{
-      name: string;
-      price: string;
-    }>;
-  };
+  addOns?: Array<{
+    name: string;
+    price: string;
+  }>;
+  addOnsTitle?: string;
 }
 
 export interface HomepageSection {
@@ -418,18 +428,19 @@ export interface ContactContent {
 // Industry mapping for subdomain detection
 export const IndustryMapping: Record<string, IndustryType> = {
   'hotels': 'hospitality',
-  'restaurants': 'foodservice', 
+  'restaurants': 'hospitality', 
   'healthcare': 'healthcare',
+  'tech': 'tech',
   'sports': 'athletics',
   'inteligencia': 'main'
 };
 
 // Industry display names
 export const IndustryNames: Record<IndustryType, string> = {
-  hospitality: 'Hotels & Hospitality',
-  foodservice: 'Restaurants & Food Service',
-  healthcare: 'Healthcare',
-  athletics: 'Sports & Recreation',
+  hospitality: 'Hospitality & Lifestyle',
+  healthcare: 'Health & Wellness',
+  tech: 'Tech, AI & Digital Innovation',
+  athletics: 'Sport, Media & Events',
   main: 'All Industries'
 };
 
@@ -440,15 +451,15 @@ export const IndustryColors: Record<IndustryType, { primary: string; secondary: 
     secondary: '#f59e0b', // Gold
     accent: '#dc2626'
   },
-  foodservice: {
-    primary: '#dc2626', // Red
-    secondary: '#f59e0b', // Orange
-    accent: '#059669'
-  },
   healthcare: {
     primary: '#059669', // Green
     secondary: '#0891b2', // Cyan
     accent: '#7c3aed'
+  },
+  tech: {
+    primary: '#6366f1', // Indigo
+    secondary: '#8b5cf6', // Purple
+    accent: '#06b6d4'
   },
   athletics: {
     primary: '#7c3aed', // Purple

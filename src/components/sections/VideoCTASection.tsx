@@ -29,7 +29,7 @@ interface VideoCTASectionProps {
 
 export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
   // Use content prop first, then individual props, then defaults
-  const videoUrl = props.content?.videoUrl || props.videoUrl || 'https://cdn.pixabay.com/video/2021/04/12/71534-542408370_large.mp4';
+  const videoUrl = props.content?.videoUrl || props.videoUrl;
   const headline = props.content?.headline || props.headline || 'Ready to transform your business?';
   const subtitle = props.content?.subtitle || props.subtitle || 'Let\'s discuss how AI-powered marketing can revolutionize your business';
   const ctaText = props.content?.ctaText || props.ctaText || 'Start Your Transformation';
@@ -42,21 +42,27 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
 
   return (
     <section className="relative h-[600px] overflow-hidden">
-      {/* Background Video */}
+      {/* Background - Video or Gradient */}
       <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-        >
-          <source src={videoUrl} type="video/mp4" />
-          <div className="w-full h-full bg-gray-900" />
-        </video>
-        
-        {/* Semi-transparent overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-60" />
+        {videoUrl ? (
+          <>
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src={videoUrl} type="video/mp4" />
+              <div className="w-full h-full bg-gray-900" />
+            </video>
+            {/* Semi-transparent overlay for video */}
+            <div className="absolute inset-0 bg-black bg-opacity-60" />
+          </>
+        ) : (
+          /* Purple gradient background when no video */
+          <div className="absolute inset-0 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900" />
+        )}
       </div>
 
       {/* Content */}

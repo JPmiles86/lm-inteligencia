@@ -11,12 +11,17 @@ export default {
         primary: 'var(--primary-color)',
         secondary: 'var(--secondary-color)',
         accent: 'var(--accent-color)',
+        'accent-teal': 'var(--accent-teal)',
+        'accent-purple': 'var(--accent-purple)',
+        'accent-orange': 'var(--accent-orange)',
         
-        // Base colors
-        'brand-blue': '#1e40af',
-        'brand-gold': '#f59e0b',
-        'brand-green': '#059669',
-        'brand-purple': '#7c3aed',
+        // Base colors (client's new color palette)
+        'brand-deep-purple': '#371657',
+        'brand-pink': '#f04a9b',
+        'brand-blue': '#176ab2',
+        'brand-teal': '#08deec',
+        'brand-purple': '#9123d1',
+        'brand-orange': '#fd820b',
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],

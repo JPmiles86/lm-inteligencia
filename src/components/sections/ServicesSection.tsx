@@ -30,6 +30,8 @@ interface ServicesSectionProps {
   industryTheme?: string;
   viewAllCta?: string;
   industryPath?: string;
+  title?: string;
+  subtitle?: string;
 }
 
 // Industry-specific icons mapping
@@ -93,7 +95,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   services,
   industryTheme = 'default',
   viewAllCta,
-  industryPath = ''
+  industryPath = '',
+  title = 'Marketing That Moves The Metrics That Matter',
+  subtitle = 'AI-Driven Strategy for Your Business'
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number>(0); // Show first service by default
   
@@ -119,13 +123,23 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           className="text-center mb-24"
         >
           <h2 className="text-5xl sm:text-6xl font-bold mb-8" style={{ color: '#000', letterSpacing: '-0.02em' }}>
-            Digital Marketing That Drives Results
+            {title.split('The Metrics That Matter').map((part, index) => (
+              <span key={index}>
+                {part}
+                {index === 0 && title.includes('The Metrics That Matter') && (
+                  <>
+                    <br />
+                    The Metrics That Matter
+                  </>
+                )}
+              </span>
+            ))}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            We manage your digital marketing so you can focus on your business. 
+            {subtitle} 
             {viewAllCta && (
               <span className="block mt-4 text-lg">
-                <Link to={`${industryPath}/services`} className="font-medium hover:opacity-80 transition-opacity duration-300" style={{ color: '#0f5bfb' }}>
+                <Link to={`${industryPath}/services`} className="font-medium hover:opacity-80 transition-opacity duration-300 text-secondary">
                   {viewAllCta}
                 </Link>
               </span>
@@ -156,8 +170,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <div 
                     className="p-3 rounded-xl transition-colors duration-300"
                     style={{ 
-                      backgroundColor: hoveredIndex === index ? '#0f5bfb10' : '#f9fafb',
-                      color: hoveredIndex === index ? '#0f5bfb' : '#6b7280'
+                      backgroundColor: hoveredIndex === index ? 'rgba(240, 74, 155, 0.06)' : '#f9fafb'
                     }}
                   >
                     {getServiceIcon(service.title)}
@@ -189,7 +202,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               {/* Service Image */}
               <div className="mb-8 rounded-xl overflow-hidden">
                 <img 
-                  src={getPlaceholderImage(hoveredIndex)}
+                  src={services[hoveredIndex]?.image || getPlaceholderImage(hoveredIndex)}
                   alt={services[hoveredIndex]?.title}
                   className="w-full h-56 object-cover transform hover:scale-[1.02] transition-transform duration-300"
                 />
@@ -212,7 +225,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <div className="text-sm font-medium mb-2 text-gray-600">
                     Key Benefit
                   </div>
-                  <div className="font-semibold text-lg" style={{ color: '#0f5bfb' }}>
+                  <div className="font-semibold text-lg text-secondary">
                     {services[hoveredIndex].keyBenefit}
                   </div>
                 </div>
@@ -224,7 +237,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   <ul className="space-y-4">
                     {services[hoveredIndex].features.slice(0, 3).map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
-                        <Check className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{ color: '#0f5bfb' }} />
+                        <Check className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0 text-accent" />
                         <span className="text-gray-700">{feature}</span>
                       </li>
                     ))}
@@ -235,8 +248,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               {/* CTA Button */}
               <Link
                 to={services[hoveredIndex]?.learnMoreLink ? `${industryPath}${services[hoveredIndex].learnMoreLink}` : `${industryPath}/contact?service=${encodeURIComponent(services[hoveredIndex]?.title || '')}`}
-                className="w-full py-4 rounded-xl font-medium text-white text-center block transition-all duration-300 hover:scale-[1.02] transform"
-                style={{ backgroundColor: '#0f5bfb' }}
+                className="w-full py-4 rounded-xl font-medium text-white text-center block transition-all duration-300 hover:scale-[1.02] transform bg-secondary hover:opacity-90"
               >
                 {services[hoveredIndex]?.learnMoreLink ? 'Learn More' : 'Get Started'}
               </Link>
@@ -252,21 +264,21 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           viewport={{ once: true }}
           className="text-center mt-24"
         >
-          <div className="bg-gray-50 rounded-3xl p-12 max-w-4xl mx-auto">
-            <h3 className="text-3xl font-bold mb-6" style={{ color: '#000' }}>
+          <div className="bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 rounded-3xl p-12 max-w-4xl mx-auto">
+            <h3 className="text-3xl font-bold mb-6 text-white">
               Ready to Get Started?
             </h3>
-            <p className="text-gray-600 mb-10 text-lg">
+            <p className="text-gray-300 mb-10 text-lg">
               Let's discuss how these services can be customized for your specific business needs.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <div className="flex justify-center">
               <Link
                 to={`${industryPath}/contact`}
-                className="px-10 py-4 rounded-xl font-medium text-white transition-all duration-300 hover:scale-[1.02] transform text-center"
-                style={{ backgroundColor: '#0f5bfb' }}
+                className="px-10 py-4 rounded-xl font-medium text-white transition-all duration-300 hover:scale-[1.02] transform text-center bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
               >
-                Schedule Consultation
+                Schedule Free Consultation
               </Link>
+              {/* Case Studies button hidden for now - can be restored later
               <Link
                 to={`${industryPath}/case-studies`}
                 className="border px-10 py-4 rounded-xl font-medium transition-all duration-300 hover:bg-gray-100 text-center"
@@ -274,6 +286,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               >
                 View Case Studies
               </Link>
+              */}
             </div>
           </div>
         </motion.div>

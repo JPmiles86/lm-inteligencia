@@ -232,7 +232,7 @@ testimonials,quote_1,text,"Laurie's Google Hotel Ads strategy helped us...","Wor
 ### File Naming Convention:
 ```
 inteligencia-content-YYYY-MM-DD.csv
-inteligencia-content-2024-03-15.csv (example)
+inteligencia-content-2025-03-15.csv (example)
 ```
 
 ## 10. Technical Support Requirements

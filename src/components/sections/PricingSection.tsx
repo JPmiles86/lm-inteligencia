@@ -40,7 +40,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({
             All plans include our core services with varying levels of support and features.
             {viewDetailedCta && (
               <span className="block mt-4 text-lg">
-                <Link to={`${industryPath}/pricing`} className="font-medium hover:opacity-80 transition-opacity duration-300" style={{ color: '#0f5bfb' }}>
+                <Link to={`${industryPath}/pricing`} className="font-medium hover:opacity-80 transition-opacity duration-300" style={{ color: '#f04a9b' }}>
                   {viewDetailedCta}
                 </Link>
               </span>

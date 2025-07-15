@@ -150,10 +150,10 @@ export const getCurrentSubdomainDisplay = (): string => {
   const industry = detectIndustry();
   
   const industryNames: Record<IndustryType, string> = {
-    hospitality: 'Hotels & Hospitality',
-    foodservice: 'Restaurants & Food Service',
-    healthcare: 'Dental & Healthcare',
-    athletics: 'Sports & Recreation',
+    hospitality: 'Hospitality & Lifestyle',
+    healthcare: 'Health & Wellness',
+    tech: 'Tech, AI & Digital Innovation',
+    athletics: 'Sport, Media & Events',
     main: 'All Industries'
   };
   
@@ -181,8 +181,8 @@ export const applyIndustryTheme = (industry: IndustryType): void => {
   // Update CSS custom properties for dynamic theming
   const industryColors = {
     hospitality: { primary: '#002643', secondary: '#0093a0', accent: '#FFD700' },
-    foodservice: { primary: '#002643', secondary: '#0093a0', accent: '#FFD700' },
     healthcare: { primary: '#002643', secondary: '#0093a0', accent: '#FFD700' },
+    tech: { primary: '#002643', secondary: '#ec4899', accent: '#FFD700' },
     athletics: { primary: '#002643', secondary: '#0093a0', accent: '#FFD700' },
     main: { primary: '#002643', secondary: '#0093a0', accent: '#FFD700' }
   };

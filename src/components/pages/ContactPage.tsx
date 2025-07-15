@@ -39,11 +39,11 @@ export const ContactPage: React.FC = () => {
 
   // Get data from config with fallbacks
   const businessTypesMap: Record<IndustryType, string[]> = {
-    hospitality: ['Boutique Hotel', 'Resort', 'Bed & Breakfast', 'Vacation Rental', 'Hotel Chain', 'Other'],
-    foodservice: ['Fine Dining', 'Casual Dining', 'Fast Casual', 'Coffee Shop', 'Bar/Pub', 'Food Truck', 'Restaurant Chain', 'Other'],
-    healthcare: ['General Dentistry', 'Dental Speciality', 'Medical Practice', 'Urgent Care', 'Healthcare Group', 'Other'],
-    athletics: ['Tennis Club', 'Pickleball Facility', 'Golf Course', 'Fitness Center', 'Sports Complex', 'Recreation Center', 'Other'],
-    main: ['Hotels & Hospitality', 'Restaurants & Food Service', 'Dental & Healthcare', 'Sports & Recreation', 'Other'],
+    hospitality: ['Boutique Hotel', 'Resort', 'Restaurant', 'Fine Dining', 'Casual Dining', 'Travel Agency', 'Tourism Business', 'Other'],
+    healthcare: ['General Dentistry', 'Dental Speciality', 'Medical Practice', 'Health Clinic', 'Wellness Center', 'Fitness Studio', 'Retreat Center', 'Other'],
+    tech: ['SaaS Startup', 'AI Company', 'MarTech Platform', 'B2B Software', 'Developer Tools', 'Tech Consultancy', 'Digital Agency', 'Other'],
+    athletics: ['Pickleball Facility', 'Sports Club', 'Event Venue', 'Tournament Organizer', 'Sports Media', 'Recreation Center', 'Other'],
+    main: ['Hospitality & Lifestyle', 'Health & Wellness', 'Tech, AI & Digital Innovation', 'Sport, Media & Events', 'Other'],
   };
   const businessTypes = config.content.contact.businessTypes || businessTypesMap[config.industry as keyof typeof businessTypesMap] || ['Other'];
 
@@ -304,7 +304,7 @@ export const ContactPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg text-lg transition-colors"
+                  className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-4 rounded-lg text-lg transition-all transform hover:scale-105"
                 >
                   {config.content.contact.formLabels?.submitButton || 'Send Message & Get Free Consultation'}
                 </button>
@@ -347,14 +347,14 @@ export const ContactPage: React.FC = () => {
               </div>
 
               {/* Calendly Section */}
-              <div className="bg-primary rounded-xl p-8 text-white">
+              <div className="bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 rounded-xl p-8 text-white">
                 <h3 className="text-2xl font-bold mb-4">
                   {config.content.contact.calendlyText || 'Schedule a Free Consultation'}
                 </h3>
-                <p className="text-blue-100 mb-6">
+                <p className="text-gray-200 mb-6">
                   Book a 30-minute strategy session to discuss your marketing goals and learn how we can help grow your business.
                 </p>
-                <button className="w-full bg-white text-primary px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                <button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105">
                   Schedule Free Call
                 </button>
               </div>
@@ -381,14 +381,6 @@ export const ContactPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* Map Placeholder */}
-              <div className="bg-gray-200 rounded-xl h-64 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <div className="text-4xl mb-2">🗺️</div>
-                  <p className="font-medium">Interactive Map</p>
-                  <p className="text-sm">Miami, FL Office Location</p>
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>

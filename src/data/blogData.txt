@@ -126,7 +126,7 @@ Remember: The goal isn't to eliminate OTAs entirely, but to create a balanced di
       title: 'Founder & Hotel Marketing Strategist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-01-15',
+    publishedDate: '2025-01-15',
     readTime: 8,
     category: 'Hotel Marketing',
     tags: ['OTA Optimization', 'Direct Bookings', 'Google Hotel Ads', 'Email Marketing'],
@@ -274,7 +274,7 @@ Social media marketing for restaurants requires consistent effort, quality conte
       title: 'Founder & Restaurant Marketing Expert',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-01-08',
+    publishedDate: '2025-01-08',
     readTime: 10,
     category: 'Restaurant Marketing',
     tags: ['Social Media Marketing', 'Instagram Marketing', 'Facebook Ads', 'Food Photography'],
@@ -481,7 +481,7 @@ The key is to view HIPAA compliance not as a restriction, but as a framework for
       title: 'Founder & Healthcare Marketing Specialist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-01-22',
+    publishedDate: '2025-01-22',
     readTime: 12,
     category: 'Healthcare Marketing',
     tags: ['HIPAA Compliance', 'Dental Marketing', 'Healthcare Marketing', 'Patient Acquisition'],
@@ -733,7 +733,7 @@ The key is to remember that you're not just running a business - you're facilita
       title: 'Founder & Sports Marketing Strategist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-01-29',
+    publishedDate: '2025-01-29',
     readTime: 11,
     category: 'Sports Marketing',
     tags: ['Sports Marketing', 'Community Building', 'Tournament Promotion', 'Membership Growth'],
@@ -742,13 +742,13 @@ The key is to remember that you're not just running a business - you're facilita
   },
   {
     id: '5',
-    title: '2024 Digital Marketing Trends Every Business Owner Should Know',
-    slug: '2024-digital-marketing-trends-business-owners',
-    excerpt: 'Stay ahead of the competition with these essential digital marketing trends that are shaping how businesses connect with customers in 2024.',
+    title: '2025 Digital Marketing Trends Every Business Owner Should Know',
+    slug: '2025-digital-marketing-trends-business-owners',
+    excerpt: 'Stay ahead of the competition with these essential digital marketing trends that are shaping how businesses connect with customers in 2025.',
     content: `
-# 2024 Digital Marketing Trends Every Business Owner Should Know
+# 2025 Digital Marketing Trends Every Business Owner Should Know
 
-The digital marketing landscape continues to evolve rapidly, and staying current with trends is crucial for business success. Here are the key trends shaping 2024 and how to leverage them for your business.
+The digital marketing landscape continues to evolve rapidly, and staying current with trends is crucial for business success. Here are the key trends shaping 2025 and how to leverage them for your business.
 
 ## 1. AI-Powered Personalization
 
@@ -969,7 +969,7 @@ Brands are shifting focus from mega-influencers to micro-influencers for authent
 
 ## Conclusion
 
-The digital marketing landscape in 2024 offers unprecedented opportunities for businesses willing to adapt and innovate. Success requires balancing proven strategies with emerging trends while maintaining focus on customer value and authentic connections.
+The digital marketing landscape in 2025 offers unprecedented opportunities for businesses willing to adapt and innovate. Success requires balancing proven strategies with emerging trends while maintaining focus on customer value and authentic connections.
 
 Remember that not every trend will be relevant to your business - choose those that align with your audience, industry, and business goals. Start small, test thoroughly, and scale what works.
 
@@ -980,7 +980,7 @@ Remember that not every trend will be relevant to your business - choose those t
       title: 'Founder & Digital Marketing Strategist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-02-05',
+    publishedDate: '2025-02-05',
     readTime: 9,
     category: 'Digital Marketing Tips',
     tags: ['Digital Marketing', 'Marketing Trends', 'AI Marketing', 'Voice Search', 'Social Commerce'],
@@ -1261,7 +1261,7 @@ Focus on creating authentic connections with your local market, providing except
       title: 'Founder & Local SEO Specialist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-02-12',
+    publishedDate: '2025-02-12',
     readTime: 14,
     category: 'Digital Marketing Tips',
     tags: ['Local SEO', 'Google My Business', 'Local Citations', 'Review Management'],
@@ -1546,7 +1546,7 @@ Remember: the goal is not just to send emails, but to build lasting relationship
       title: 'Founder & Email Marketing Strategist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-02-19',
+    publishedDate: '2025-02-19',
     readTime: 13,
     category: 'Digital Marketing Tips',
     tags: ['Email Marketing', 'Marketing Automation', 'Lead Nurturing', 'Customer Retention'],
@@ -1848,7 +1848,7 @@ The key is to start small, learn from your data, and gradually expand your succe
       title: 'Founder & Google Ads Specialist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-02-26',
+    publishedDate: '2025-02-26',
     readTime: 15,
     category: 'Digital Marketing Tips',
     tags: ['Google Ads', 'PPC Marketing', 'Small Business Marketing', 'Digital Advertising'],

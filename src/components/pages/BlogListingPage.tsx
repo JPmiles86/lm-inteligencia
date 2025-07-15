@@ -75,10 +75,7 @@ export const BlogListingPage: React.FC = () => {
           <img
             src={post.featuredImage}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-300"
-            style={{ transform: 'scale(1)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             loading="lazy"
           />
         </div>
@@ -161,19 +158,19 @@ export const BlogListingPage: React.FC = () => {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">{blogPosts.length}</div>
+                <div className="text-3xl font-bold text-secondary mb-2">{blogPosts.length}</div>
                 <div className="text-gray-300">Expert Articles</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">4</div>
+                <div className="text-3xl font-bold text-secondary mb-2">4</div>
                 <div className="text-gray-300">Industries Covered</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">15+</div>
+                <div className="text-3xl font-bold text-secondary mb-2">15+</div>
                 <div className="text-gray-300">Years Experience</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">100+</div>
+                <div className="text-3xl font-bold text-secondary mb-2">100+</div>
                 <div className="text-gray-300">Success Stories</div>
               </div>
             </div>
@@ -314,7 +311,7 @@ export const BlogListingPage: React.FC = () => {
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -322,10 +319,10 @@ export const BlogListingPage: React.FC = () => {
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl font-bold text-white mb-6">
               Stay Updated with Marketing Insights
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-gray-200 mb-8">
               Get the latest marketing strategies, industry insights, and expert tips delivered directly to your inbox.
             </p>
             
@@ -335,78 +332,19 @@ export const BlogListingPage: React.FC = () => {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
-              <button className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity">
+              <button className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-medium transition-all transform hover:scale-105">
                 Subscribe
               </button>
             </div>
             
-            <p className="text-sm text-gray-500 mt-4">
+            <p className="text-sm text-gray-300 mt-4">
               No spam. Unsubscribe anytime. Read our{' '}
-              <a href="/privacy" className="text-primary hover:underline">privacy policy</a>.
+              <a href="/privacy" className="text-secondary hover:underline">privacy policy</a>.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="text-2xl font-bold mb-4">Inteligencia</div>
-              <p className="text-gray-400 mb-4">
-                Expert marketing insights for {industryName.toLowerCase()}.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4">Popular Categories</h4>
-              <ul className="space-y-2 text-gray-400">
-                {blogCategories.slice(1, 5).map((category) => (
-                  <li key={category}>
-                    <button
-                      onClick={() => setSelectedCategory(category)}
-                      className="hover:text-white transition-colors"
-                    >
-                      {category}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4">Services</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to={`${industryPath}/services`} className="hover:text-white transition-colors">Digital Marketing</Link></li>
-                <li><Link to={`${industryPath}/services`} className="hover:text-white transition-colors">SEO & Local Search</Link></li>
-                <li><Link to={`${industryPath}/services`} className="hover:text-white transition-colors">Social Media</Link></li>
-                <li><Link to={`${industryPath}/services`} className="hover:text-white transition-colors">Email Marketing</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-bold mb-4">Contact</h4>
-              <div className="space-y-2 text-gray-400">
-                <div>info@inteligencia.com</div>
-                <div>(555) 123-4567</div>
-                <div className="pt-4">
-                  <Link
-                    to={`${industryPath}/contact`}
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity inline-block"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Inteligencia. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

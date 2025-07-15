@@ -58,9 +58,12 @@ export const Navbar: React.FC<NavbarProps> = ({ config, onIndustrySwitch, curren
               className="flex items-center space-x-3 cursor-pointer"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
-              <div className="text-2xl font-bold">
-                <span style={{ color: config?.branding?.primaryColor || '#0f5bfb' }}>Inteligencia</span>
-              </div>
+              <img 
+                src="/LM_inteligencia/Inteligencia-logo-new.png" 
+                alt="Inteligencia Digital Marketing" 
+                className="h-10"
+                style={{ objectFit: 'contain' }}
+              />
               <div className="hidden sm:block text-sm text-gray-600">
                 {config?.name || 'Digital Marketing'}
               </div>
@@ -114,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({ config, onIndustrySwitch, curren
               <button
                 onClick={() => scrollToSection('contact')}
                 className="text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: config?.branding?.primaryColor || '#0f5bfb' }}
+                style={{ backgroundColor: config?.branding?.secondaryColor || '#f04a9b' }}
               >
                 Get Started
               </button>

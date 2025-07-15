@@ -6,8 +6,8 @@ import type { IndustryType } from '../types/Industry';
 export const developmentRoutes = {
   main: '?industry=inteligencia',
   hospitality: '?industry=hotels',
-  foodservice: '?industry=restaurants',
   healthcare: '?industry=healthcare',
+  tech: '?industry=tech',
   athletics: '?industry=sports',
 };
 
@@ -15,17 +15,21 @@ export const developmentRoutes = {
 export const subdomainMapping: Record<string, IndustryType> = {
   'inteligencia': 'main',
   'hotels': 'hospitality',
-  'restaurants': 'foodservice',
+  'restaurants': 'hospitality',
+  'hospitality': 'hospitality',
   'healthcare': 'healthcare',
+  'health': 'healthcare',
+  'dental': 'healthcare',
+  'tech': 'tech',
   'sports': 'athletics',
 };
 
 // Reverse mapping for generating URLs
 export const industryToSubdomain: Record<IndustryType, string> = {
   main: 'inteligencia',
-  hospitality: 'hotels',
-  foodservice: 'restaurants',
-  healthcare: 'healthcare',
+  hospitality: 'hospitality',
+  healthcare: 'health',
+  tech: 'tech',
   athletics: 'sports',
 };
 

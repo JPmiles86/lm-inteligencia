@@ -9,13 +9,16 @@ import type { HeroContent } from '../../types/Industry';
 interface HeroSectionProps {
   content: HeroContent;
   industryPath?: string;
+  useMinimalBackground?: boolean;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ 
   content, 
-  industryPath = ''
+  industryPath = '',
+  useMinimalBackground = true
 }) => {
   const [hasAnimated, setHasAnimated] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   
@@ -25,8 +28,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     }
   }, [isInView, hasAnimated]);
   
-  // Use minimal white background for cleaner design
-  const useMinimalBackground = true;
+  // Check for mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   return (
     <section className={`relative min-h-screen flex items-center justify-center overflow-hidden ${useMinimalBackground ? 'bg-white' : ''}`}>
@@ -34,20 +44,38 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       {!useMinimalBackground && (
         <div className="absolute inset-0 z-0">
           {content.backgroundType === 'video' ? (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-            >
-              <source src={content.backgroundSrc} type="video/mp4" />
-              <img 
-                src="/images/fallback-hero.jpg" 
-                alt="Background" 
-                className="w-full h-full object-cover"
-              />
-            </video>
+            <>
+              {/* Vimeo Video Background */}
+              {content.backgroundVideo && (
+                <div className="absolute inset-0 w-full h-full">
+                  <iframe
+                    src={`${isMobile && content.backgroundVideoMobile ? content.backgroundVideoMobile : content.backgroundVideo}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto`}
+                    className="absolute inset-0 w-full h-full"
+                    style={{ width: '100vw', height: '100vh', objectFit: 'cover' }}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen"
+                    title="Background video"
+                  />
+                </div>
+              )}
+              {/* Fallback for old video implementation */}
+              {!content.backgroundVideo && content.backgroundSrc && (
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="w-full h-full object-cover"
+                >
+                  <source src={content.backgroundSrc} type="video/mp4" />
+                  <img 
+                    src="/images/fallback-hero.jpg" 
+                    alt="Background" 
+                    className="w-full h-full object-cover"
+                  />
+                </video>
+              )}
+            </>
           ) : (
             <img
               src={content.backgroundSrc}
@@ -89,7 +117,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           >
             <Link 
               to={`${industryPath}/contact`}
-              className={`inline-block px-10 py-5 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md ${useMinimalBackground ? 'bg-[#0f5bfb] text-white hover:bg-[#0d52d9]' : 'bg-white text-gray-900 hover:bg-gray-100'}`}
+              className={`inline-block px-10 py-5 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md ${useMinimalBackground ? 'bg-secondary text-white hover:opacity-90' : 'bg-white text-gray-900 hover:bg-gray-100'}`}
             >
               {content.ctaText}
             </Link>

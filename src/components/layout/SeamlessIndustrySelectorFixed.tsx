@@ -17,23 +17,23 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & dental practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 
@@ -41,8 +41,8 @@ const selectedTagline = "intelligent marketing solutions that drive real results
 
 const industryHoverColors: Record<IndustryTypeWithoutMain, string> = {
   'hospitality': '#0f5bfb',
-  'foodservice': '#f12d8f',
   'healthcare': '#ffa424',
+  'tech': '#f12d8f',
   'athletics': '#760b85'
 };
 
@@ -66,9 +66,9 @@ export const SeamlessIndustrySelectorFixed: React.FC = () => {
     
     // Navigate without page refresh
     const pathMap: Record<IndustryTypeWithoutMain, string> = {
-      'hospitality': '/hotels',
-      'foodservice': '/restaurants',
-      'healthcare': '/dental',
+      'hospitality': '/hospitality',
+      'healthcare': '/health',
+      'tech': '/tech',
       'athletics': '/sports'
     };
     

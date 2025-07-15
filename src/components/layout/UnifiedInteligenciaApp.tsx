@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 // Removed unused ChevronDown import
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { IndustryType } from '../../types/Industry';
 import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
+import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
 
 // Removed unused type IndustryTypeWithoutMain
 
@@ -17,6 +18,7 @@ import { HeroSection } from '../sections/HeroSection';
 import { ServicesSection } from '../sections/ServicesSection';
 import { TestimonialsSection } from '../sections/TestimonialsSection';
 import { VideoCTASection } from '../sections/VideoCTASection';
+import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
 import { IndustryNavbar } from './IndustryNavbar';
 import { PageLoadingSpinner } from './LoadingSpinner';
 
@@ -38,23 +40,23 @@ interface Industry {
 const industries: Industry[] = [
   {
     industry: 'hospitality',
-    title: 'hotels',
-    label: 'hospitality & accommodations'
-  },
-  {
-    industry: 'foodservice',
-    title: 'food service',
-    label: 'restaurants & food businesses'
+    title: 'hospitality & lifestyle',
+    label: 'hotels • restaurants • travel & tourism'
   },
   {
     industry: 'healthcare', 
-    title: 'healthcare',
-    label: 'medical & healthcare practices'
+    title: 'health & wellness',
+    label: 'dentistry • health clinics • retreats • fitness'
+  },
+  {
+    industry: 'tech',
+    title: 'tech & AI',
+    label: 'SaaS • AI startups • martech • platforms'
   },
   {
     industry: 'athletics',
-    title: 'sports', 
-    label: 'athletic facilities & communities'
+    title: 'sport & media', 
+    label: 'pickleball • events • tournaments • media'
   }
 ];
 
@@ -64,10 +66,11 @@ const industries: Industry[] = [
 
 export const UnifiedInteligenciaApp: React.FC = () => {
   const location = useLocation();
-  // Removed unused navigate variable
+  const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const landingAreaRef = useRef<HTMLDivElement>(null);
+  const previousPathRef = useRef<string>(location.pathname);
 
   // Zustand store
   const {
@@ -92,43 +95,59 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const industryKey = pathSegments[0] || '';
   const subPage = pathSegments[1];
   
-  // Map URL paths to industries
-  const pathToIndustryMap: Record<string, IndustryType> = {
-    'hotels': 'hospitality',
-    'restaurants': 'foodservice',
-    'dental': 'healthcare',
-    'sports': 'athletics'
-  };
-  
-  const currentIndustry = industryKey ? pathToIndustryMap[industryKey] || null : null;
+  // Use centralized mapping
+  const currentIndustry = getIndustryFromPath(location.pathname);
   const isRootPage = location.pathname === '/';
   const isIndustryHomepage = pathSegments.length === 1 && currentIndustry !== null;
-  const isHomepage = isRootPage; // Only root page should have landing area
-  const isSubpage = pathSegments.length > 1 || isIndustryHomepage;
+  const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
+  const isSubpage = pathSegments.length > 1; // Only paths with multiple segments are subpages
+  
+  // Handle invalid industry paths
+  useEffect(() => {
+    if (industryKey && !currentIndustry && !isRootPage) {
+      // Invalid industry path - redirect to root
+      navigate('/');
+    }
+  }, [industryKey, currentIndustry, isRootPage, navigate]);
 
   // Debug logging removed
 
   useEffect(() => {
+    // Check if navigating from a subpage to industry homepage
+    const previousPath = previousPathRef.current;
+    const previousSegments = previousPath.split('/').filter(Boolean);
+    const isFromSubpage = previousSegments.length > 1 && isIndustryHomepage;
+    
     // Check initial URL on mount and sync with Zustand
     if (currentIndustry) {
       // Direct access to industry URL
       setSelectedIndustry(currentIndustry);
       setLandingAreaState(isHomepage ? 'decided' : 'hidden');
       if (isHomepage) {
-        setTimeout(() => setShowContent(true), 500);
+        setTimeout(() => {
+          setShowContent(true);
+          // Auto-scroll past landing area if coming from subpage
+          if (isFromSubpage && contentRef.current) {
+            setTimeout(() => {
+              contentRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }
+        }, 500);
       }
     } else if (location.pathname === '/') {
       // Root path - show undecided state
       resetToUndecided();
       setShowContent(false);
     }
+    
+    // Update previous path ref
+    previousPathRef.current = location.pathname;
 
     // Handle browser navigation
     const handlePopState = () => {
       const currentPath = window.location.pathname;
       const segments = currentPath.split('/').filter(Boolean);
-      const key = segments[0] || '';
-      const industry = key ? pathToIndustryMap[key] : undefined;
+      const industry = getIndustryFromPath(currentPath);
       
       if (currentPath === '/') {
         resetToUndecided();
@@ -353,12 +372,23 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                 {/* Hero Section */}
                 <HeroSection 
                   content={config.content.hero}
+                  useMinimalBackground={true}
                 />
+                
+                {/* Full Viewport Video Section - Only show if video URLs are configured */}
+                {config.content.hero.backgroundVideo && config.content.hero.backgroundVideoMobile && (
+                  <VideoBackgroundSection 
+                    desktopVideoUrl={config.content.hero.backgroundVideo}
+                    mobileVideoUrl={config.content.hero.backgroundVideoMobile}
+                  />
+                )}
                 
                 {/* Services Section */}
                 <div id="services">
                   <ServicesSection 
                     services={config.content.services}
+                    title={config.content.servicesTitle || 'Marketing That Moves The Metrics That Matter'}
+                    subtitle={config.content.servicesSubtitle || 'AI-Driven Strategy for Your Business'}
                     industryTheme={config.industry}
                   />
                 </div>
@@ -384,7 +414,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                 {/* Contact Section */}
                 <section id="contact" className="py-20 bg-gray-50">
                   <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold mb-8" style={{ color: '#1f1d32' }}>
+                    <h2 className="text-4xl font-bold mb-8 text-primary">
                       Ready to Transform Your {industries.find(i => i.industry === selectedIndustry)?.title} Marketing?
                     </h2>
                     <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -392,21 +422,14 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <a 
-                        href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry)}/contact`}
-                        className="inline-block px-8 py-4 text-white rounded-lg font-semibold transition-all hover:scale-105 transform"
-                        style={{ 
-                          backgroundColor: config?.branding?.primaryColor || '#0f5bfb',
-                        }}
+                        href={selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/contact` : '#'}
+                        className="inline-block px-8 py-4 text-white rounded-lg font-semibold transition-all hover:scale-105 transform bg-secondary hover:opacity-90"
                       >
                         Schedule Free Consultation
                       </a>
                       <a 
-                        href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry)}/services`}
-                        className="inline-block px-8 py-4 border-2 rounded-lg font-semibold transition-all hover:bg-gray-100"
-                        style={{ 
-                          borderColor: config?.branding?.primaryColor || '#0f5bfb',
-                          color: config?.branding?.primaryColor || '#0f5bfb',
-                        }}
+                        href={selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/services` : '#'}
+                        className="inline-block px-8 py-4 border-2 rounded-lg font-semibold transition-all hover:scale-105 transform border-secondary text-secondary hover:bg-secondary hover:text-white"
                       >
                         View Our Services
                       </a>

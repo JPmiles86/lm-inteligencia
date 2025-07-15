@@ -4,44 +4,47 @@
 
 /* Custom CSS variables for dynamic theming */
 :root {
-  /* New vibrant brand colors */
-  --primary-color: #0f5bfb;    /* Electric Blue */
-  --secondary-color: #f12d8f;  /* Neon Magenta */
-  --accent-color: #ffa424;     /* Vibrant Orange */
+  /* New brand colors as per client requirements */
+  --primary-color: #371657;    /* Deep Purple - Header Font/Copy */
+  --secondary-color: #f04a9b;  /* Bright Pink - Buttons */
+  --accent-color: #176ab2;     /* Blue - Big Numbers */
+  --accent-teal: #08deec;      /* Teal - Accent */
+  --accent-purple: #9123d1;    /* Purple - Accent */
+  --accent-orange: #fd820b;    /* Orange - Accent */
   --dark-color: #002643;       /* Deep Navy */
   --light-gray: #f3f4f6;       /* Light Gray */
   
   /* Base typography */
-  --font-sans: 'Montserrat', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Poppins', system-ui, -apple-system, sans-serif;
   
   /* Transition timing */
   --transition-base: 300ms;
 }
 
-/* Industry-specific color overrides - using new vibrant colors */
+/* Industry-specific color overrides - using new brand colors */
 .industry-hospitality {
-  --primary-color: #0f5bfb;
-  --secondary-color: #f12d8f;
-  --accent-color: #ffa424;
+  --primary-color: #371657;
+  --secondary-color: #f04a9b;
+  --accent-color: #176ab2;
 }
 
 .industry-foodservice {
-  --primary-color: #0f5bfb;
-  --secondary-color: #f12d8f;
-  --accent-color: #ffa424;
+  --primary-color: #371657;
+  --secondary-color: #f04a9b;
+  --accent-color: #176ab2;
 }
 
 .industry-healthcare {
-  --primary-color: #0f5bfb;
-  --secondary-color: #f12d8f;
-  --accent-color: #ffa424;
+  --primary-color: #371657;
+  --secondary-color: #f04a9b;
+  --accent-color: #176ab2;
 }
 
 .industry-athletics {
-  --primary-color: #0f5bfb;
-  --secondary-color: #f12d8f;
-  --accent-color: #ffa424;
+  --primary-color: #371657;
+  --secondary-color: #f04a9b;
+  --accent-color: #176ab2;
 }
 
 /* Base styles */
@@ -57,23 +60,82 @@ body {
   padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700; /* Bold for H1 */
+  line-height: 1.2;
+  margin: 0;
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 600; /* Semi-bold for subheadings */
   line-height: 1.2;
   margin: 0;
 }
 
 /* Custom component styles */
 .btn-primary {
-  @apply bg-primary text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:opacity-90 hover:scale-105;
-  background-color: var(--primary-color);
+  @apply text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:opacity-90 hover:scale-105;
+  background-color: var(--secondary-color);
 }
 
 .btn-secondary {
-  @apply border-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-opacity-10;
-  border-color: var(--primary-color);
+  @apply border-2 px-6 py-3 rounded-lg font-medium transition-all duration-300;
+  border-color: var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* Gradient buttons */
+.btn-gradient {
+  @apply text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl;
+  background: linear-gradient(to right, var(--secondary-color), var(--accent-purple));
+}
+
+/* Text colors */
+.text-primary {
   color: var(--primary-color);
+}
+
+.text-secondary {
+  color: var(--secondary-color);
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+/* Background colors */
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+
+.bg-accent {
+  background-color: var(--accent-color);
+}
+
+/* Background gradients */
+.bg-gradient-primary {
+  background: linear-gradient(to bottom right, var(--primary-color), var(--accent-purple), #111827);
+}
+
+/* Border colors */
+.border-secondary {
+  border-color: var(--secondary-color);
+}
+
+/* Ring colors for focus states */
+.ring-secondary {
+  --tw-ring-color: var(--secondary-color);
 }
 
 .text-primary {

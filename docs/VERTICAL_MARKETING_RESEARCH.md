@@ -155,7 +155,7 @@
 - **Youth Engagement**: Growing the next generation of players
 
 ### Metrics That Matter
-- **Sponsorship Revenue Growth**: 56% YoY growth in 2024 ($25M market)
+- **Sponsorship Revenue Growth**: 56% YoY growth in 2025 ($25M market)
 - **Event Attendance Numbers**: Players and spectators combined
 - **Participant Growth Rate**: 51% YoY, 223% over 3 years
 - **Social Media Engagement Rate**: Community interaction levels

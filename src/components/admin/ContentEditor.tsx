@@ -333,7 +333,7 @@ export const ContentEditor: React.FC<ContentEditorProps> = ({
     { id: 'contact', label: 'Contact', component: renderContactSection },
   ];
 
-  const industries: IndustryType[] = ['hospitality', 'foodservice', 'healthcare', 'athletics'];
+  const industries: IndustryType[] = ['hospitality', 'healthcare', 'tech', 'athletics'];
 
   if (loading) {
     return (

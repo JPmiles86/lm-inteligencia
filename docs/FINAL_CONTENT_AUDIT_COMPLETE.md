@@ -94,7 +94,7 @@ Footer content is now managed centrally:
 - Company name: "Inteligencia"
 - Description: "Specialized marketing solutions across multiple industries"
 - Industries list: Standard 4 industries
-- Copyright: "© 2024 Inteligencia. All rights reserved."
+- Copyright: "© 2025 Inteligencia. All rights reserved."
 
 ## Content Management for Laurie
 

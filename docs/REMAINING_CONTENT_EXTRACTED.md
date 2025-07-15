@@ -169,7 +169,7 @@ Added `formLabels` property to ContactContent interface in `/src/types/Industry.
 ### Remaining Hardcoded Content
 After comprehensive search, the following hardcoded content remains **by design**:
 - **Fallback data in components**: Used only when configuration is not available
-- **Footer copyright**: Standard across all sites (`2024 Inteligencia`)
+- **Footer copyright**: Standard across all sites (`2025 Inteligencia`)
 - **Navigation labels**: Consistently hardcoded for stability
 - **Case study fallback data**: Provides content when config unavailable
 

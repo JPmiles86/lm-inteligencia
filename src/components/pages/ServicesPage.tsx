@@ -19,8 +19,86 @@ export const ServicesPage: React.FC = () => {
     subtitle: 'Comprehensive digital marketing solutions designed specifically for your industry'
   };
   
-  // Define the 5 core services to display
-  const mainServices = [
+  // Define the 7 core services to display for hotels
+  const mainServices = industryKey === 'hotels' ? [
+    {
+      title: 'Hotels Ad Management',
+      icon: '🏨',
+      description: 'Drive direct bookings with targeted campaigns that reach travelers at the perfect moment.',
+      features: [
+        'Google Hotel Ads Setup',
+        'Direct Booking Optimization',
+        'Rate Parity Management',
+        'Revenue Performance Tracking'
+      ]
+    },
+    {
+      title: 'Meta (FB/IG) Advertising',
+      icon: '📱',
+      description: 'Reach leisure travelers on social media with stunning visuals and compelling offers.',
+      features: [
+        'Facebook Ads Management',
+        'Instagram Story Campaigns',
+        'Lookalike Audience Building',
+        'Dynamic Hotel Ads'
+      ]
+    },
+    {
+      title: 'Email Marketing & Funnels',
+      icon: '📧',
+      description: 'Nurture guest relationships and drive repeat bookings with personalized campaigns.',
+      features: [
+        'Guest Welcome Series',
+        'Pre-Arrival Campaigns',
+        'Loyalty Program Emails',
+        'Seasonal Promotions'
+      ]
+    },
+    {
+      title: 'Marketing Strategy Consulting',
+      icon: '📊',
+      description: 'Expert guidance on reducing OTA dependency and increasing direct revenue.',
+      features: [
+        'Revenue Strategy Planning',
+        'Channel Mix Optimization',
+        'Competitive Analysis',
+        'Direct Booking Roadmap'
+      ]
+    },
+    {
+      title: 'Event/Launch Campaigns',
+      icon: '🚀',
+      description: 'Grand openings, renovations, or special events - we ensure maximum visibility.',
+      features: [
+        'Pre-Launch Buzz Building',
+        'Media & Influencer Outreach',
+        'Opening Week Campaigns',
+        'Post-Launch Momentum'
+      ]
+    },
+    {
+      title: 'OTA Optimization & Demand Generation',
+      icon: '🌐',
+      description: 'Maximize visibility on booking platforms while building direct booking channels.',
+      features: [
+        'OTA Listing Optimization',
+        'Review Management',
+        'Ranking Improvement',
+        'Channel Performance Analysis'
+      ]
+    },
+    {
+      title: 'Restaurant Marketing',
+      icon: '🍽️',
+      description: 'Fill your hotel restaurant with both guests and locals through targeted campaigns.',
+      features: [
+        'Local SEO Optimization',
+        'Social Media Presence',
+        'Event & Special Menus',
+        'Guest Dining Campaigns'
+      ]
+    }
+  ] : [
     {
       title: 'Google Ads Management',
       icon: '🔍',
@@ -75,13 +153,35 @@ export const ServicesPage: React.FC = () => {
         'Launch Event Marketing',
         'Post-Launch Optimization'
       ]
+    },
+    {
+      title: 'SEO & Local Search Optimization',
+      icon: '🌐',
+      description: 'Maximize your online visibility and attract more local customers through search optimization.',
+      features: [
+        'Local SEO Strategy',
+        'Google My Business Optimization',
+        'Content Optimization',
+        'Review Management'
+      ]
+    },
+    {
+      title: 'Content Marketing & Social Media',
+      icon: '📝',
+      description: 'Engage your audience with compelling content and build a strong social media presence.',
+      features: [
+        'Content Strategy Development',
+        'Social Media Management',
+        'Blog & Article Writing',
+        'Community Engagement'
+      ]
     }
   ];
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-gray-900 text-white overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -121,7 +221,7 @@ export const ServicesPage: React.FC = () => {
 
           {/* Core Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {mainServices.map((service, index) => (
+            {mainServices && mainServices.map((service, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -130,7 +230,7 @@ export const ServicesPage: React.FC = () => {
                 viewport={{ once: true }}
                 className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-8 hover:shadow-xl transition-shadow border border-gray-100"
               >
-                <div className="text-4xl mb-6">{service.icon}</div>
+                <div className="text-4xl mb-6 text-center">{service.icon}</div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{service.title}</h3>
                 <p className="text-gray-600 mb-6">{service.description}</p>
                 
@@ -150,50 +250,9 @@ export const ServicesPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Optional Add-Ons Section */}
-      {config.content.pricing.addOns && (
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">{config.content.pricing.addOns.title}</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Enhance your marketing package with these additional services designed to accelerate your growth.
-              </p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {config.content.pricing.addOns.services.map((addon: { name: string; price: string }, index: number) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow text-center"
-                >
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{addon.name}</h3>
-                  <div className="text-2xl font-bold text-primary mb-4">{addon.price}</div>
-                  <a
-                    href={`/${industryKey}/contact`}
-                    className="text-primary hover:text-primary/80 font-medium text-sm transition-colors"
-                  >
-                    Learn More →
-                  </a>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-900 via-purple-900 to-gray-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -208,18 +267,12 @@ export const ServicesPage: React.FC = () => {
               Let's discuss how our proven strategies can help grow your business. 
               Schedule a free consultation with our {industryName.toLowerCase()} marketing experts today.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <a
                 href={`/${industryKey}/contact`}
                 className="bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block"
               >
                 Get Your Free Consultation
-              </a>
-              <a
-                href={`/${industryKey}/pricing`}
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block"
-              >
-                View Pricing Plans
               </a>
             </div>
           </motion.div>

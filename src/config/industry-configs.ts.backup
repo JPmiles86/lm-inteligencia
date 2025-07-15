@@ -20,9 +20,9 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
     name: 'Hotels & Hospitality Marketing',
     subdomain: 'hotels',
     branding: {
-      primaryColor: '#002643',
-      secondaryColor: '#0093a0',
-      accentColor: '#FFD700',
+      primaryColor: '#371657',
+      secondaryColor: '#f04a9b',
+      accentColor: '#176ab2',
     },
     content: {
       hero: {
@@ -41,25 +41,39 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
       // HOMEPAGE - Brief overview content only (hooks to drive to Services page)
       services: [
         {
-          title: 'Google Hotel Ads',
-          description: 'Capture guests at the exact moment they\'re ready to book with AI-optimized campaigns.',
+          title: 'Google Ads Management',
+          description: 'Drive direct bookings with targeted campaigns that reach travelers at the perfect moment.',
           keyBenefit: 'Reduce OTA dependency by 35%',
           icon: 'hotel',
-          learnMoreLink: '/services#google-hotel-ads',
+          learnMoreLink: '/hotels/services#google-ads',
         },
         {
-          title: 'Meta Advertising for Hotels',
-          description: 'Build awareness and drive bookings with visual storytelling that showcases your property.',
-          keyBenefit: '50% lower cost per booking vs OTAs',
+          title: 'Meta (FB/IG) Advertising',
+          description: 'Showcase your property with visual storytelling that inspires bookings and builds brand loyalty.',
+          keyBenefit: '50% lower cost per booking',
           icon: 'camera',
-          learnMoreLink: '/services#meta-advertising',
+          learnMoreLink: '/hotels/services#meta-advertising',
         },
         {
-          title: 'Email Marketing & CRM',
-          description: 'Turn one-time guests into loyal repeat customers with automated guest journey campaigns.',
-          keyBenefit: '25% increase in repeat bookings',
+          title: 'Email Marketing & Funnels',
+          description: 'Convert inquiries into bookings and guests into repeat customers with automated campaigns.',
+          keyBenefit: '40% higher guest lifetime value',
           icon: 'mail',
-          learnMoreLink: '/services#email-marketing',
+          learnMoreLink: '/hotels/services#email-marketing',
+        },
+        {
+          title: 'Marketing Strategy Consulting',
+          description: 'Get expert guidance to optimize your marketing mix and maximize revenue per available room.',
+          keyBenefit: 'Increase RevPAR by 25%',
+          icon: 'chart-line',
+          learnMoreLink: '/hotels/services#strategy-consulting',
+        },
+        {
+          title: 'Event/Launch Campaigns',
+          description: 'Fill your property for special events, seasonal promotions, and grand openings with targeted campaigns.',
+          keyBenefit: '85% occupancy for events',
+          icon: 'calendar',
+          learnMoreLink: '/hotels/services#event-campaigns',
         },
       ],
       // NOTE: About page content moved to universal-content.ts for consistency across all industries
@@ -403,8 +417,41 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             position: 'General Manager',
             company: 'Oceanview Resort Miami'
           },
-          image: 'https://picsum.photos/800/600?random=1',
+          image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop',
           tags: ['Google Hotel Ads', 'Direct Bookings', 'Email Marketing', 'OTA Optimization']
+        },
+        {
+          id: 'paradise-inn-boutique',
+          title: 'Paradise Inn Boutique Hotel Achieves Record Occupancy',
+          industry: 'Hotels & Hospitality',
+          client: 'Paradise Inn Boutique Hotel',
+          challenge: 'Small boutique hotel struggling to compete with larger chains. Limited marketing budget and low brand awareness in a saturated market.',
+          solution: 'Focused on hyper-local SEO, Instagram influencer partnerships, and strategic Google Ads campaigns targeting high-value guests. Created unique packages for special occasions.',
+          results: [
+            {
+              metric: 'Occupancy Rate',
+              value: '+35%',
+              description: 'Year-over-year occupancy improvement'
+            },
+            {
+              metric: 'Average Daily Rate',
+              value: '+50%',
+              description: 'Increased ADR through premium positioning'
+            },
+            {
+              metric: 'Social Media Growth',
+              value: '+1200%',
+              description: 'Instagram follower growth in 8 months'
+            }
+          ],
+          testimonial: {
+            quote: "Inteligencia helped us compete with hotels 10x our size. Our boutique charm finally reached the right audience, and our revenue has never been better.",
+            author: 'Jennifer Park',
+            position: 'Owner',
+            company: 'Paradise Inn Boutique Hotel'
+          },
+          image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop',
+          tags: ['Boutique Hotels', 'Local SEO', 'Instagram Marketing', 'Revenue Management']
         }
       ],
     },
@@ -421,9 +468,9 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
     name: 'Restaurant & Food Service Marketing',
     subdomain: 'restaurants',
     branding: {
-      primaryColor: '#002643',
-      secondaryColor: '#0093a0',
-      accentColor: '#FFD700',
+      primaryColor: '#371657',
+      secondaryColor: '#f04a9b',
+      accentColor: '#176ab2',
     },
     content: {
       hero: {
@@ -878,8 +925,41 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             position: 'Owner & Head Chef',
             company: 'Bella Vista Italian Bistro'
           },
-          image: 'https://picsum.photos/800/600?random=2',
+          image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop',
           tags: ['Local SEO', 'Social Media', 'Food Photography', 'Delivery Optimization']
+        },
+        {
+          id: 'taco-heaven-chain',
+          title: 'Taco Heaven Expands from 2 to 12 Locations',
+          industry: 'Restaurants & Food Service',
+          client: 'Taco Heaven Fast Casual Chain',
+          challenge: 'Family-owned taco shop wanted to expand but lacked brand consistency and marketing systems. Each location operated independently with different menus and pricing.',
+          solution: 'Developed unified brand identity, implemented centralized social media management, created location-based Google Ads campaigns, and launched a mobile app with loyalty program.',
+          results: [
+            {
+              metric: 'New Locations',
+              value: '10',
+              description: 'Successful franchise expansions in 18 months'
+            },
+            {
+              metric: 'Revenue Per Location',
+              value: '+85%',
+              description: 'Average revenue increase across all locations'
+            },
+            {
+              metric: 'App Downloads',
+              value: '45,000+',
+              description: 'Active users on loyalty app'
+            }
+          ],
+          testimonial: {
+            quote: "Inteligencia didn't just help us market better - they helped us build a scalable brand. We went from a local favorite to a regional powerhouse.",
+            author: 'Carlos Martinez',
+            position: 'Founder & CEO',
+            company: 'Taco Heaven'
+          },
+          image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop',
+          tags: ['Franchise Marketing', 'Brand Development', 'Mobile Apps', 'Multi-Location']
         }
       ],
     },
@@ -896,9 +976,9 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
     name: 'Dental & Healthcare Marketing',
     subdomain: 'dental',
     branding: {
-      primaryColor: '#002643',
-      secondaryColor: '#0093a0',
-      accentColor: '#FFD700',
+      primaryColor: '#371657',
+      secondaryColor: '#f04a9b',
+      accentColor: '#176ab2',
     },
     content: {
       hero: {
@@ -1065,6 +1145,75 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
         ],
       },
+      // CASE STUDIES - Success stories for this industry
+      caseStudies: [
+        {
+          id: 'smile-dental-practice',
+          title: 'Smile Dental Grows from 1 to 5 Locations',
+          industry: 'Healthcare',
+          client: 'Smile Dental Practice',
+          challenge: 'Single-location dental practice wanted to expand but struggled with patient acquisition. Limited online presence and heavy reliance on referrals.',
+          solution: 'Implemented HIPAA-compliant digital marketing including local SEO for each location, Google Ads for high-value procedures, and automated patient communication system.',
+          results: [
+            {
+              metric: 'New Patients',
+              value: '+250%',
+              description: 'Monthly new patient acquisitions'
+            },
+            {
+              metric: 'Location Growth',
+              value: '5 offices',
+              description: 'Expanded from 1 to 5 locations in 2 years'
+            },
+            {
+              metric: 'Case Value',
+              value: '+40%',
+              description: 'Average treatment value increase'
+            }
+          ],
+          testimonial: {
+            quote: "Inteligencia understood HIPAA compliance and helped us grow responsibly. Their patient acquisition strategies transformed our practice into a thriving multi-location business.",
+            author: 'Dr. Michael Chen',
+            position: 'Founding Dentist',
+            company: 'Smile Dental Practice'
+          },
+          image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&h=600&fit=crop',
+          tags: ['Dental Marketing', 'HIPAA Compliant', 'Multi-Location', 'Patient Acquisition']
+        },
+        {
+          id: 'wellness-medical-center',
+          title: 'Wellness Medical Center Doubles Patient Base',
+          industry: 'Healthcare',
+          client: 'Wellness Medical Center',
+          challenge: 'Integrative medicine practice faced skepticism and low awareness. Needed to educate market while attracting patients seeking alternative healthcare options.',
+          solution: 'Created educational content marketing strategy, developed targeted Facebook and Google campaigns, implemented online booking system, and built trust through patient testimonial videos.',
+          results: [
+            {
+              metric: 'Patient Base',
+              value: '+120%',
+              description: 'Total active patient growth'
+            },
+            {
+              metric: 'Online Bookings',
+              value: '85%',
+              description: 'Appointments booked online'
+            },
+            {
+              metric: 'Website Traffic',
+              value: '+500%',
+              description: 'Organic traffic increase'
+            }
+          ],
+          testimonial: {
+            quote: "They helped us bridge the gap between traditional and integrative medicine marketing. Our practice is now fully booked with patients who truly understand our approach.",
+            author: 'Dr. Sarah Williams',
+            position: 'Medical Director',
+            company: 'Wellness Medical Center'
+          },
+          image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop',
+          tags: ['Medical Marketing', 'Content Strategy', 'Online Booking', 'Integrative Medicine']
+        }
+      ],
     },
     metadata: {
       title: 'Healthcare Marketing Services - Inteligencia',
@@ -1079,9 +1228,9 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
     name: 'Sports & Recreation Marketing',
     subdomain: 'sports',
     branding: {
-      primaryColor: '#002643',
-      secondaryColor: '#0093a0',
-      accentColor: '#FFD700',
+      primaryColor: '#371657',
+      secondaryColor: '#f04a9b',
+      accentColor: '#176ab2',
     },
     content: {
       hero: {
@@ -1248,6 +1397,75 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
         ],
       },
+      // CASE STUDIES - Success stories for this industry
+      caseStudies: [
+        {
+          id: 'ace-pickleball-center',
+          title: 'Ace Pickleball Center Becomes #1 in Region',
+          industry: 'Sports & Recreation',
+          client: 'Ace Pickleball Center',
+          challenge: 'New pickleball facility in competitive market with 3 established competitors. Needed to quickly build membership base and establish tournament presence.',
+          solution: 'Launched community-focused social media campaigns, created beginner-friendly programs marketed through Facebook groups, implemented tournament marketing system, and built partnerships with local businesses.',
+          results: [
+            {
+              metric: 'Memberships',
+              value: '1,200+',
+              description: 'Active members in first year'
+            },
+            {
+              metric: 'Tournament Size',
+              value: '300%',
+              description: 'Growth in tournament participation'
+            },
+            {
+              metric: 'Court Utilization',
+              value: '92%',
+              description: 'Peak hour court occupancy rate'
+            }
+          ],
+          testimonial: {
+            quote: "Inteligencia helped us go from unknown to the premier pickleball destination in our region. Their community-building approach was exactly what we needed.",
+            author: 'Tom Richardson',
+            position: 'Founder & Director',
+            company: 'Ace Pickleball Center'
+          },
+          image: 'https://images.unsplash.com/photo-1626410730620-90f9e4413fc9?w=800&h=600&fit=crop',
+          tags: ['Pickleball Marketing', 'Community Building', 'Tournament Promotion', 'Membership Growth']
+        },
+        {
+          id: 'fitness-first-gym',
+          title: 'Fitness First Gym Triples Membership Revenue',
+          industry: 'Sports & Recreation',
+          client: 'Fitness First Gym',
+          challenge: 'Traditional gym losing members to boutique fitness studios and home workout apps. Aging demographic and outdated marketing approach.',
+          solution: 'Repositioned as community wellness hub, launched targeted campaigns for different age groups, created virtual and hybrid membership options, implemented retention-focused email automation.',
+          results: [
+            {
+              metric: 'Revenue',
+              value: '+200%',
+              description: 'Total membership revenue increase'
+            },
+            {
+              metric: 'Retention Rate',
+              value: '85%',
+              description: 'Member retention after 12 months'
+            },
+            {
+              metric: 'New Programs',
+              value: '15',
+              description: 'Specialty classes launched'
+            }
+          ],
+          testimonial: {
+            quote: "They helped us transform from just another gym to a thriving fitness community. Our members now see us as essential to their wellness journey.",
+            author: 'Lisa Martinez',
+            position: 'General Manager',
+            company: 'Fitness First Gym'
+          },
+          image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop',
+          tags: ['Gym Marketing', 'Member Retention', 'Digital Transformation', 'Wellness Programs']
+        }
+      ],
     },
     metadata: {
       title: 'Sports Marketing Services - Inteligencia',
@@ -1262,9 +1480,9 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
     name: 'Inteligencia - Multi-Industry Marketing',
     subdomain: 'inteligencia',
     branding: {
-      primaryColor: '#002643',
-      secondaryColor: '#0093a0',
-      accentColor: '#FFD700',
+      primaryColor: '#371657',
+      secondaryColor: '#f04a9b',
+      accentColor: '#176ab2',
     },
     content: {
       hero: {

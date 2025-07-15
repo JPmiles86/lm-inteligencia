@@ -10,9 +10,11 @@ import type { IndustryType } from '../../types/Industry';
 const industryPathMap: Record<string, IndustryType> = {
   hospitality: 'hospitality',
   hotels: 'hospitality',
-  foodservice: 'foodservice',
-  restaurants: 'foodservice',
+  restaurants: 'hospitality',
+  health: 'healthcare',
   healthcare: 'healthcare',
+  dental: 'healthcare',
+  tech: 'tech',
   athletics: 'athletics',
   sports: 'athletics'
 };
@@ -37,7 +39,7 @@ export const SharedIndustryLayout: React.FC = () => {
     <IndustryContext.Provider value={contextValue}>
       <div className="min-h-screen bg-white">
         <IndustryNavbar />
-        <main className="pt-20">
+        <main>
           <Outlet />
         </main>
         <Footer selectedIndustry={industry} />

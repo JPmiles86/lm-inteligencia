@@ -5,9 +5,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { IndustryType, IndustryConfig } from '../../types/Industry';
-import { IndustryNames, IndustryMapping } from '../../types/Industry';
+import { IndustryNames } from '../../types/Industry';
 import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
+import { useNavigationStore } from '../../store/navigationStore';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility
@@ -43,7 +45,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const industryKey = contextIndustryKey || params.industry || pathSegments[0] || 'hotels'; // Default to hotels if undefined
-  const isSeamlessPage = pathSegments.length === 1 && industryKey in IndustryMapping;
+  const isSeamlessPage = pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null;
 
   useEffect(() => {
     const handleScroll = (): void => {
@@ -113,14 +115,19 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
-                to={`/${industryKey}`}
+                to={industry === 'main' || !industry ? '/' : `/${industryKey}`}
                 className="group"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="text-2xl font-bold text-center"
+                  className="flex items-center"
                 >
-                  <span style={{ color: config?.branding?.primaryColor || '#0f5bfb' }}>Inteligencia</span>
+                  <img 
+                    src="/LM_inteligencia/Inteligencia-logo-new.png" 
+                    alt="Inteligencia Digital Marketing" 
+                    className="h-10"
+                    style={{ objectFit: 'contain' }}
+                  />
                 </motion.div>
               </Link>
               <div className="relative industry-dropdown-container">
@@ -137,18 +144,23 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 {/* Industry Dropdown */}
                 {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
-                    {Object.entries(IndustryMapping).map(([key, ind]) => {
-                      if (key === 'inteligencia') return null;
+                    {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
+                      if (ind === 'main' || ind === industry || !urlPath) return null;
                       // Preserve current sub-page when switching industries
                       const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
                       return (
                         <Link
                           key={ind}
-                          to={`/${key}${currentSubPage}`}
-                          onClick={() => setIsIndustryDropdownOpen(false)}
+                          to={`/${urlPath}${currentSubPage}`}
+                          onClick={() => {
+                            setIsIndustryDropdownOpen(false);
+                            // Update the navigation store when switching industries
+                            const store = useNavigationStore.getState();
+                            store.setSelectedIndustry(ind as IndustryType);
+                          }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
-                          {IndustryNames[ind]}
+                          {IndustryNames[ind as IndustryType]}
                         </Link>
                       );
                     })}
@@ -210,8 +222,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
 
               <button
                 onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
-                className="text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: config?.branding?.primaryColor || '#0f5bfb' }}
+                className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
               </button>
@@ -298,8 +309,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             
             <button
               onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
-              className="block w-full text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity text-center"
-              style={{ backgroundColor: config?.branding?.primaryColor || '#0f5bfb' }}
+              className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
             </button>
@@ -334,7 +344,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const industryKey = params.industry || pathSegments[0] || 'hotels'; // Default to hotels if undefined
-  const isSeamlessPage = pathSegments.length === 1 && industryKey in IndustryMapping;
+  const isSeamlessPage = pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null;
 
   useEffect(() => {
     const handleScroll = (): void => {
@@ -404,14 +414,19 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
-                to={`/${industryKey}`}
+                to={industry === 'main' || !industry ? '/' : `/${industryKey}`}
                 className="group"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="text-2xl font-bold text-center"
+                  className="flex items-center"
                 >
-                  <span style={{ color: config?.branding?.primaryColor || '#0f5bfb' }}>Inteligencia</span>
+                  <img 
+                    src="/LM_inteligencia/Inteligencia-logo-new.png" 
+                    alt="Inteligencia Digital Marketing" 
+                    className="h-10"
+                    style={{ objectFit: 'contain' }}
+                  />
                 </motion.div>
               </Link>
               <div className="relative industry-dropdown-container">
@@ -428,18 +443,23 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 {/* Industry Dropdown */}
                 {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
-                    {Object.entries(IndustryMapping).map(([key, ind]) => {
-                      if (key === 'inteligencia') return null;
+                    {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
+                      if (ind === 'main' || ind === industry || !urlPath) return null;
                       // Preserve current sub-page when switching industries
                       const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
                       return (
                         <Link
                           key={ind}
-                          to={`/${key}${currentSubPage}`}
-                          onClick={() => setIsIndustryDropdownOpen(false)}
+                          to={`/${urlPath}${currentSubPage}`}
+                          onClick={() => {
+                            setIsIndustryDropdownOpen(false);
+                            // Update the navigation store when switching industries
+                            const store = useNavigationStore.getState();
+                            store.setSelectedIndustry(ind as IndustryType);
+                          }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
-                          {IndustryNames[ind]}
+                          {IndustryNames[ind as IndustryType]}
                         </Link>
                       );
                     })}
@@ -501,8 +521,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
 
               <button
                 onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
-                className="text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: config?.branding?.primaryColor || '#0f5bfb' }}
+                className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
               </button>
@@ -589,8 +608,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             
             <button
               onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
-              className="block w-full text-white py-3 rounded-lg font-medium hover:opacity-90 transition-opacity text-center"
-              style={{ backgroundColor: config?.branding?.primaryColor || '#0f5bfb' }}
+              className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
             </button>

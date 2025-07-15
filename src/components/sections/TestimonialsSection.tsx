@@ -40,7 +40,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               We're currently working with amazing clients and will be featuring their success stories here soon. 
               Contact us to discuss how we can help you achieve similar results.
             </p>
-            <button className="px-10 py-4 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02]" style={{ backgroundColor: '#0f5bfb' }}>
+            <button className="px-10 py-4 text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-[1.02] bg-secondary hover:opacity-90">
               Be Our Next Success Story
             </button>
           </div>
@@ -104,8 +104,24 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                   {testimonials[activeTestimonial]?.position}
                 </div>
                 <div className="font-medium" style={{ color: '#0f5bfb' }}>
-                  {testimonials[activeTestimonial]?.company}
+                  {testimonials[activeTestimonial]?.companyUrl ? (
+                    <a 
+                      href={testimonials[activeTestimonial].companyUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover:underline"
+                    >
+                      {testimonials[activeTestimonial]?.company}
+                    </a>
+                  ) : (
+                    testimonials[activeTestimonial]?.company
+                  )}
                 </div>
+                {testimonials[activeTestimonial]?.location && (
+                  <div className="text-sm text-gray-500 mt-1">
+                    {testimonials[activeTestimonial].location}
+                  </div>
+                )}
                 
                 {/* Rating Stars */}
                 {testimonials[activeTestimonial]?.rating && (
@@ -155,11 +171,11 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
               <button
                 key={index}
                 onClick={() => setActiveTestimonial(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === activeTestimonial
-                    ? 'w-8' : ''
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === activeTestimonial 
+                    ? 'w-8 bg-secondary' 
+                    : 'w-2 bg-gray-300'
                 }`}
-                style={{ backgroundColor: index === activeTestimonial ? '#0f5bfb' : '#e5e7eb' }}
               />
             ))}
           </div>
@@ -176,8 +192,7 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
           >
             <Link
               to={`${industryPath}/case-studies`}
-              className="inline-flex items-center text-lg font-medium hover:opacity-80 transition-opacity duration-300"
-              style={{ color: '#0f5bfb' }}
+              className="inline-flex items-center text-lg font-medium hover:opacity-80 transition-opacity duration-300 text-secondary"
             >
               {viewAllCta}
             </Link>
@@ -218,7 +233,21 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                         {testimonial.author}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {testimonial.position}, {testimonial.company}
+                        {testimonial.position}, 
+                        {testimonial.companyUrl ? (
+                          <a 
+                            href={testimonial.companyUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: 'inherit' }}
+                          >
+                            {testimonial.company}
+                          </a>
+                        ) : (
+                          testimonial.company
+                        )}
+                        {testimonial.location && `, ${testimonial.location}`}
                       </div>
                     </div>
                   </div>

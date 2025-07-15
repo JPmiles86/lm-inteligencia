@@ -57,9 +57,9 @@ export const TransitionManager: React.FC<TransitionManagerProps> = ({
 
   const getIndustryPath = (industry: IndustryType): string => {
     const pathMap: Record<IndustryTypeWithoutMain, string> = {
-      'hospitality': '/hotels',
-      'foodservice': '/restaurants',
-      'healthcare': '/dental',
+      'hospitality': '/hospitality',
+      'healthcare': '/health',
+      'tech': '/tech',
       'athletics': '/sports'
     };
     

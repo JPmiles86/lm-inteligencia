@@ -113,7 +113,7 @@ footer: {
     'Sports & Recreation'
   ],
   contactTitle: 'Contact',
-  copyright: '© 2024 Inteligencia. All rights reserved.'
+  copyright: '© 2025 Inteligencia. All rights reserved.'
 }
 ```
 
@@ -304,7 +304,7 @@ export const blogPosts: BlogPost[] = [
       title: 'Marketing Expert',
       image: '/images/team/laurie-meiring.jpg'
     },
-    publishedDate: '2024-01-15',
+    publishedDate: '2025-01-15',
     readTime: 5,
     category: 'Marketing Tips',
     tags: ['SEO', 'Digital Marketing'],
