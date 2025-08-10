@@ -1,0 +1,321 @@
+/* 
+ * DEPRECATED: This component was part of the wrong approach.
+ * We're now using App.unified.tsx with Zustand for state management.
+ * Keeping this file commented out for reference.
+ */
+
+// The entire component below is commented out
+/*
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { Outlet, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { IndustryType, IndustryConfig } from '../../types/Industry';
+import { IndustryMapping } from '../../types/Industry';
+import { useIndustryConfig } from '../../hooks/useIndustryConfig';
+import { IndustryNavbar } from './IndustryNavbar';
+import { PageLoadingSpinner } from './LoadingSpinner';
+
+// Industry Context for sharing data with child components
+interface IndustryContextType {
+  industry: IndustryType;
+  config: IndustryConfig;
+  industryKey: string;
+}
+
+const IndustryContext = createContext<IndustryContextType | null>(null);
+
+export const useIndustryContext = () => {
+  const context = useContext(IndustryContext);
+  if (!context) {
+    throw new Error('useIndustryContext must be used within SharedIndustryLayout');
+  }
+  return context;
+};
+
+// Industry taglines for header display
+const industryTaglines: Record<IndustryType, string> = {
+  hospitality: 'elevating hotel marketing to new heights',
+  foodservice: 'serving up success for restaurants',
+  healthcare: 'healthy growth for medical practices',
+  athletics: 'winning strategies for sports facilities',
+  main: 'intelligent marketing solutions that drive real results'
+};
+
+// Industry display names for header
+const industryDisplayNames: Record<IndustryType, string> = {
+  hospitality: 'hotels',
+  foodservice: 'restaurants',
+  healthcare: 'healthcare',
+  athletics: 'sports',
+  main: 'all industries'
+};
+
+export const SharedIndustryLayout: React.FC = () => {
+  const { industry: industryParam } = useParams<{ industry: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [showNavbar, setShowNavbar] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Validate and convert industry parameter
+  const industryKey = industryParam || '';
+  const industry = IndustryMapping[industryKey] || null;
+
+  // Redirect if invalid industry
+  useEffect(() => {
+    if (!industry && industryKey) {
+      navigate('/');
+    }
+  }, [industry, industryKey, navigate]);
+
+  // Load industry configuration
+  const { config, loading, error } = useIndustryConfig(industry);
+
+  // Handle navbar visibility based on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setShowNavbar(scrollPosition > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Handle page transitions
+  useEffect(() => {
+    setIsTransitioning(true);
+    const timer = setTimeout(() => setIsTransitioning(false), 300);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  if (!industry) {
+    return null; // Will redirect
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <PageLoadingSpinner />
+      </div>
+    );
+  }
+
+  if (error || !config) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Content</h2>
+          <p className="text-gray-600">{error || 'Failed to load industry configuration'}</p>
+          <button
+            onClick={() => navigate('/')}
+            className="mt-4 px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Return Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <IndustryContext.Provider value={{ industry, config, industryKey }}>
+      <div className="min-h-screen bg-white">
+        {/* Fixed Navigation Bar */}
+        <AnimatePresence>
+          {showNavbar && (
+            <motion.div
+              initial={{ y: -100 }}
+              animate={{ y: 0 }}
+              exit={{ y: -100 }}
+              transition={{ duration: 0.3 }}
+              className="fixed top-0 left-0 right-0 z-50"
+            >
+              <IndustryNavbar 
+                industry={industry}
+                config={config}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Persistent Header Section */}
+        <motion.header 
+          className="relative bg-white border-b border-gray-100"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col items-center text-center">
+              {/* Logo with subtle animation */}
+              <motion.img 
+                src="/LM_inteligencia/Inteligencia-logo-trans.png" 
+                alt="Inteligencia logo" 
+                className="h-20 w-auto mb-4"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0
+                }}
+                transition={{ 
+                  duration: 0.5,
+                  delay: 0.1
+                }}
+                whileHover={{ scale: 1.05 }}
+              />
+              
+              {/* Brand name with industry */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <h1 className="text-4xl font-light mb-2" style={{ color: '#1f1d32' }}>
+                  inteligencia
+                  <span 
+                    className="text-2xl ml-3"
+                    style={{ color: config.branding.primaryColor }}
+                  >
+                    {industryDisplayNames[industry]}
+                  </span>
+                </h1>
+                
+                {/* Industry tagline */}
+                <p 
+                  className="text-lg text-gray-600 font-light"
+                  style={{ fontFamily: 'Poppins, sans-serif' }}
+                >
+                  {industryTaglines[industry]}
+                </p>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Navigation for sub-pages */}
+          <nav className="bg-gray-50 border-t border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <IndustryNavbar 
+                industry={industry}
+                config={config}
+              />
+            </div>
+          </nav>
+        </motion.header>
+
+        {/* Main Content Area with Transitions */}
+        <main className="relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ 
+                duration: 0.3,
+                ease: "easeInOut"
+              }}
+            >
+              {/* Outlet renders child routes */}
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
+        </main>
+
+        {/* Footer - Always visible */}
+        <footer className="bg-black text-white py-12 mt-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {/* Company Info */}
+              <div>
+                <div className="text-2xl font-bold mb-4">Inteligencia</div>
+                <p className="text-gray-400 mb-4">
+                  Smart marketing solutions that drive real results for {config.name.toLowerCase()}.
+                </p>
+              </div>
+              
+              {/* Services */}
+              <div>
+                <h4 className="font-bold mb-4">Services</h4>
+                <ul className="space-y-2 text-gray-400">
+                  {config.content.services.slice(0, 4).map((service, index) => (
+                    <li key={index}>
+                      <a 
+                        href={`/${industryKey}/services`} 
+                        className="hover:text-white transition-colors"
+                      >
+                        {service.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              {/* Quick Links */}
+              <div>
+                <h4 className="font-bold mb-4">Quick Links</h4>
+                <ul className="space-y-2 text-gray-400">
+                  <li>
+                    <a href={`/${industryKey}/about`} className="hover:text-white transition-colors">
+                      About Us
+                    </a>
+                  </li>
+                  <li>
+                    <a href={`/${industryKey}/case-studies`} className="hover:text-white transition-colors">
+                      Case Studies
+                    </a>
+                  </li>
+                  <li>
+                    <a href={`/${industryKey}/pricing`} className="hover:text-white transition-colors">
+                      Pricing
+                    </a>
+                  </li>
+                  <li>
+                    <a href={`/${industryKey}/contact`} className="hover:text-white transition-colors">
+                      Contact
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              
+              {/* Contact */}
+              <div>
+                <h4 className="font-bold mb-4">Contact</h4>
+                <div className="space-y-2 text-gray-400">
+                  {config.content.contact.email && (
+                    <div>
+                      <a href={`mailto:${config.content.contact.email}`} className="hover:text-white transition-colors">
+                        {config.content.contact.email}
+                      </a>
+                    </div>
+                  )}
+                  {config.content.contact.phone && (
+                    <div>
+                      <a href={`tel:${config.content.contact.phone}`} className="hover:text-white transition-colors">
+                        {config.content.contact.phone}
+                      </a>
+                    </div>
+                  )}
+                  <div className="pt-2">
+                    <a 
+                      href={`/${industryKey}/contact`} 
+                      className="inline-block px-4 py-2 rounded text-white transition-all hover:scale-105"
+                      style={{ backgroundColor: config.branding.primaryColor }}
+                    >
+                      Get in Touch →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+              <p>&copy; {new Date().getFullYear()} Inteligencia. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </IndustryContext.Provider>
+  );
+};
+*/
