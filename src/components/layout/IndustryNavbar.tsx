@@ -9,7 +9,6 @@ import { IndustryNames } from '../../types/Industry';
 import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
-import { useNavigationStore } from '../../store/navigationStore';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility
@@ -104,11 +103,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-white/95 backdrop-blur-sm shadow-lg' 
-            : 'bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
@@ -131,9 +126,15 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 </motion.div>
               </Link>
               <div className="relative industry-dropdown-container">
+                {/* Temporarily show brand name instead of dropdown for single vertical launch */}
+                <div className="text-lg text-primary mt-1" style={{ fontFamily: 'inherit' }}>
+                  Inteligencia
+                </div>
+                
+                {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
                 <button
                   onClick={() => setIsIndustryDropdownOpen(!isIndustryDropdownOpen)}
-                  className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
+                  className="hidden flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
                 >
                   {industryName}
                   <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -141,8 +142,8 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                   </svg>
                 </button>
                 
-                {/* Industry Dropdown */}
-                {isIndustryDropdownOpen && (
+                {/* Industry Dropdown - Temporarily hidden for single vertical launch */}
+                {false && isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       if (ind === 'main' || ind === industry || !urlPath) return null;
@@ -154,9 +155,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                           to={`/${urlPath}${currentSubPage}`}
                           onClick={() => {
                             setIsIndustryDropdownOpen(false);
-                            // Update the navigation store when switching industries
-                            const store = useNavigationStore.getState();
-                            store.setSelectedIndustry(ind as IndustryType);
+                            // Let the URL be the single source of truth - UnifiedInteligenciaApp will handle store updates
                           }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
@@ -403,11 +402,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-white/95 backdrop-blur-sm shadow-lg' 
-            : 'bg-transparent'
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
@@ -430,9 +425,15 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 </motion.div>
               </Link>
               <div className="relative industry-dropdown-container">
+                {/* Temporarily show brand name instead of dropdown for single vertical launch */}
+                <div className="text-lg text-primary mt-1" style={{ fontFamily: 'inherit' }}>
+                  Inteligencia
+                </div>
+                
+                {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
                 <button
                   onClick={() => setIsIndustryDropdownOpen(!isIndustryDropdownOpen)}
-                  className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
+                  className="hidden flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
                 >
                   {industryName}
                   <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -440,8 +441,8 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                   </svg>
                 </button>
                 
-                {/* Industry Dropdown */}
-                {isIndustryDropdownOpen && (
+                {/* Industry Dropdown - Temporarily hidden for single vertical launch */}
+                {false && isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       if (ind === 'main' || ind === industry || !urlPath) return null;
@@ -453,9 +454,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                           to={`/${urlPath}${currentSubPage}`}
                           onClick={() => {
                             setIsIndustryDropdownOpen(false);
-                            // Update the navigation store when switching industries
-                            const store = useNavigationStore.getState();
-                            store.setSelectedIndustry(ind as IndustryType);
+                            // Let the URL be the single source of truth - UnifiedInteligenciaApp will handle store updates
                           }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >

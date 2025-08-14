@@ -11,11 +11,12 @@ export const developmentRoutes = {
   athletics: '?industry=sports',
 };
 
-// Production subdomain mapping
+// Production subdomain mapping for inteligenciadm.com
 export const subdomainMapping: Record<string, IndustryType> = {
-  'inteligencia': 'main',
+  'inteligenciadm': 'main',
+  'www': 'main',
   'hotels': 'hospitality',
-  'restaurants': 'hospitality',
+  'restaurants': 'hospitality', 
   'hospitality': 'hospitality',
   'healthcare': 'healthcare',
   'health': 'healthcare',
@@ -26,9 +27,9 @@ export const subdomainMapping: Record<string, IndustryType> = {
 
 // Reverse mapping for generating URLs
 export const industryToSubdomain: Record<IndustryType, string> = {
-  main: 'inteligencia',
+  main: 'inteligenciadm',
   hospitality: 'hospitality',
-  healthcare: 'health',
+  healthcare: 'health', 
   tech: 'tech',
   athletics: 'sports',
 };
@@ -41,7 +42,7 @@ export const environmentConfig = {
     useQueryParams: true,
   },
   production: {
-    baseUrl: 'https://inteligencia.com',
+    baseUrl: 'https://inteligenciadm.com',
     useSubdomains: true,
     useQueryParams: false,
   },

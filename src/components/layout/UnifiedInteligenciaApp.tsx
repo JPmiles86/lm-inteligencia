@@ -6,6 +6,7 @@ import type { IndustryType } from '../../types/Industry';
 import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
 import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
+import { handleDomainRedirect, isRedirectEnabled } from '../../utils/domainRedirect';
 
 // Removed unused type IndustryTypeWithoutMain
 
@@ -102,6 +103,13 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
   const isSubpage = pathSegments.length > 1; // Only paths with multiple segments are subpages
   
+  // Handle domain redirect from main domain to hospitality subdomain
+  useEffect(() => {
+    if (isRedirectEnabled()) {
+      handleDomainRedirect();
+    }
+  }, []); // Run once on mount
+
   // Handle invalid industry paths
   useEffect(() => {
     if (industryKey && !currentIndustry && !isRootPage) {

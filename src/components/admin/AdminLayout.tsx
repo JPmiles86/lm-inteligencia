@@ -231,7 +231,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                     >
                       <div className="px-4 py-3 border-b border-gray-100">
                         <p className="font-medium text-gray-900">Laurie Meiring</p>
-                        <p className="text-sm text-gray-600">laurie@inteligencia.com</p>
+                        <p className="text-sm text-gray-600">laurie@inteligenciadm.com</p>
                       </div>
                       
                       <div className="py-2">

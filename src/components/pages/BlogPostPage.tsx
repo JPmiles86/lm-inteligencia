@@ -554,8 +554,8 @@ export const BlogPostPage: React.FC = () => {
             <div>
               <h4 className="font-bold mb-4">Contact</h4>
               <div className="space-y-2 text-gray-400">
-                <div>info@inteligencia.com</div>
-                <div>(555) 123-4567</div>
+                <div>laurie@inteligenciadm.com</div>
+                <div>+506 6200 2747</div>
                 <div className="pt-4">
                   <Link
                     to={`${industryPath}/contact`}

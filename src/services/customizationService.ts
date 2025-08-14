@@ -130,8 +130,8 @@ const defaultTypographySettings: TypographySettings = {
 };
 
 const defaultContactSettings: ContactSettings = {
-  email: 'info@inteligencia.com',
-  phone: '(555) 123-4567',
+  email: 'laurie@inteligenciadm.com',
+  phone: '+506 6200 2747',
   address: {
     street: '123 Business Avenue',
     city: 'Los Angeles',

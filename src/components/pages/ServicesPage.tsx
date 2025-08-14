@@ -33,7 +33,7 @@ export const ServicesPage: React.FC = () => {
       ]
     },
     {
-      title: 'Meta (FB/IG) Advertising',
+      title: 'Meta (Facebook/Instagram) Advertising',
       icon: '📱',
       description: 'Reach leisure travelers on social media with stunning visuals and compelling offers.',
       features: [
@@ -96,6 +96,28 @@ export const ServicesPage: React.FC = () => {
         'Social Media Presence',
         'Event & Special Menus',
         'Guest Dining Campaigns'
+      ]
+    },
+    {
+      title: 'Alternative Channel Marketing',
+      icon: '🔄',
+      description: 'Expand your reach beyond the major platforms with targeted campaigns on alternative channels that fit your audience.',
+      features: [
+        'Microsoft (Bing Ads)',
+        'X (Formerly Twitter) Ads',
+        'Snapchat Ads',
+        'Niche Platform Campaigns'
+      ]
+    },
+    {
+      title: 'Conversion Rate Optimization (CRO)',
+      icon: '📈',
+      description: 'Turn more clicks into customers with data-driven website and funnel optimization.',
+      features: [
+        'Landing Page Optimization',
+        'A/B Testing',
+        'User Experience (UX) Enhancements',
+        'Heatmaps & Behavior Analysis'
       ]
     }
   ] : [
@@ -213,7 +235,7 @@ export const ServicesPage: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">What's Included in Every Package</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Digital Marketing Services</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our comprehensive marketing services work together to drive growth and maximize your ROI.
             </p>

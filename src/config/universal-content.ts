@@ -76,7 +76,7 @@ export const universalContent: UniversalContent & {
     },
     valuesSection: {
       title: 'Our Values',
-      subtitle: 'These core principles reflect how we think, how we work, and how we show up for our clients—every single time.'
+      subtitle: 'These core principles reflect how we think, how we work, and how we show up for our clients - every single time.'
     },
     teamSection: {
       title: 'Our Expert Team',
@@ -95,10 +95,10 @@ export const universalContent: UniversalContent & {
       title: 'Meet Laurie Meiring',
       subtitle: 'Founder & Chief Strategist',
       tagline: 'MBA • Agile Marketing Leader • AI‑Driven Digital Innovator • Hospitality Veteran',
-      description: 'Laurie Meiring brings over 10 years of hands-on digital marketing leadership to Inteligencia, backed by an MBA and a career that bridges the worlds of hospitality, AI-driven performance marketing, and creative brand building.',
-      extendedStory: 'Before founding Inteligencia, Laurie served as Director of Digital Marketing at Web Marketing for Dentists, where he led a team managing over $750K/month in Google Ads and $80K+/month in Meta spend for 200+ dental practices across North America. His results-first approach helped local businesses consistently outperform national competitors.',
-      approach: 'He launched Inteligencia with a clear belief: different industries require deeply tailored marketing - not cookie-cutter solutions. That\'s why the agency focuses on four core verticals where Laurie has developed meaningful expertise: hospitality, tech, healthcare, and sports/media.\n\nLaurie\'s campaigns are equal parts data science and storytelling - designed to drive ROI while resonating with real human needs. He blends strategic insight with deep client empathy, helping businesses grow through performance marketing that actually performs.',
-      image: '/images/LaurieHeadshot.png',
+      description: 'Laurie Meiring brings over a decade of digital marketing leadership to Inteligencia, backed by an MBA and a career spanning hospitality, healthcare, technology, and sports/media. His work blends the precision of data-driven performance marketing with the creativity of brand storytelling - delivering measurable ROI while building brands people remember.',
+      extendedStory: 'Before founding Inteligencia, Laurie served as Director of Digital Marketing at Web Marketing for Dentists, where he led a team managing $750K+/month in Google Ads and $80K+/month in Meta campaigns for over 200 dental practices across North America. His strategies consistently helped local practices outperform national chains, proving that targeted, tailored campaigns can outpace even the biggest competitors.\n\nLaurie\'s roots in hospitality have given him an exceptional service mindset and over 5 years Leading Digital Marketing for Marriott Hotels the ability to craft marketing strategies that convert experiences into bookings. In healthcare, his work has empowered practitioners to attract, educate, and retain patients in highly competitive markets. His tech clients benefit from his early adoption of AI and automation tools to scale demand, while his work in sports and media leverages storytelling and community engagement to build loyal audiences.',
+      approach: 'Laurie launched Inteligencia on a core belief: every industry has unique challenges, and marketing should be built to meet them - never off the shelf. Whether growing occupancy, generating qualified patient leads, scaling a tech product, or building a sports brand, Laurie\'s campaigns are built for performance and designed for people.',
+      image: '/images/hospitality/BioPhoto2.JPG',
       certifications: ['MBA – Digital Marketing, Cum Laude (2018)', 'Bachelor\'s in Hotel and Restaurant Management (2003)', 'Chef\'s Diploma (2012)', 'Advanced Digital Marketing Certificate (2023)', 'Ship 30 for 30 Digital Writing Course (2023)'],
     },
     
@@ -115,17 +115,17 @@ export const universalContent: UniversalContent & {
       },
       {
         title: 'AI-Driven Innovation',
-        description: 'We embrace AI as a force multiplier, not a shortcut. From advanced targeting to content generation, we leverage cutting-edge tools to stay ahead of the curve—and so do our clients.',
+        description: 'We embrace AI as a force multiplier, not a shortcut. From advanced targeting to content generation, we harness cutting-edge tools that keep both us and our clients ahead of the curve.',
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7l2-7z"/></svg>',
       },
       {
         title: 'Results Obsessed',
-        description: 'We don\'t chase vanity metrics. We build and optimize campaigns around what actually matters - profitability, growth, and long-term value.',
+        description: 'We don\'t chase vanity metrics. We build and optimize campaigns around what actually matters: profitability, growth, and long-term value.',
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>',
       },
       {
         title: 'Creative Firepower',
-        description: 'Creative isn\'t just how things look—it\'s how strategies come to life. From storytelling to campaign structure, we combine artistic instinct with marketing science to produce standout work.',
+        description: 'Creativity isn\'t just how things look - it\'s how strategies come to life. From storytelling to campaign structure, we combine artistic instinct with marketing science to produce standout work.',
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
       },
       // Second row - existing values

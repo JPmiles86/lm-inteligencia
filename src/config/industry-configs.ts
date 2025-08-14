@@ -53,7 +53,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           learnMoreLink: '/hotels/services#google-ads',
         },
         {
-          title: 'Meta (FB/IG) Advertising',
+          title: 'Meta (Facebook & Instagram) Ads',
           description: 'Showcase your property with visual storytelling that inspires bookings and builds brand loyalty.',
           keyBenefit: 'Turn views into Bookings with Visual Impact',
           icon: 'camera',
@@ -94,7 +94,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         },
         {
           title: 'Restaurant Marketing',
-          description: 'Fill Every Table Every Night: Drive Foot Traffic and Online orders with Restaurant Marketing that works',
+          description: 'Fill every table every night: drive foot traffic and online orders with restaurant marketing that works',
           keyBenefit: 'Increase Restaurant Bookings, Online Orders and ROI',
           icon: 'utensils',
           image: '/images/RestaurantMarketing.png',
@@ -129,7 +129,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           location: 'Sayulita, Mexico',
         },
         {
-          quote: 'We had never run Hotel Ads or Meta campaigns before, and honestly didn\'t know where to start. Laurie came in, set everything up seamlessly, and within weeks we saw a major spike in direct bookings. The Meta ads alone cut our cost-per-booking in half. His strategy just works — efficient, targeted, and totally aligned with our goals.',
+          quote: 'We had never run Hotel Ads or Meta campaigns before, and honestly didn\'t know where to start. Laurie came in, set everything up seamlessly, and within weeks we saw a major spike in direct bookings. The Meta ads alone cut our cost-per-booking in half. His strategy just works - efficient, targeted, and totally aligned with our goals.',
           author: 'Stephanie Sitt',
           position: 'Owner',
           company: 'Hotel Amavi',
@@ -145,7 +145,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         trustIndicators: [
           'Free Strategy Consultation',
           'No Long-term Contracts', 
-          'Results in 30 Days'
+          'Proven Growth Strategies'
         ],
       },
       pricing: {
@@ -232,8 +232,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         title: 'Ready to Transform Your Hotel\'s Performance?',
         subtitle: 'Get your free hotel marketing audit and discover how to reduce OTA dependency while increasing direct bookings.',
         calendlyText: 'Schedule Your Free Hotel Marketing Consultation',
-        email: 'hotels@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
         address: '123 Business Ave, Suite 100, Miami, FL 33101',
         // CONTACT PAGE EXTENDED CONTENT - Business types, budgets, timelines, office hours, FAQs
         businessTypes: ['Boutique Hotel', 'Resort', 'Bed & Breakfast', 'Vacation Rental', 'Hotel Chain', 'Other'],
@@ -260,7 +260,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             firstName: 'Enter your first name',
             lastName: 'Enter your last name',
             email: 'your@email.com',
-            phone: '(555) 123-4567',
+            phone: '+506 6200 2747',
             company: 'Your Business Name',
             businessType: 'Select your business type',
             budget: 'Select your budget range',
@@ -282,7 +282,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
           {
             question: 'Do you work with hotels outside of these industries?',
-            answer: 'We focus exclusively on hospitality, food service, healthcare, and athletics to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
+            answer: 'We focus exclusively on hospitality, healthcare, tech, and sport/media to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
           },
           {
             question: 'What makes your approach different for hotels?',
@@ -514,7 +514,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             position: 'Owner',
             company: '40 Acres Farmhouse'
           },
-          image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800&h=600&fit=crop',
+          image: '/images/hospitality/40AcresFarmHouse.jpg',
           tags: ['Boutique Hotels', 'Direct Bookings', 'OTA Optimization', 'South Africa']
         },
         {
@@ -547,7 +547,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             position: 'Owner',
             company: 'Casa Salita and Suegra'
           },
-          image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=600&fit=crop',
+          image: '/images/hospitality/CasaSalitaandSuegra.jpg',
           tags: ['Vacation Rentals', 'Google Hotel Ads', 'Social Media', 'Mexico']
         },
         {
@@ -575,12 +575,12 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             }
           ],
           testimonial: {
-            quote: "We had never run Hotel Ads or Meta campaigns before, and honestly didn't know where to start. Laurie came in, set everything up seamlessly, and within weeks we saw a major spike in direct bookings. The Meta ads alone cut our cost-per-booking in half. His strategy just works — efficient, targeted, and totally aligned with our goals.",
+            quote: "We had never run Hotel Ads or Meta campaigns before, and honestly didn't know where to start. Laurie came in, set everything up seamlessly, and within weeks we saw a major spike in direct bookings. The Meta ads alone cut our cost-per-booking in half. His strategy just works - efficient, targeted, and totally aligned with our goals.",
             author: 'Stephanie Sitt',
             position: 'Owner',
             company: 'Hotel Amavi'
           },
-          image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop',
+          image: '/images/hospitality/hotelamavi.jpeg',
           tags: ['Boutique Hotels', 'Meta Advertising', 'Google Hotel Ads', 'Costa Rica']
         }
       ],
@@ -786,8 +786,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         title: 'Let\'s Fill Your Restaurant Tonight',
         subtitle: 'Get your free restaurant marketing analysis and learn how to increase foot traffic and online orders.',
         calendlyText: 'Schedule Your Free Restaurant Consultation',
-        email: 'restaurants@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
         address: '123 Business Ave, Suite 100, Miami, FL 33101',
         // CONTACT PAGE EXTENDED CONTENT - Business types, budgets, timelines, office hours, FAQs
         businessTypes: ['Fine Dining', 'Casual Dining', 'Fast Casual', 'Coffee Shop', 'Bar/Pub', 'Food Truck', 'Restaurant Chain', 'Other'],
@@ -814,7 +814,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             firstName: 'Enter your first name',
             lastName: 'Enter your last name',
             email: 'your@email.com',
-            phone: '(555) 123-4567',
+            phone: '+506 6200 2747',
             company: 'Your Business Name',
             businessType: 'Select your business type',
             budget: 'Select your budget range',
@@ -836,7 +836,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
           {
             question: 'Do you work with restaurants outside of these industries?',
-            answer: 'We focus exclusively on hospitality, food service, healthcare, and athletics to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
+            answer: 'We focus exclusively on hospitality, healthcare, tech, and sport/media to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
           },
           {
             question: 'What makes your approach different for restaurants?',
@@ -1307,8 +1307,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         title: 'Ready to Grow Your Practice?',
         subtitle: 'Get your free practice growth analysis and discover how to attract quality patients with HIPAA-compliant marketing.',
         calendlyText: 'Schedule Your Free Practice Growth Consultation',
-        email: 'health@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
         address: '123 Business Ave, Suite 100, Miami, FL 33101',
         // CONTACT PAGE EXTENDED CONTENT - Business types, budgets, timelines, office hours, FAQs
         businessTypes: ['General Dentistry', 'Dental Specialty', 'Medical Practice', 'Wellness Center', 'Fitness Facility', 'Health Spa/Retreat', 'Urgent Care', 'Healthcare Group', 'Other'],
@@ -1335,7 +1335,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             firstName: 'Enter your first name',
             lastName: 'Enter your last name',
             email: 'your@email.com',
-            phone: '(555) 123-4567',
+            phone: '+506 6200 2747',
             company: 'Your Practice Name',
             businessType: 'Select your practice type',
             budget: 'Select your budget range',
@@ -1357,7 +1357,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
           {
             question: 'Do you work with practices outside of these industries?',
-            answer: 'We focus exclusively on hospitality, food service, healthcare, and athletics to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
+            answer: 'We focus exclusively on hospitality, healthcare, tech, and sport/media to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
           },
           {
             question: 'Is your marketing HIPAA-compliant?',
@@ -2012,8 +2012,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         title: 'Ready to Build Your Sports Community?',
         subtitle: 'Get your free facility growth plan and learn how to maximize membership and tournament participation.',
         calendlyText: 'Schedule Your Free Facility Growth Consultation',
-        email: 'sports@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
         address: '123 Business Ave, Suite 100, Miami, FL 33101',
         // CONTACT PAGE EXTENDED CONTENT - Business types, budgets, timelines, office hours, FAQs
         businessTypes: ['Tennis Club', 'Pickleball Facility', 'Golf Course', 'Fitness Center', 'Sports Complex', 'Recreation Center', 'Other'],
@@ -2040,7 +2040,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             firstName: 'Enter your first name',
             lastName: 'Enter your last name',
             email: 'your@email.com',
-            phone: '(555) 123-4567',
+            phone: '+506 6200 2747',
             company: 'Your Facility Name',
             businessType: 'Select your facility type',
             budget: 'Select your budget range',
@@ -2062,7 +2062,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           },
           {
             question: 'Do you work with facilities outside of these industries?',
-            answer: 'We focus exclusively on hospitality, food service, healthcare, and athletics to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
+            answer: 'We focus exclusively on hospitality, healthcare, tech, and sport/media to provide the deepest expertise possible. This specialization allows us to deliver superior results compared to generalist agencies.',
           },
           {
             question: 'What makes your approach different for sports facilities?',
@@ -2393,8 +2393,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         title: 'Ready to Scale Your Tech Company?',
         subtitle: 'Get your free growth audit and discover untapped opportunities to accelerate your business.',
         calendlyText: 'Schedule Your Free Growth Strategy Session',
-        email: 'tech@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
         address: '123 Business Ave, Suite 100, Miami, FL 33101',
         businessTypes: ['SaaS', 'AI/ML Startup', 'Developer Tools', 'B2B Software', 'MarTech', 'FinTech', 'Other Tech'],
         budgetRanges: ['$1,000 - $2,500/month', '$2,500 - $5,000/month', '$5,000 - $10,000/month', '$10,000+ /month', 'Let\'s discuss'],
@@ -2420,7 +2420,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
             firstName: 'Enter your first name',
             lastName: 'Enter your last name',
             email: 'your@email.com',
-            phone: '(555) 123-4567',
+            phone: '+506 6200 2747',
             company: 'Your Company Name',
             businessType: 'Select your business type',
             budget: 'Select your budget range',
@@ -2771,8 +2771,8 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
       contact: {
         title: 'Ready to Get Started?',
         subtitle: 'Contact us to discuss your industry-specific marketing needs.',
-        email: 'info@inteligencia.com',
-        phone: '(555) 123-4567',
+        email: 'laurie@inteligenciadm.com',
+        phone: '+506 6200 2747',
       },
     },
     metadata: {

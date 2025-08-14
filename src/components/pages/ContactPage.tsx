@@ -77,6 +77,12 @@ export const ContactPage: React.FC = () => {
       description: 'Call us during business hours (9 AM - 6 PM EST)',
     },
     {
+      type: 'WhatsApp',
+      value: config.content.contact.phone,
+      icon: '/images/Digital_Glyph_Green.svg',
+      description: 'Chat with us on WhatsApp for quick responses',
+    },
+    {
       type: 'Office',
       value: config.content.contact.address || '123 Business Ave, Suite 100, Miami, FL 33101',
       icon: '📍',
@@ -192,7 +198,7 @@ export const ContactPage: React.FC = () => {
                       value={formData.phone}
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                      placeholder={config.content.contact.formLabels?.placeholders.phone || '(555) 123-4567'}
+                      placeholder={config.content.contact.formLabels?.placeholders.phone || '+506 6200 2747'}
                     />
                   </div>
                 </div>
@@ -334,16 +340,43 @@ export const ContactPage: React.FC = () => {
 
               {/* Contact Methods */}
               <div className="space-y-6">
-                {contactMethods.map((method, index) => (
-                  <div key={index} className="flex items-start p-6 bg-gray-50 rounded-xl">
-                    <div className="text-3xl mr-4">{method.icon}</div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{method.type}</h3>
-                      <p className="text-primary font-medium mb-2">{method.value}</p>
-                      <p className="text-gray-600 text-sm">{method.description}</p>
-                    </div>
-                  </div>
-                ))}
+                {contactMethods.filter(method => method.type !== 'Office').map((method, index) => {
+                  const getContactLink = () => {
+                    if (method.type === 'Email') {
+                      return `mailto:${method.value}`;
+                    } else if (method.type === 'Phone') {
+                      return `tel:${method.value}`;
+                    } else if (method.type === 'WhatsApp') {
+                      // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
+                      const cleanPhone = method.value.replace(/[\s\-()]/g, '');
+                      return `https://wa.me/${cleanPhone}?text=Hi! I'm interested in learning more about your marketing services.`;
+                    }
+                    return '#';
+                  };
+
+                  return (
+                    <a
+                      key={index}
+                      href={getContactLink()}
+                      target={method.type === 'WhatsApp' ? '_blank' : '_self'}
+                      rel={method.type === 'WhatsApp' ? 'noopener noreferrer' : undefined}
+                      className="flex items-start p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                      <div className="mr-4">
+                        {method.icon.startsWith('/') ? (
+                          <img src={method.icon} alt={method.type} className="w-12 h-12" />
+                        ) : (
+                          <div className="text-3xl">{method.icon}</div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">{method.type}</h3>
+                        <p className="text-primary font-medium mb-2">{method.value}</p>
+                        <p className="text-gray-600 text-sm">{method.description}</p>
+                      </div>
+                    </a>
+                  );
+                })}
               </div>
 
               {/* Calendly Section */}
@@ -359,8 +392,8 @@ export const ContactPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Office Hours */}
-              <div className="bg-gray-100 rounded-xl p-6">
+              {/* Office Hours - Hidden per client request */}
+              <div className="bg-gray-100 rounded-xl p-6 hidden">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Office Hours</h3>
                 <div className="space-y-2 text-gray-700">
                   <div className="flex justify-between">
