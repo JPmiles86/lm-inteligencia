@@ -6,7 +6,7 @@ import type { IndustryType } from '../../types/Industry';
 import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
 import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
-import { handleDomainRedirect, isRedirectEnabled } from '../../utils/domainRedirect';
+import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from '../../utils/domainRedirect';
 
 // Removed unused type IndustryTypeWithoutMain
 
@@ -91,8 +91,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   // Always call the hook, but with a null check inside
   const { config, loading, error } = useIndustryConfig(selectedIndustry);
   
-  // Import getCurrentSubdomain at the top of component
-  const { getCurrentSubdomain } = require('../../utils/domainRedirect');
+  // Get subdomain using the imported function
   const subdomain = getCurrentSubdomain();
   
   // Route detection with subdomain awareness
