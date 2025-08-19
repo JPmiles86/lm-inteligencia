@@ -1,0 +1,26 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "inteligenciadm.com"
+        }
+      ],
+      "destination": "https://hospitality.inteligenciadm.com/$1",
+      "permanent": false
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.inteligenciadm.com"
+        }
+      ],
+      "destination": "https://hospitality.inteligenciadm.com/$1",
+      "permanent": false
+    }
+  ]
+}

@@ -7,11 +7,33 @@
     <title>Inteligencia - Specialized Marketing Solutions</title>
     <meta name="description" content="Professional marketing services tailored for hotels, restaurants, healthcare, and sports industries." />
     
-    <!-- Redirect to hospitality subdomain if on main domain -->
+    <!-- IMMEDIATE REDIRECT SCRIPT - RUNS FIRST -->
     <script>
-      if (window.location.hostname === 'inteligenciadm.com' || window.location.hostname === 'www.inteligenciadm.com') {
-        document.write('<meta http-equiv="refresh" content="0; url=https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search + '">');
-      }
+      // This runs before ANYTHING else loads
+      (function() {
+        var host = window.location.hostname;
+        var path = window.location.pathname;
+        var search = window.location.search;
+        
+        // Log what we're seeing
+        console.log('[REDIRECT CHECK] Current hostname:', host);
+        
+        // Check for main domain (case insensitive)
+        if (host.toLowerCase() === 'inteligenciadm.com' || host.toLowerCase() === 'www.inteligenciadm.com') {
+          console.log('[REDIRECT] Redirecting from', host, 'to hospitality.inteligenciadm.com');
+          
+          // Do the redirect immediately
+          var redirectUrl = 'https://hospitality.inteligenciadm.com' + path + search;
+          
+          // Try multiple redirect methods
+          window.location.replace(redirectUrl);
+          window.location.href = redirectUrl;
+          window.location = redirectUrl;
+          
+          // Stop all further execution
+          throw new Error('Redirecting...');
+        }
+      })();
     </script>
     
     <!-- Industry-specific styling will be injected here -->
