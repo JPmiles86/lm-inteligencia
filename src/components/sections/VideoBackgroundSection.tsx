@@ -108,9 +108,9 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
         <div 
           className={`absolute inset-0 transition-opacity duration-1000 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            // Scale container to avoid black bars
             width: '100%',
             height: '100%',
+            overflow: 'hidden',
           }}
         >
           <iframe
@@ -120,10 +120,9 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '100vw',
-              height: '56.25vw', // 16:9 Aspect ratio
-              minHeight: '100vh',
-              minWidth: '177.77vh', // 16:9 Aspect ratio
+              // Use max to ensure video always covers the viewport
+              width: 'max(100vw, 177.77vh)', // 16:9 aspect ratio width
+              height: 'max(56.25vw, 100vh)', // 16:9 aspect ratio height
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
