@@ -25,7 +25,6 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   industryName: industryNameProp,
   currentIndustry 
 }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isIndustryDropdownOpen, setIsIndustryDropdownOpen] = useState(false);
   const location = useLocation();
@@ -63,15 +62,6 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   const industryKey = subdomain === 'hospitality' ? '' : (contextIndustryKey || params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
   const isSeamlessPage = (pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null) || 
                          (subdomain === 'hospitality' && location.pathname === '/');
-
-  useEffect(() => {
-    const handleScroll = (): void => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Click outside handler for industry dropdown
   useEffect(() => {
@@ -345,7 +335,6 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   industryName: industryNameProp,
   currentIndustry 
 }) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isIndustryDropdownOpen, setIsIndustryDropdownOpen] = useState(false);
   const location = useLocation();
@@ -360,15 +349,6 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const industryKey = params.industry || pathSegments[0] || 'hotels'; // Default to hotels if undefined
   const isSeamlessPage = pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null;
-
-  useEffect(() => {
-    const handleScroll = (): void => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Click outside handler for industry dropdown
   useEffect(() => {

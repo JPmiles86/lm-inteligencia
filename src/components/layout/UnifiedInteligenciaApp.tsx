@@ -6,7 +6,7 @@ import type { IndustryType } from '../../types/Industry';
 import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
 import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
-import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from '../../utils/domainRedirect';
+import { getCurrentSubdomain } from '../../utils/domainRedirect';
 
 // Removed unused type IndustryTypeWithoutMain
 

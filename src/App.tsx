@@ -12,9 +12,6 @@ import { AdminAuth } from './components/admin/AdminAuth';
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
 
-// Utils
-import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from './utils/domainRedirect';
-
 /**
  * App using the unified single-page architecture
  * This approach maintains the header during all transitions
