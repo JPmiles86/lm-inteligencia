@@ -128,8 +128,10 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '120%',
-              height: '120%',
+              width: '177.77vh', // 16:9 aspect ratio based on height
+              height: '100%',
+              minWidth: '100%',
+              minHeight: '100%',
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
@@ -160,8 +162,8 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '120%',
-              height: '120%',
+              width: '130%',
+              height: '130%',
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
