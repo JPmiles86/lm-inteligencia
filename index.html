@@ -22,6 +22,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <!-- Immediate redirect script - runs before React loads -->
+    <script>
+      (function() {
+        var hostname = window.location.hostname;
+        // If on main domain, redirect to hospitality subdomain immediately
+        if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+          window.location.replace('https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search);
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -125,23 +125,20 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   
   // Handle domain redirect and subdomain detection - MUST RUN FIRST
   useEffect(() => {
-    // Check for redirect IMMEDIATELY
-    if (isRedirectEnabled()) {
-      const subdomain = getCurrentSubdomain();
-      
-      // If on main domain, redirect to hospitality subdomain
-      if (subdomain === 'main') {
-        console.log('Redirecting from main domain to hospitality subdomain...');
-        handleDomainRedirect();
-        return; // Don't do anything else
-      }
-      
-      // If on hospitality subdomain, automatically select hospitality
-      if (subdomain === 'hospitality' && location.pathname === '/') {
-        setSelectedIndustry('hospitality');
-        setLandingAreaState('decided');
-        setTimeout(() => setShowContent(true), 500);
-      }
+    const hostname = window.location.hostname;
+    
+    // IMMEDIATE REDIRECT - no conditions, just redirect if on main domain
+    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+      console.log('[UnifiedApp] Redirecting to hospitality subdomain...');
+      window.location.href = 'https://hospitality.inteligenciadm.com' + location.pathname + location.search;
+      return;
+    }
+    
+    // If on hospitality subdomain, automatically select hospitality
+    if (hostname === 'hospitality.inteligenciadm.com' && location.pathname === '/') {
+      setSelectedIndustry('hospitality');
+      setLandingAreaState('decided');
+      setTimeout(() => setShowContent(true), 500);
     }
   }, []); // Run once on mount
 

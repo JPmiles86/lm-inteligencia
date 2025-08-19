@@ -22,12 +22,13 @@ import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from './
 const App: React.FC = () => {
   // Check for redirect IMMEDIATELY on app load
   useEffect(() => {
-    if (isRedirectEnabled()) {
-      const subdomain = getCurrentSubdomain();
-      if (subdomain === 'main') {
-        console.log('[App.tsx] Triggering redirect from main domain...');
-        handleDomainRedirect();
-      }
+    const hostname = window.location.hostname;
+    
+    // Direct check - if on main domain, redirect to hospitality
+    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+      console.log('[App.tsx] On main domain, redirecting to hospitality...');
+      window.location.href = 'https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search;
+      return;
     }
   }, []);
 
