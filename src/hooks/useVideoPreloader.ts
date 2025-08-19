@@ -50,7 +50,7 @@ export const useVideoPreloader = () => {
       }
     }
 
-    // Delay preloading to not interfere with initial page load
+    // Start preloading immediately - videos will be needed soon
     const timeoutId = setTimeout(() => {
       videoUrls.forEach((url) => {
         const iframe = document.createElement('iframe');
@@ -67,7 +67,7 @@ export const useVideoPreloader = () => {
         document.body.appendChild(iframe);
         iframes.push(iframe);
       });
-    }, 1000); // Reduced delay to 1 second for faster preloading
+    }, 100); // Start preloading almost immediately
 
     // Cleanup
     return () => {

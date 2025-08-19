@@ -19,6 +19,8 @@ export const handleDomainRedirect = (): void => {
   // Check if we're already on a subdomain
   const isSubdomain = hostname.includes('.inteligenciadm.com') && hostname !== 'www.inteligenciadm.com';
   
+  // TEMPORARY: Redirect main domain to hospitality subdomain
+  // Once all verticals are ready, remove this redirect to show all 4 verticals on main domain
   if (isMainDomain && !isSubdomain) {
     // Redirect to hospitality subdomain while preserving the path and query params
     const redirectUrl = `https://hospitality.inteligenciadm.com${pathname}${search}`;

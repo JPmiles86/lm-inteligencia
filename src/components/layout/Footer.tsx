@@ -108,12 +108,18 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
             <ul className="space-y-2 text-gray-400">
               {industries.map((ind) => (
                 <li key={ind.industry}>
-                  <a
-                    href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`}
-                    className="hover:text-white transition-colors text-left block"
-                  >
-                    {ind.label}
-                  </a>
+                  {ind.industry === 'hospitality' ? (
+                    <a
+                      href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`}
+                      className="hover:text-white transition-colors text-left block capitalize"
+                    >
+                      {ind.title}
+                    </a>
+                  ) : (
+                    <span className="text-gray-500 text-left block capitalize">
+                      {ind.title} <span className="text-xs">(Coming Soon)</span>
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

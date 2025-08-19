@@ -57,6 +57,23 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
 
   const [showScrollHint, setShowScrollHint] = useState(false);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
+  
+  // Check if we're on a subdomain
+  const getCurrentSubdomain = () => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) return null;
+    const parts = hostname.split('.');
+    if (parts.length >= 3 && parts[parts.length - 2] === 'inteligenciadm') {
+      return parts[0] || null;
+    }
+    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+      return 'main';
+    }
+    return null;
+  };
+  
+  const subdomain = getCurrentSubdomain();
 
   // Show scroll hint after 2 seconds of no interaction in decided state
   useEffect(() => {
@@ -101,15 +118,18 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
     setSelectedIndustry(industry);
     setLandingAreaState('decided');
     
-    // Update URL without navigation
-    const pathMap: Record<IndustryType, string> = {
-      'hospitality': '/hospitality',
-      'healthcare': '/health',
-      'tech': '/tech',
-      'athletics': '/sports',
-      'main': '/'
-    };
-    window.history.pushState({}, '', pathMap[industry]);
+    // Don't update URL on subdomains, only on main domain
+    if (!subdomain || subdomain === 'main') {
+      // Update URL without navigation
+      const pathMap: Record<IndustryType, string> = {
+        'hospitality': '/hospitality',
+        'healthcare': '/health',
+        'tech': '/tech',
+        'athletics': '/sports',
+        'main': '/'
+      };
+      window.history.pushState({}, '', pathMap[industry]);
+    }
   };
 
   const handleScrollClick = () => {
@@ -204,6 +224,14 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
             const shouldHide = landingAreaState === 'decided' && !isSelected;
             const centeringAnimation = getCenteringAnimation(index, isSelected && landingAreaState === 'decided');
             
+            // On subdomain, only show the relevant industry
+            const isOnSubdomain = subdomain && subdomain !== 'main';
+            const isSubdomainIndustry = subdomain === 'hospitality' && industry.industry === 'hospitality';
+            
+            if (isOnSubdomain && !isSubdomainIndustry) {
+              return null;
+            }
+            
             return (
               <motion.div
                 key={industry.industry}
@@ -218,11 +246,11 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
                   y: { duration: 0.5, delay: 0.6 + index * 0.1 },
                   position: { duration: 0 }
                 }}
-                whileHover={landingAreaState === 'undecided' ? { scale: 1.02 } : {}}
+                whileHover={landingAreaState === 'undecided' && !isOnSubdomain ? { scale: 1.02 } : {}}
                 className={`cursor-pointer group p-4 rounded-lg ${
-                  landingAreaState !== 'undecided' ? 'pointer-events-none' : ''
+                  landingAreaState !== 'undecided' || isOnSubdomain ? 'pointer-events-none' : ''
                 }`}
-                onClick={() => handleIndustryClick(industry.industry)}
+                onClick={() => !isOnSubdomain && handleIndustryClick(industry.industry)}
                 style={isSelected && landingAreaState === 'decided' ? { zIndex: 10 } : {}}
               >
                 <div className="text-2xl font-light tracking-wide">
@@ -241,7 +269,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
                       opacity: shouldHide ? 0 : 0.7
                     }}
                     whileHover={{ 
-                      color: landingAreaState === 'undecided' ? industryHoverColors[industry.industry] : '#666'
+                      color: landingAreaState === 'undecided' && !isOnSubdomain ? industryHoverColors[industry.industry] : '#666'
                     }}
                   >
                     {industry.label}

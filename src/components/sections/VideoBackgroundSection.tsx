@@ -33,7 +33,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
     };
   }, []);
 
-  // Intersection Observer to load video only when section is visible
+  // Intersection Observer to load video when section is about to be visible
   useEffect(() => {
     const currentSection = sectionRef.current;
     const observer = new IntersectionObserver(
@@ -41,14 +41,15 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
         entries.forEach((entry) => {
           if (entry.isIntersecting && !isVideoLoading) {
             isVideoLoading = true;
-            // Delay to allow preloader to finish
-            setTimeout(() => {
-              setShouldLoadVideo(true);
-            }, 500);
+            // Load immediately - video should already be preloaded
+            setShouldLoadVideo(true);
           }
         });
       },
-      { threshold: 0.1 }
+      { 
+        threshold: 0.01, // Trigger earlier when just 1% is visible
+        rootMargin: '200px' // Start loading 200px before the section comes into view
+      }
     );
 
     if (currentSection) {
@@ -92,8 +93,15 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
       className="relative w-full overflow-hidden bg-black" 
       style={{ height: '85vh' }}
     >
-      {/* Static background while video loads - will be replaced with first frame screenshot later */}
-      <div className="absolute inset-0 bg-black"></div>
+      {/* Gradient placeholder while video loads */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900"></div>
+      
+      {/* Loading indicator - subtle pulse */}
+      {shouldLoadVideo && !isVideoReady && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
+        </div>
+      )}
       
       {/* Vimeo Video Container - Only load when visible and ready */}
       {shouldLoadVideo && (
@@ -128,13 +136,13 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
                 iframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"timeupdate"}', '*');
               }
               
-              // Fallback timer in case postMessage doesn't work
+              // Fallback timer in case postMessage doesn't work - reduced time
               setTimeout(() => {
                 if (!isVideoReady) {
                   setIsVideoReady(true);
                   isVideoLoading = false;
                 }
-              }, 4000);
+              }, 1500);
             }}
           />
         </div>

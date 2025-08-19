@@ -41,10 +41,28 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   const industry = contextIndustry || industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
 
+  // Get subdomain helper
+  const getCurrentSubdomain = () => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) return null;
+    const parts = hostname.split('.');
+    if (parts.length >= 3 && parts[parts.length - 2] === 'inteligenciadm') {
+      return parts[0] || null;
+    }
+    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+      return 'main';
+    }
+    return null;
+  };
+  
+  const subdomain = getCurrentSubdomain();
+  
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
-  const industryKey = contextIndustryKey || params.industry || pathSegments[0] || 'hotels'; // Default to hotels if undefined
-  const isSeamlessPage = pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null;
+  const industryKey = subdomain === 'hospitality' ? '' : (contextIndustryKey || params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
+  const isSeamlessPage = (pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null) || 
+                         (subdomain === 'hospitality' && location.pathname === '/');
 
   useEffect(() => {
     const handleScroll = (): void => {
@@ -110,7 +128,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
-                to={industry === 'main' || !industry ? '/' : `/${industryKey}`}
+                to={industry === 'main' || !industry ? '/' : (industryKey ? `/${industryKey}` : '/')}
                 className="group"
               >
                 <motion.div
@@ -172,7 +190,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             <div className="hidden lg:flex items-center space-x-8">
               {/* Services - always navigate to services page */}
               <Link
-                to={`/${industryKey}/services`}
+                to={industryKey ? `/${industryKey}/services` : '/services'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.services}
@@ -180,7 +198,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
 
               {/* About - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/about`}
+                to={industryKey ? `/${industryKey}/about` : '/about'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.about}
@@ -188,7 +206,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
 
               {/* Case Studies - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/case-studies`}
+                to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.caseStudies}
@@ -196,7 +214,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
 
               {/* Blog - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/blog`}
+                to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.blog}
@@ -212,7 +230,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 </button>
               ) : (
                 <Link
-                  to={`/${industryKey}/contact`}
+                  to={industryKey ? `/${industryKey}/contact` : '/contact'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
                 >
                   {navItems.contact}
@@ -220,7 +238,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               )}
 
               <button
-                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
+                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
                 className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
@@ -258,7 +276,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
           <div className="px-4 py-6 space-y-4">
             {/* Mobile navigation items */}
             <Link
-              to={`/${industryKey}/services`}
+              to={industryKey ? `/${industryKey}/services` : '/services'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -266,7 +284,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/about`}
+              to={industryKey ? `/${industryKey}/about` : '/about'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -274,7 +292,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/case-studies`}
+              to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -409,7 +427,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
-                to={industry === 'main' || !industry ? '/' : `/${industryKey}`}
+                to={industry === 'main' || !industry ? '/' : (industryKey ? `/${industryKey}` : '/')}
                 className="group"
               >
                 <motion.div
@@ -471,7 +489,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             <div className="hidden lg:flex items-center space-x-8">
               {/* Services - always navigate to services page */}
               <Link
-                to={`/${industryKey}/services`}
+                to={industryKey ? `/${industryKey}/services` : '/services'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.services}
@@ -479,7 +497,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
 
               {/* About - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/about`}
+                to={industryKey ? `/${industryKey}/about` : '/about'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.about}
@@ -487,7 +505,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
 
               {/* Case Studies - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/case-studies`}
+                to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.caseStudies}
@@ -495,7 +513,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
 
               {/* Blog - always navigate to subpage */}
               <Link
-                to={`/${industryKey}/blog`}
+                to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 className="font-medium transition-colors hover:text-primary text-gray-700"
               >
                 {navItems.blog}
@@ -511,7 +529,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 </button>
               ) : (
                 <Link
-                  to={`/${industryKey}/contact`}
+                  to={industryKey ? `/${industryKey}/contact` : '/contact'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
                 >
                   {navItems.contact}
@@ -519,7 +537,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               )}
 
               <button
-                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
+                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
                 className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
@@ -557,7 +575,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
           <div className="px-4 py-6 space-y-4">
             {/* Mobile navigation items */}
             <Link
-              to={`/${industryKey}/services`}
+              to={industryKey ? `/${industryKey}/services` : '/services'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -565,7 +583,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/about`}
+              to={industryKey ? `/${industryKey}/about` : '/about'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -573,7 +591,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/case-studies`}
+              to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >

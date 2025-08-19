@@ -91,21 +91,51 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   // Always call the hook, but with a null check inside
   const { config, loading, error } = useIndustryConfig(selectedIndustry);
   
-  // Route detection
+  // Import getCurrentSubdomain at the top of component
+  const { getCurrentSubdomain } = require('../../utils/domainRedirect');
+  const subdomain = getCurrentSubdomain();
+  
+  // Route detection with subdomain awareness
   const pathSegments = location.pathname.split('/').filter(Boolean);
-  const industryKey = pathSegments[0] || '';
-  const subPage = pathSegments[1];
+  let industryKey = pathSegments[0] || '';
+  let subPage = pathSegments[1];
+  
+  // On subdomain, adjust path interpretation
+  if (subdomain === 'hospitality') {
+    // On hospitality subdomain, root should be hospitality
+    if (location.pathname === '/') {
+      industryKey = 'hospitality';
+    }
+    // On subdomain, first segment is the subpage (not industry)
+    if (pathSegments.length >= 1 && pathSegments[0] !== 'hospitality') {
+      subPage = pathSegments[0];
+      industryKey = 'hospitality';
+    }
+  }
   
   // Use centralized mapping
-  const currentIndustry = getIndustryFromPath(location.pathname);
+  const currentIndustry = subdomain === 'hospitality' && location.pathname === '/' 
+    ? 'hospitality' 
+    : getIndustryFromPath(location.pathname);
   const isRootPage = location.pathname === '/';
-  const isIndustryHomepage = pathSegments.length === 1 && currentIndustry !== null;
+  const isIndustryHomepage = (pathSegments.length === 1 && currentIndustry !== null) || 
+                             (subdomain === 'hospitality' && location.pathname === '/');
   const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
-  const isSubpage = pathSegments.length > 1; // Only paths with multiple segments are subpages
+  const isSubpage = (pathSegments.length > 1) || 
+                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Only paths with multiple segments are subpages
   
-  // Handle domain redirect from main domain to hospitality subdomain
+  // Handle domain redirect and subdomain detection
   useEffect(() => {
-    if (isRedirectEnabled()) {
+    const subdomain = getCurrentSubdomain();
+    
+    // If on hospitality subdomain, automatically select hospitality
+    if (subdomain === 'hospitality' && location.pathname === '/') {
+      setSelectedIndustry('hospitality');
+      setLandingAreaState('decided');
+      setTimeout(() => setShowContent(true), 500);
+    }
+    // If on main domain or www, redirect to hospitality subdomain
+    else if (subdomain === 'main' && isRedirectEnabled()) {
       handleDomainRedirect();
     }
   }, []); // Run once on mount
