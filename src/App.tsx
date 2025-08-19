@@ -12,11 +12,25 @@ import { AdminAuth } from './components/admin/AdminAuth';
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
 
+// Utils
+import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from './utils/domainRedirect';
+
 /**
  * App using the unified single-page architecture
  * This approach maintains the header during all transitions
  */
 const App: React.FC = () => {
+  // Check for redirect IMMEDIATELY on app load
+  useEffect(() => {
+    if (isRedirectEnabled()) {
+      const subdomain = getCurrentSubdomain();
+      if (subdomain === 'main') {
+        console.log('[App.tsx] Triggering redirect from main domain...');
+        handleDomainRedirect();
+      }
+    }
+  }, []);
+
   const [landingAreaLoaded, setLandingAreaLoaded] = useState(false);
   
   // Start preloading videos after landing area loads (logo, title, verticals)

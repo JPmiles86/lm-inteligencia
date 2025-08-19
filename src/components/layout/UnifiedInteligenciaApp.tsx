@@ -123,19 +123,25 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const isSubpage = (pathSegments.length > 1) || 
                     (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Only paths with multiple segments are subpages
   
-  // Handle domain redirect and subdomain detection
+  // Handle domain redirect and subdomain detection - MUST RUN FIRST
   useEffect(() => {
-    const subdomain = getCurrentSubdomain();
-    
-    // If on hospitality subdomain, automatically select hospitality
-    if (subdomain === 'hospitality' && location.pathname === '/') {
-      setSelectedIndustry('hospitality');
-      setLandingAreaState('decided');
-      setTimeout(() => setShowContent(true), 500);
-    }
-    // If on main domain or www, redirect to hospitality subdomain
-    else if (subdomain === 'main' && isRedirectEnabled()) {
-      handleDomainRedirect();
+    // Check for redirect IMMEDIATELY
+    if (isRedirectEnabled()) {
+      const subdomain = getCurrentSubdomain();
+      
+      // If on main domain, redirect to hospitality subdomain
+      if (subdomain === 'main') {
+        console.log('Redirecting from main domain to hospitality subdomain...');
+        handleDomainRedirect();
+        return; // Don't do anything else
+      }
+      
+      // If on hospitality subdomain, automatically select hospitality
+      if (subdomain === 'hospitality' && location.pathname === '/') {
+        setSelectedIndustry('hospitality');
+        setLandingAreaState('decided');
+        setTimeout(() => setShowContent(true), 500);
+      }
     }
   }, []); // Run once on mount
 

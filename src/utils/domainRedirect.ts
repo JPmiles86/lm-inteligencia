@@ -6,12 +6,15 @@ import { getCurrentEnvironment } from '../config/subdomain-mapping';
 export const handleDomainRedirect = (): void => {
   // Only run in production environment
   if (getCurrentEnvironment() === 'development') {
+    console.log('Skipping redirect in development environment');
     return;
   }
 
   const hostname = window.location.hostname;
   const pathname = window.location.pathname;
   const search = window.location.search;
+  
+  console.log('Current hostname:', hostname);
   
   // Check if we're on the main domain (inteligenciadm.com or www.inteligenciadm.com)
   const isMainDomain = hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com';
@@ -26,8 +29,10 @@ export const handleDomainRedirect = (): void => {
     const redirectUrl = `https://hospitality.inteligenciadm.com${pathname}${search}`;
     
     console.log(`Redirecting from ${hostname} to hospitality.inteligenciadm.com`);
+    console.log('Redirect URL:', redirectUrl);
     
-    // Perform the redirect
+    // Perform the redirect with both methods for reliability
+    window.location.href = redirectUrl;
     window.location.replace(redirectUrl);
   }
 };
