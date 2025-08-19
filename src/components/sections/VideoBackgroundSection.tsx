@@ -14,18 +14,19 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
   desktopVideoUrl = 'https://player.vimeo.com/video/1100417251',
   mobileVideoUrl = 'https://player.vimeo.com/video/1100417904'
 }) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isDesktopReady, setIsDesktopReady] = useState(false);
+  const [isMobileReady, setIsMobileReady] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const desktopIframeRef = useRef<HTMLIFrameElement>(null);
+  const mobileIframeRef = useRef<HTMLIFrameElement>(null);
 
   // Check for mobile device
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    checkMobile();
     window.addEventListener('resize', checkMobile);
     
     return () => {
@@ -72,7 +73,12 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
         const data = JSON.parse(event.data);
         // Listen for play event which indicates video is actually playing
         if (data.event === 'play' || data.event === 'timeupdate') {
-          setIsVideoReady(true);
+          // Determine which video sent the message based on player_id
+          if (data.player_id === 'desktop-video') {
+            setIsDesktopReady(true);
+          } else if (data.player_id === 'mobile-video') {
+            setIsMobileReady(true);
+          }
           isVideoLoading = false;
         }
       } catch (e) {
@@ -84,8 +90,8 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  // Get the appropriate video URL
-  const videoUrl = isMobile && mobileVideoUrl ? mobileVideoUrl : desktopVideoUrl;
+  // Determine which video is ready
+  const isCurrentVideoReady = isMobile ? isMobileReady : isDesktopReady;
 
   return (
     <section 
@@ -97,49 +103,81 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900"></div>
       
       {/* Loading indicator - subtle pulse */}
-      {shouldLoadVideo && !isVideoReady && (
+      {shouldLoadVideo && !isCurrentVideoReady && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-white/20 border-t-white/60 rounded-full animate-spin"></div>
         </div>
       )}
       
-      {/* Vimeo Video Container - Only load when visible and ready */}
+      {/* Video Container with both videos preloaded */}
       {shouldLoadVideo && (
         <div 
-          className={`absolute inset-0 transition-opacity duration-1000 ${isVideoReady ? 'opacity-100' : 'opacity-0'}`}
+          className="absolute inset-0"
           style={{
             width: '100%',
             height: '100%',
             overflow: 'hidden',
           }}
         >
+          {/* Desktop Video */}
           <iframe
-            ref={iframeRef}
-            src={`${videoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&responsive=1`}
+            ref={desktopIframeRef}
+            src={`${desktopVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&player_id=desktop-video`}
+            className={`absolute transition-opacity duration-500 ${!isMobile && isDesktopReady ? 'opacity-100' : 'opacity-0'} ${isMobile ? 'pointer-events-none' : ''}`}
             style={{ 
               position: 'absolute',
               top: '50%',
               left: '50%',
-              // Use max to ensure video always covers the viewport
-              width: 'max(100vw, 177.77vh)', // 16:9 aspect ratio width
-              height: 'max(56.25vw, 100vh)', // 16:9 aspect ratio height
+              width: '120%',
+              height: '120%',
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
             allow="autoplay; fullscreen; picture-in-picture"
-            title="Background video"
+            title="Desktop background video"
             onLoad={() => {
               // Enable postMessage communication for event listening
-              if (iframeRef.current?.contentWindow) {
-                iframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"play"}', '*');
-                iframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"timeupdate"}', '*');
+              if (desktopIframeRef.current?.contentWindow) {
+                desktopIframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"play"}', '*');
+                desktopIframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"timeupdate"}', '*');
               }
               
-              // Fallback timer in case postMessage doesn't work - reduced time
+              // Fallback timer in case postMessage doesn't work
               setTimeout(() => {
-                if (!isVideoReady) {
-                  setIsVideoReady(true);
-                  isVideoLoading = false;
+                if (!isDesktopReady) {
+                  setIsDesktopReady(true);
+                }
+              }, 1500);
+            }}
+          />
+          
+          {/* Mobile Video */}
+          <iframe
+            ref={mobileIframeRef}
+            src={`${mobileVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&player_id=mobile-video`}
+            className={`absolute transition-opacity duration-500 ${isMobile && isMobileReady ? 'opacity-100' : 'opacity-0'} ${!isMobile ? 'pointer-events-none' : ''}`}
+            style={{ 
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              width: '120%',
+              height: '120%',
+              transform: 'translate(-50%, -50%)',
+              border: 'none',
+            }}
+            allow="autoplay; fullscreen; picture-in-picture"
+            title="Mobile background video"
+            onLoad={() => {
+              // Enable postMessage communication for event listening
+              if (mobileIframeRef.current?.contentWindow) {
+                mobileIframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"play"}', '*');
+                mobileIframeRef.current.contentWindow.postMessage('{"method":"addEventListener","value":"timeupdate"}', '*');
+              }
+              
+              // Fallback timer in case postMessage doesn't work
+              setTimeout(() => {
+                if (!isMobileReady) {
+                  setIsMobileReady(true);
                 }
               }, 1500);
             }}
