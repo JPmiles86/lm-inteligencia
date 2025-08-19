@@ -124,7 +124,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-20 lg:h-24 py-2">
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
@@ -138,7 +138,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-10"
+                    className="h-12 lg:h-14"
                     style={{ objectFit: 'contain' }}
                   />
                 </motion.div>
@@ -248,9 +248,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-md transition-colors ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
+              className="lg:hidden p-2 rounded-md transition-colors text-gray-700 hover:text-gray-900"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMobileMenuOpen ? (
@@ -335,7 +333,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
       </motion.nav>
 
       {/* Spacer for fixed navbar on non-seamless pages */}
-      {!isSeamlessPage && <div className="h-16 lg:h-20" />}
+      {!isSeamlessPage && <div className="h-20 lg:h-24" />}
     </>
   );
 };
@@ -423,7 +421,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-20 lg:h-24 py-2">
             {/* Logo and Industry Selector */}
             <div className="flex flex-col items-start">
               <Link
@@ -437,7 +435,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-10"
+                    className="h-12 lg:h-14"
                     style={{ objectFit: 'contain' }}
                   />
                 </motion.div>
@@ -547,9 +545,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 rounded-md transition-colors ${
-                isScrolled ? 'text-gray-700' : 'text-white'
-              }`}
+              className="lg:hidden p-2 rounded-md transition-colors text-gray-700 hover:text-gray-900"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMobileMenuOpen ? (
@@ -634,7 +630,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
       </motion.nav>
 
       {/* Spacer for fixed navbar on non-seamless pages */}
-      {!isSeamlessPage && <div className="h-16 lg:h-20" />}
+      {!isSeamlessPage && <div className="h-20 lg:h-24" />}
     </>
   );
 };

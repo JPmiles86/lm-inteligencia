@@ -20,15 +20,17 @@ import { handleDomainRedirect, isRedirectEnabled, getCurrentSubdomain } from './
  * This approach maintains the header during all transitions
  */
 const App: React.FC = () => {
-  // Check for redirect IMMEDIATELY on app load
+  // Check for redirect on app load but don't block rendering
   useEffect(() => {
     const hostname = window.location.hostname;
     
     // Direct check - if on main domain, redirect to hospitality
     if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
       console.log('[App.tsx] On main domain, redirecting to hospitality...');
-      window.location.href = 'https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search;
-      return;
+      // Small delay to let meta refresh work first
+      setTimeout(() => {
+        window.location.href = 'https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search;
+      }, 100);
     }
   }, []);
 

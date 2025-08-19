@@ -147,8 +147,74 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           </p>
         </motion.div>
 
-        {/* Services Grid with Hover Reveal */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Mobile/Tablet View - All Cards Expanded */}
+        <div className="lg:hidden space-y-8">
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              {/* Service Image */}
+              <div className="h-64 overflow-hidden">
+                <img 
+                  src={service.image || getPlaceholderImage(index)}
+                  alt={service.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Service Content */}
+              <div className="p-8">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="p-3 rounded-xl" style={{ backgroundColor: 'rgba(240, 74, 155, 0.06)' }}>
+                    {getServiceIcon(service.title)}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold mb-2" style={{ color: '#000' }}>
+                      {service.title}
+                    </h3>
+                    <p className="text-gray-600">
+                      {service.keyBenefit}
+                    </p>
+                  </div>
+                </div>
+                
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {service.description}
+                </p>
+                
+                {service.features && (
+                  <ul className="space-y-3">
+                    {service.features.map((feature, fIndex) => (
+                      <li key={fIndex} className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                
+                {service.learnMoreLink && (
+                  <Link 
+                    to={service.learnMoreLink}
+                    className="inline-block mt-6 text-secondary font-semibold hover:opacity-80 transition-opacity"
+                  >
+                    Learn More →
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Desktop View - Original Hover Interaction */}
+        <div className="hidden lg:grid grid-cols-2 gap-12">
           {/* Services List */}
           <div className="space-y-6">
             {services.map((service, index) => (
@@ -190,8 +256,8 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             ))}
           </div>
 
-          {/* Service Details Panel */}
-          <div className="lg:sticky lg:top-8 h-fit">
+          {/* Service Details Panel - Desktop Only */}
+          <div className="sticky top-8 h-fit">
             <motion.div
               key={hoveredIndex}
               initial={{ opacity: 0, y: 20 }}

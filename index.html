@@ -7,6 +7,13 @@
     <title>Inteligencia - Specialized Marketing Solutions</title>
     <meta name="description" content="Professional marketing services tailored for hotels, restaurants, healthcare, and sports industries." />
     
+    <!-- Redirect to hospitality subdomain if on main domain -->
+    <script>
+      if (window.location.hostname === 'inteligenciadm.com' || window.location.hostname === 'www.inteligenciadm.com') {
+        document.write('<meta http-equiv="refresh" content="0; url=https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search + '">');
+      }
+    </script>
+    
     <!-- Industry-specific styling will be injected here -->
     <style>
       :root {
@@ -22,38 +29,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <!-- Immediate redirect script - runs before React loads -->
-    <script>
-      // TEMPORARY REDIRECT TO HOSPITALITY SUBDOMAIN
-      // Remove this script when all verticals are ready
-      var hostname = window.location.hostname.toLowerCase();
-      var pathname = window.location.pathname;
-      var search = window.location.search;
-      
-      // Debug - show what hostname we're seeing
-      console.log('Redirect check - hostname:', hostname);
-      // TEMPORARY: Alert to see what's happening
-      alert('Hostname detected: ' + hostname);
-      
-      // Check if we need to redirect
-      var needsRedirect = false;
-      var redirectUrl = 'https://hospitality.inteligenciadm.com' + pathname + search;
-      
-      if (hostname === 'inteligenciadm.com') {
-        needsRedirect = true;
-        console.log('Main domain detected - redirecting to hospitality');
-      } else if (hostname === 'www.inteligenciadm.com') {
-        needsRedirect = true;
-        console.log('WWW domain detected - redirecting to hospitality');
-      }
-      
-      // Perform redirect
-      if (needsRedirect) {
-        console.log('Redirecting to:', redirectUrl);
-        // Use location.replace so user can't go back
-        window.location.replace(redirectUrl);
-      }
-    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

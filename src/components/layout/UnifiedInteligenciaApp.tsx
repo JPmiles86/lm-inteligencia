@@ -123,16 +123,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const isSubpage = (pathSegments.length > 1) || 
                     (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Only paths with multiple segments are subpages
   
-  // Handle domain redirect and subdomain detection - MUST RUN FIRST
+  // Handle subdomain detection and auto-selection
   useEffect(() => {
     const hostname = window.location.hostname;
-    
-    // IMMEDIATE REDIRECT - no conditions, just redirect if on main domain
-    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
-      console.log('[UnifiedApp] Redirecting to hospitality subdomain...');
-      window.location.href = 'https://hospitality.inteligenciadm.com' + location.pathname + location.search;
-      return;
-    }
     
     // If on hospitality subdomain, automatically select hospitality
     if (hostname === 'hospitality.inteligenciadm.com' && location.pathname === '/') {
@@ -140,6 +133,8 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       setLandingAreaState('decided');
       setTimeout(() => setShowContent(true), 500);
     }
+    
+    // Redirect handled by meta refresh and App.tsx, so page still renders
   }, []); // Run once on mount
 
   // Handle invalid industry paths
