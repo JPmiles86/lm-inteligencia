@@ -127,23 +127,35 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   useEffect(() => {
     const hostname = window.location.hostname;
     
-    // If on hospitality subdomain, automatically select hospitality
-    if (hostname === 'hospitality.inteligenciadm.com' && location.pathname === '/') {
+    // If on hospitality subdomain, ALWAYS select hospitality industry
+    if (hostname === 'hospitality.inteligenciadm.com') {
       setSelectedIndustry('hospitality');
-      setLandingAreaState('decided');
-      setTimeout(() => setShowContent(true), 500);
+      
+      // Only set landing area state for homepage
+      if (location.pathname === '/') {
+        setLandingAreaState('decided');
+        setTimeout(() => setShowContent(true), 500);
+      } else {
+        // For subpages, hide landing area
+        setLandingAreaState('hidden');
+      }
     }
     
     // Redirect handled by meta refresh and App.tsx, so page still renders
-  }, []); // Run once on mount
+  }, [location.pathname]); // Re-run when pathname changes
 
-  // Handle invalid industry paths
+  // Handle invalid industry paths (but not on subdomains)
   useEffect(() => {
+    // Skip this check if we're on a subdomain
+    if (subdomain === 'hospitality') {
+      return;
+    }
+    
     if (industryKey && !currentIndustry && !isRootPage) {
       // Invalid industry path - redirect to root
       navigate('/');
     }
-  }, [industryKey, currentIndustry, isRootPage, navigate]);
+  }, [industryKey, currentIndustry, isRootPage, navigate, subdomain]);
 
   // Debug logging removed
 
