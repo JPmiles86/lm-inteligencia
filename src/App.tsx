@@ -6,7 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaApp';
 
 // Admin Components
-import { AdminDashboard } from './components/admin/AdminDashboard';
+import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
 
 // Hooks
@@ -69,7 +69,7 @@ const App: React.FC = () => {
             path="/admin" 
             element={
               <AdminAuth>
-                <AdminDashboard tenantId="laurie-inteligencia" />
+                <AdminPanel />
               </AdminAuth>
             } 
           />

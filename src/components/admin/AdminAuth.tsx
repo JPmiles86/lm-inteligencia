@@ -7,8 +7,13 @@ interface AdminAuthProps {
 
 export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // Admin credentials (in production, this should be in a secure backend)
+  const ADMIN_EMAIL = 'laurie@inteligenciadm.com';
+  const ADMIN_PASSWORD = 'Inteligencia2025!';
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin_authenticated');
@@ -19,33 +24,19 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'password123') {
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_authenticated', 'true');
       setError('');
     } else {
-      setError('Invalid password');
+      setError('Invalid email or password');
+      setEmail('');
       setPassword('');
     }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('admin_authenticated');
-  };
-
   if (isAuthenticated) {
-    return (
-      <>
-        {children}
-        <button
-          onClick={handleLogout}
-          className="fixed bottom-4 right-4 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700 transition-colors z-50"
-        >
-          Logout
-        </button>
-      </>
-    );
+    return <>{children}</>;
   }
 
   return (
@@ -59,13 +50,29 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
           </div>
           
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
-            Admin Access Required
+            Admin Access
           </h2>
           <p className="text-gray-600 text-center mb-8">
-            Please enter the admin password to continue
+            Please sign in to access the admin panel
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="admin@example.com"
+                required
+                autoFocus
+              />
+            </div>
+            
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -76,9 +83,8 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter admin password"
+                placeholder="Enter password"
                 required
-                autoFocus
               />
             </div>
 

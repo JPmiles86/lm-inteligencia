@@ -9,6 +9,7 @@ import { IndustryNames } from '../../types/Industry';
 import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
+import { useAdminSettings } from '../../hooks/useAdminSettings';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility
@@ -30,6 +31,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ industry: string }>();
+  const adminSettings = useAdminSettings();
 
   // Always call the hook - this component is only rendered when context is available
   const context = useIndustryContext();
@@ -203,12 +205,14 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               {/* Blog - always navigate to subpage */}
-              <Link
-                to={industryKey ? `/${industryKey}/blog` : '/blog'}
-                className="font-medium transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.blog}
-              </Link>
+              {adminSettings.showBlog && (
+                <Link
+                  to={industryKey ? `/${industryKey}/blog` : '/blog'}
+                  className="font-medium transition-colors hover:text-primary text-gray-700"
+                >
+                  {navItems.blog}
+                </Link>
+              )}
 
               {/* Contact - scroll on main page, navigate on subpages */}
               {isSeamlessPage ? (
@@ -340,6 +344,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ industry: string }>();
+  const adminSettings = useAdminSettings();
 
   // Determine the current industry and name from props only
   const industry = industryProp || config?.industry || currentIndustry || 'main';
@@ -490,12 +495,14 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               {/* Blog - always navigate to subpage */}
-              <Link
-                to={industryKey ? `/${industryKey}/blog` : '/blog'}
-                className="font-medium transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.blog}
-              </Link>
+              {adminSettings.showBlog && (
+                <Link
+                  to={industryKey ? `/${industryKey}/blog` : '/blog'}
+                  className="font-medium transition-colors hover:text-primary text-gray-700"
+                >
+                  {navItems.blog}
+                </Link>
+              )}
 
               {/* Contact - scroll on main page, navigate on subpages */}
               {isSeamlessPage ? (
