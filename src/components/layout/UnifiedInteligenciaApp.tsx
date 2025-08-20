@@ -459,7 +459,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                   <VideoCTASection 
                     content={config.content.videoCTA}
                     industryTheme={config.industry}
-                    industryPath={contextValue.industryPath}
+                    industryPath={subdomain === 'hospitality' ? '' : `/${industryKey}`}
                   />
                 )}
                 
