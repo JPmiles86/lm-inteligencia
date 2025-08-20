@@ -50,7 +50,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Reduce OTA dependency by 35%',
           icon: 'hotel',
           image: '/images/HotelAdsManagement.png',
-          learnMoreLink: '/hotels/services#google-ads',
+          learnMoreLink: '/services#google-ads',
         },
         {
           title: 'Meta (Facebook & Instagram) Ads',
@@ -58,7 +58,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Turn views into Bookings with Visual Impact',
           icon: 'camera',
           image: '/images/MetaAdvertising.png',
-          learnMoreLink: '/hotels/services#meta-advertising',
+          learnMoreLink: '/services#meta-advertising',
         },
         {
           title: 'Email Marketing & Funnels',
@@ -66,7 +66,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: '40% higher guest lifetime value',
           icon: 'mail',
           image: '/images/EmailMarketing.png',
-          learnMoreLink: '/hotels/services#email-marketing',
+          learnMoreLink: '/services#email-marketing',
         },
         {
           title: 'Marketing Strategy Consulting',
@@ -74,7 +74,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Increase RevPAR by 25%',
           icon: 'chart-line',
           image: '/images/MarketingStrategy.png',
-          learnMoreLink: '/hotels/services#strategy-consulting',
+          learnMoreLink: '/services#strategy-consulting',
         },
         {
           title: 'Event/Launch Campaigns',
@@ -82,7 +82,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Drive 85%+ Occupancy for Events',
           icon: 'calendar',
           image: '/images/EventMarketing.png',
-          learnMoreLink: '/hotels/services#event-campaigns',
+          learnMoreLink: '/services#event-campaigns',
         },
         {
           title: 'OTA Optimization & Demand Generation',
@@ -90,7 +90,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Maximize visibility across all booking platforms',
           icon: 'globe',
           image: '/images/OTAOptimization.png',
-          learnMoreLink: '/hotels/services#strategy-consulting',
+          learnMoreLink: '/services#strategy-consulting',
         },
         {
           title: 'Restaurant Marketing',
@@ -98,7 +98,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           keyBenefit: 'Increase Restaurant Bookings, Online Orders and ROI',
           icon: 'utensils',
           image: '/images/RestaurantMarketing.png',
-          learnMoreLink: '/hotels/services#restaurant-marketing',
+          learnMoreLink: '/services#restaurant-marketing',
         },
       ],
       // NOTE: About page content moved to universal-content.ts for consistency across all industries
@@ -141,7 +141,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
         headline: 'Ready to transform your hospitality business?',
         subtitle: 'Let\'s discuss how AI-powered marketing can revolutionize your hotel\'s performance',
         ctaText: 'Start Your Transformation',
-        ctaLink: '/hotels/contact',
+        ctaLink: '/contact',
         trustIndicators: [
           'Free Strategy Consultation',
           'No Long-term Contracts', 

@@ -268,11 +268,15 @@ export const UnifiedInteligenciaApp: React.FC = () => {
     if (!selectedIndustry || !config) return null;
 
     // Create context value for pages
+    const subdomain = getCurrentSubdomain();
+    const isOnHospitalitySubdomain = subdomain === 'hospitality';
+    
     const contextValue = {
       config,
       industry: selectedIndustry,
       industryKey,
-      industryPath: `/${industryKey}`
+      // Use empty path on hospitality subdomain, otherwise use industry-prefixed path
+      industryPath: isOnHospitalitySubdomain ? '' : `/${industryKey}`
     };
     
     const renderPage = () => {
@@ -455,6 +459,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                   <VideoCTASection 
                     content={config.content.videoCTA}
                     industryTheme={config.industry}
+                    industryPath={contextValue.industryPath}
                   />
                 )}
                 

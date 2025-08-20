@@ -17,6 +17,7 @@ interface VideoCTAContent {
 interface VideoCTASectionProps {
   content?: VideoCTAContent;
   industryTheme?: string;
+  industryPath?: string;
   // Also support direct props for backwards compatibility
   industry?: string;
   videoUrl?: string;
@@ -33,7 +34,10 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
   const headline = props.content?.headline || props.headline || 'Ready to transform your business?';
   const subtitle = props.content?.subtitle || props.subtitle || 'Let\'s discuss how AI-powered marketing can revolutionize your business';
   const ctaText = props.content?.ctaText || props.ctaText || 'Start Your Transformation';
-  const ctaLink = props.content?.ctaLink || props.ctaLink || '/contact';
+  const baseCTALink = props.content?.ctaLink || props.ctaLink || '/contact';
+  
+  // Prepend industryPath if provided
+  const ctaLink = props.industryPath ? `${props.industryPath}${baseCTALink}` : baseCTALink;
   const trustIndicators = props.content?.trustIndicators || props.trustIndicators || [
     'Free Strategy Consultation',
     'No Long-term Contracts', 

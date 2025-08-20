@@ -5,6 +5,7 @@ import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { IndustryNavbar } from './IndustryNavbar';
 import { Footer } from './Footer';
 import { PageLoadingSpinner } from './LoadingSpinner';
+import { getCurrentSubdomain } from '../../utils/domainRedirect';
 import type { IndustryType } from '../../types/Industry';
 
 const industryPathMap: Record<string, IndustryType> = {
@@ -23,6 +24,10 @@ export const SharedIndustryLayout: React.FC = () => {
   const { industry: industryParam } = useParams();
   const industry = industryPathMap[industryParam || ''] || 'hospitality';
   const { config, loading } = useIndustryConfig(industry);
+  
+  // Check if we're on a subdomain to determine URL prefix
+  const subdomain = getCurrentSubdomain();
+  const isOnHospitalitySubdomain = subdomain === 'hospitality';
 
   if (loading || !config) {
     return <PageLoadingSpinner />;
@@ -32,7 +37,8 @@ export const SharedIndustryLayout: React.FC = () => {
     config,
     industry,
     industryKey: industryParam || 'hospitality',
-    industryPath: `/${industryParam || 'hospitality'}`
+    // Use empty path on hospitality subdomain, otherwise use industry-prefixed path
+    industryPath: isOnHospitalitySubdomain ? '' : `/${industryParam || 'hospitality'}`
   };
 
   return (

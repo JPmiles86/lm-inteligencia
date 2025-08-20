@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import type { IndustryConfig } from '../../types/Industry';
+import { useIndustryContext } from '../../contexts/IndustryContext';
 import { IndustryNavbar } from '../layout/IndustryNavbar';
 import { HeroSection } from '../sections/HeroSection';
 import { ServicesSection } from '../sections/ServicesSection';
@@ -16,6 +17,7 @@ interface IndustryPageProps {
 }
 
 export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
+  const { industryPath } = useIndustryContext();
   const industryName = getIndustryName(config.industry);
 
   return (
@@ -40,6 +42,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
         title={config.content.servicesTitle || 'Marketing That Moves The Metrics That Matter'}
         subtitle={config.content.servicesSubtitle || 'AI-Driven Strategy for Your Business'}
         industryTheme={config.industry}
+        industryPath={industryPath}
       />
 
       {/* Testimonials Section */}
@@ -51,6 +54,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ config }) => {
       {/* Video CTA Section */}
       <VideoCTASection 
         industry={config.industry}
+        industryPath={industryPath}
         headline={`Ready to transform your ${industryName.toLowerCase()}'s digital presence?`}
       />
 

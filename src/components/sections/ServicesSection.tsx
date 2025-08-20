@@ -202,7 +202,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 
                 {service.learnMoreLink && (
                   <Link 
-                    to={service.learnMoreLink}
+                    to={`${industryPath}${service.learnMoreLink}`}
                     className="inline-block mt-6 text-secondary font-semibold hover:opacity-80 transition-opacity"
                   >
                     Learn More →

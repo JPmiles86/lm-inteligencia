@@ -105,6 +105,7 @@ export const SeamlessIndustryPage: React.FC = () => {
         {/* Video CTA Section */}
         <VideoCTASection 
           industry={config.industry}
+          industryPath={industryPath}
           headline={`Ready to transform your ${industryName.toLowerCase()}'s digital presence?`}
         />
 
