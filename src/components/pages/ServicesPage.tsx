@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryName } from '../../types/Industry';
 import { SimplifiedPricingSection } from '../sections/SimplifiedPricingSection';
@@ -290,12 +291,12 @@ export const ServicesPage: React.FC = () => {
               Schedule a free consultation with our {industryName.toLowerCase()} marketing experts today.
             </p>
             <div className="flex justify-center">
-              <a
-                href="/contact"
+              <Link
+                to="/contact"
                 className="bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block"
               >
                 Get Your Free Consultation
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>

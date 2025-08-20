@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryName, CaseStudyContent, IndustryConfig } from '../../types/Industry';
 import { CaseStudyTimeline } from '../CaseStudyTimeline';
@@ -306,18 +307,18 @@ export const CaseStudiesPage: React.FC = () => {
               Join the businesses that have transformed their marketing and achieved remarkable results with Inteligencia.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+              <Link
+                to="/contact"
+                className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105 inline-block text-center"
               >
                 Get Your Free Analysis
-              </a>
-              <a
-                href="/services"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+              </Link>
+              <Link
+                to="/services"
+                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block text-center"
               >
                 View Our Services
-              </a>
+              </Link>
             </div>
           </motion.div>
         </div>
