@@ -122,16 +122,18 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
           {/* Desktop Video */}
           <iframe
             ref={desktopIframeRef}
-            src={`${desktopVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&player_id=desktop-video`}
+            src={`${desktopVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&responsive=1`}
             className={`absolute transition-opacity duration-500 ${!isMobile && isDesktopReady ? 'opacity-100' : 'opacity-0'} ${isMobile ? 'pointer-events-none' : ''}`}
             style={{ 
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '177.77vh', // 16:9 aspect ratio based on height
-              height: '100%',
-              minWidth: '100%',
-              minHeight: '100%',
+              // Always fill width, height adjusts to maintain 16:9
+              width: '100vw',
+              height: '56.25vw', // 16:9 aspect ratio
+              // But also ensure minimum height covers viewport
+              minHeight: '100vh',
+              minWidth: '177.77vh', // 16:9 aspect ratio
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
@@ -156,14 +158,18 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
           {/* Mobile Video */}
           <iframe
             ref={mobileIframeRef}
-            src={`${mobileVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&player_id=mobile-video`}
+            src={`${mobileVideoUrl}?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&quality=auto&responsive=1`}
             className={`absolute transition-opacity duration-500 ${isMobile && isMobileReady ? 'opacity-100' : 'opacity-0'} ${!isMobile ? 'pointer-events-none' : ''}`}
             style={{ 
               position: 'absolute',
               top: '50%',
               left: '50%',
-              width: '130%',
-              height: '130%',
+              // Always fill width, height adjusts to maintain 16:9
+              width: '100vw',
+              height: '56.25vw', // 16:9 aspect ratio
+              // But also ensure minimum height covers viewport
+              minHeight: '100vh',
+              minWidth: '177.77vh', // 16:9 aspect ratio
               transform: 'translate(-50%, -50%)',
               border: 'none',
             }}
