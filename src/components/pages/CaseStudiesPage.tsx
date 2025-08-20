@@ -307,13 +307,13 @@ export const CaseStudiesPage: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`/${industryKey}/contact`}
+                href="/contact"
                 className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
               >
                 Get Your Free Analysis
               </a>
               <a
-                href={`/${industryKey}/services`}
+                href="/services"
                 className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors"
               >
                 View Our Services

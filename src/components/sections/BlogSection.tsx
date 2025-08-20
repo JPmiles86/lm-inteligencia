@@ -46,7 +46,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
               viewport={{ once: true }}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
             >
-              <Link to={`${industryPath}/blog/${post.slug}`}>
+              <Link to={`/blog/${post.slug}`}>
                 <div className="relative h-48 bg-gray-200 overflow-hidden">
                   <img 
                     src={post.featuredImage} 
@@ -99,7 +99,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
           className="text-center"
         >
           <Link
-            to={`${industryPath}/blog`}
+            to="/blog"
             className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             View All Articles

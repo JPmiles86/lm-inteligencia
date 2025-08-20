@@ -139,7 +139,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             {subtitle} 
             {viewAllCta && (
               <span className="block mt-4 text-lg">
-                <Link to={`${industryPath}/services`} className="font-medium hover:opacity-80 transition-opacity duration-300 text-secondary">
+                <Link to="/services" className="font-medium hover:opacity-80 transition-opacity duration-300 text-secondary">
                   {viewAllCta}
                 </Link>
               </span>
@@ -202,7 +202,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 
                 {service.learnMoreLink && (
                   <Link 
-                    to={`${industryPath}${service.learnMoreLink}`}
+                    to={service.learnMoreLink}
                     className="inline-block mt-6 text-secondary font-semibold hover:opacity-80 transition-opacity"
                   >
                     Learn More →
@@ -313,7 +313,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
               {/* CTA Button */}
               <Link
-                to={services[hoveredIndex]?.learnMoreLink ? `${industryPath}${services[hoveredIndex].learnMoreLink}` : `${industryPath}/contact?service=${encodeURIComponent(services[hoveredIndex]?.title || '')}`}
+                to={services[hoveredIndex]?.learnMoreLink || `/contact?service=${encodeURIComponent(services[hoveredIndex]?.title || '')}`}
                 className="w-full py-4 rounded-xl font-medium text-white text-center block transition-all duration-300 hover:scale-[1.02] transform bg-secondary hover:opacity-90"
               >
                 {services[hoveredIndex]?.learnMoreLink ? 'Learn More' : 'Get Started'}
@@ -339,7 +339,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             </p>
             <div className="flex justify-center">
               <Link
-                to={`${industryPath}/contact`}
+                to="/contact"
                 className="px-10 py-4 rounded-xl font-medium text-white transition-all duration-300 hover:scale-[1.02] transform text-center bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
               >
                 Schedule Free Consultation

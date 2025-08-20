@@ -162,7 +162,7 @@ export const PricingPage: React.FC = () => {
                 {pricingPageContent.customPricingSection.subtitle}
               </p>
               <a
-                href={`/${industryKey}/contact`}
+                href="/contact"
                 className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-bold hover:bg-primary/90 transition-colors"
               >
                 {pricingPageContent.customPricingSection.ctaText}
@@ -321,13 +321,13 @@ export const PricingPage: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`/${industryKey}/contact`}
+                href="/contact"
                 className="bg-white text-primary px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors"
               >
                 {pricingPageContent.ctaSection.primaryButton}
               </a>
               <a
-                href={`/${industryKey}/services`}
+                href="/services"
                 className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-primary transition-colors"
               >
                 {pricingPageContent.ctaSection.secondaryButton}

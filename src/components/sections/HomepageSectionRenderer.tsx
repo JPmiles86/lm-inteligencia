@@ -203,7 +203,7 @@ export const HomepageSectionRenderer: React.FC<HomepageSectionRendererProps> = (
                   {section.description}
                 </p>
                 <Link
-                  to={`${industryPath}/contact`}
+                  to="/contact"
                   className="inline-flex items-center px-10 py-4 rounded-xl font-medium text-white transition-all duration-300 hover:scale-[1.02] transform"
                   style={{ backgroundColor: '#0f5bfb' }}
                 >

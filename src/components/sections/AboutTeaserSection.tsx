@@ -76,7 +76,7 @@ export const AboutTeaserSection: React.FC<AboutTeaserSectionProps> = ({
 
             {/* CTA */}
             <Link
-              to={`${industryPath}/about`}
+              to="/about"
               className="inline-flex items-center text-lg font-medium hover:opacity-80 transition-opacity duration-300"
               style={{ color: '#0f5bfb' }}
             >
