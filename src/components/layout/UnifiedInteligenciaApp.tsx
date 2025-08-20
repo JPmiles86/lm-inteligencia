@@ -457,13 +457,13 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <a 
-                        href={selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/contact` : '#'}
+                        href={subdomain === 'hospitality' ? '/contact' : (selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/contact` : '#')}
                         className="inline-block px-8 py-4 text-white rounded-lg font-semibold transition-all hover:scale-105 transform bg-secondary hover:opacity-90"
                       >
                         Schedule Free Consultation
                       </a>
                       <a 
-                        href={selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/services` : '#'}
+                        href={subdomain === 'hospitality' ? '/services' : (selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/services` : '#')}
                         className="inline-block px-8 py-4 border-2 rounded-lg font-semibold transition-all hover:scale-105 transform border-secondary text-secondary hover:bg-secondary hover:text-white"
                       >
                         View Our Services

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import type { IndustryType } from '../../types/Industry';
+import { getCurrentSubdomain } from '../../utils/domainRedirect';
 
 interface FooterProps {
   selectedIndustry: IndustryType;
@@ -48,8 +49,11 @@ const pathToIndustryMap: Record<string, IndustryType> = {
 
 export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
   const { config, loading } = useIndustryConfig(selectedIndustry);
-
-  // Debug logging removed
+  const subdomain = getCurrentSubdomain();
+  const isOnSubdomain = subdomain === 'hospitality';
+  
+  // Determine URL prefix - empty for subdomain, use industry path for main domain
+  const urlPrefix = isOnSubdomain ? '' : `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry) || ''}`;
 
   // Handle loading state or missing config
   if (loading) {
@@ -92,7 +96,7 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
               {config.content.services?.slice(0, 4).map((service, index) => (
                 <li key={index}>
                   <a 
-                    href={service.learnMoreLink || `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry)}/services`} 
+                    href={service.learnMoreLink || `${urlPrefix}/services`} 
                     className="hover:text-white transition-colors"
                   >
                     {service.title}
@@ -110,7 +114,7 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
                 <li key={ind.industry}>
                   {ind.industry === 'hospitality' ? (
                     <a
-                      href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`}
+                      href={isOnSubdomain ? '/' : `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`}
                       className="hover:text-white transition-colors text-left block capitalize"
                     >
                       {ind.title}
@@ -144,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
                 </div>
               )}
               <div className="pt-2">
-                <a href={`/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry)}/contact`} className="text-white hover:opacity-80 transition-opacity">
+                <a href={`${urlPrefix}/contact`} className="text-white hover:opacity-80 transition-opacity">
                   Get in Touch →
                 </a>
               </div>
