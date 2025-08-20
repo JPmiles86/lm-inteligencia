@@ -92,7 +92,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
       }
     } else if (!isSeamlessPage && isScrollTarget) {
       // On subpage wanting to scroll to main page section
-      navigate(`/${industryKey}#${destination}`);
+      navigate(`${industryKey ? `/${industryKey}` : ''}#${destination}`);
     } else {
       // Regular navigation to subpage
       navigate(destination);
@@ -292,7 +292,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/blog`}
+              to={industryKey ? `/${industryKey}/blog` : '/blog'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -308,7 +308,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               </button>
             ) : (
               <Link
-                to={`/${industryKey}/contact`}
+                to={industryKey ? `/${industryKey}/contact` : '/contact'}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
               >
@@ -317,7 +317,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             )}
             
             <button
-              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
+              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
               className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
@@ -350,10 +350,28 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   const industry = industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
 
+  // Get subdomain helper
+  const getCurrentSubdomain = () => {
+    if (typeof window === 'undefined') return null;
+    const hostname = window.location.hostname;
+    if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) return null;
+    const parts = hostname.split('.');
+    if (parts.length >= 3 && parts[parts.length - 2] === 'inteligenciadm') {
+      return parts[0] || null;
+    }
+    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+      return 'main';
+    }
+    return null;
+  };
+  
+  const subdomain = getCurrentSubdomain();
+
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
-  const industryKey = params.industry || pathSegments[0] || 'hotels'; // Default to hotels if undefined
-  const isSeamlessPage = pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null;
+  const industryKey = subdomain === 'hospitality' ? '' : (params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
+  const isSeamlessPage = (pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null) || 
+                         (subdomain === 'hospitality' && location.pathname === '/');
 
   // Click outside handler for industry dropdown
   useEffect(() => {
@@ -382,7 +400,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
       }
     } else if (!isSeamlessPage && isScrollTarget) {
       // On subpage wanting to scroll to main page section
-      navigate(`/${industryKey}#${destination}`);
+      navigate(`${industryKey ? `/${industryKey}` : ''}#${destination}`);
     } else {
       // Regular navigation to subpage
       navigate(destination);
@@ -582,7 +600,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             <Link
-              to={`/${industryKey}/blog`}
+              to={industryKey ? `/${industryKey}/blog` : '/blog'}
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
             >
@@ -598,7 +616,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               </button>
             ) : (
               <Link
-                to={`/${industryKey}/contact`}
+                to={industryKey ? `/${industryKey}/contact` : '/contact'}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
               >
@@ -607,7 +625,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             )}
             
             <button
-              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : `/${industryKey}/contact`, isSeamlessPage)}
+              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
               className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
