@@ -49,20 +49,20 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
   console.log('[AdminAuth] User not authenticated, rendering login form');
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-purple-100">
           <div className="flex justify-center mb-6">
-            <div className="bg-blue-100 p-3 rounded-full">
-              <Lock className="w-8 h-8 text-blue-600" />
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-full shadow-lg">
+              <Lock className="w-8 h-8 text-white" />
             </div>
           </div>
           
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
-            Admin Access
+            Welcome Back, You Beautiful Bastard! 
           </h2>
           <p className="text-gray-600 text-center mb-8">
-            Please sign in to access the admin panel
+            Ready to make some marketing magic? Let's get you logged in.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,9 +105,9 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 font-semibold shadow-lg"
             >
-              Access Admin Panel
+              Let's Fucking Go! 🚀
             </button>
           </form>
         </div>

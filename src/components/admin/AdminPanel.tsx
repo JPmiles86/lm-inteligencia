@@ -43,13 +43,15 @@ export const AdminPanel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-8">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+      <div className="max-w-6xl mx-auto p-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-purple-100">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">🎉 Admin Panel Working!</h1>
-              <p className="text-green-600 font-medium">✅ Admin route successfully loaded - 404 issue resolved!</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Welcome to Your Command Center 🚀
+              </h1>
+              <p className="text-gray-600 mt-2">Where marketing dreams become reality, you magnificent bastard!</p>
             </div>
             <button
               onClick={handleLogout}
