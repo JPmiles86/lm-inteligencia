@@ -17,6 +17,13 @@
         
         // Log what we're seeing
         console.log('[REDIRECT CHECK] Current hostname:', host);
+        console.log('[REDIRECT CHECK] Current path:', path);
+        
+        // Skip redirect for admin path
+        if (path === '/admin') {
+          console.log('[REDIRECT] Skipping redirect for /admin path');
+          return;
+        }
         
         // Check for main domain (case insensitive)
         if (host.toLowerCase() === 'inteligenciadm.com' || host.toLowerCase() === 'www.inteligenciadm.com') {
