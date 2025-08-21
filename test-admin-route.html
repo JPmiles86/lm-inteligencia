@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Route Test</title>
+</head>
+<body>
+    <h1>Admin Route Test</h1>
+    <p>Open browser console to see debug logs</p>
+    
+    <h2>Test Links:</h2>
+    <ul>
+        <li><a href="/admin" target="_blank">Local Admin (/admin)</a></li>
+        <li><a href="https://inteligenciadm.com/admin" target="_blank">Main Domain Admin</a></li>
+        <li><a href="https://hospitality.inteligenciadm.com/admin" target="_blank">Hospitality Subdomain Admin</a></li>
+    </ul>
+    
+    <h2>Expected Console Logs:</h2>
+    <pre>
+1. [REDIRECT CHECK] === INDEX.HTML REDIRECT SCRIPT ===
+2. [REDIRECT] ✅ ADMIN PATH DETECTED - Skipping redirect
+3. [App.tsx] Admin route matched! Rendering AdminAuth + AdminPanel
+4. [UnifiedApp] ✅ ADMIN ROUTE DETECTED
+5. [AdminAuth] Component mounting
+6. [AdminPanel] Component mounting
+    </pre>
+    
+    <h2>If you see a 404:</h2>
+    <ol>
+        <li>Check browser console for error messages</li>
+        <li>Look for "Route Not Found" or missing component errors</li>
+        <li>Verify the logs show admin route was detected</li>
+        <li>Check network tab for any failed requests</li>
+    </ol>
+</body>
+</html>
