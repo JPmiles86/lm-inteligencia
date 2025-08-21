@@ -290,6 +290,16 @@ export const UnifiedInteligenciaApp: React.FC = () => {
         case 'contact':
           return <ContactPage />;
         case 'blog': {
+          // Check if blog is disabled
+          const adminSettings = localStorage.getItem('admin_settings');
+          if (adminSettings) {
+            const settings = JSON.parse(adminSettings);
+            if (!settings.showBlog) {
+              // Redirect to homepage if blog is disabled
+              window.location.href = isOnHospitalitySubdomain ? '/' : `/${industryKey}`;
+              return null;
+            }
+          }
           // Check if we have a blog post slug
           const blogSlug = pathSegments[2];
           if (blogSlug) {
