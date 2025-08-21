@@ -16,8 +16,7 @@ interface HomepageSectionRendererProps {
 export const HomepageSectionRenderer: React.FC<HomepageSectionRendererProps> = ({ 
   section, 
   industryTheme = 'default',
-  index,
-  industryPath = '' 
+  index
 }) => {
   // Industry theme will be used for custom styling in future versions
   void industryTheme;

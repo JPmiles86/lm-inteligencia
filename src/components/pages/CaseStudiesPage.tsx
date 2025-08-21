@@ -10,7 +10,7 @@ import { CaseStudyTimeline } from '../CaseStudyTimeline';
 import { defaultIndustryConfigs } from '../../config/industry-configs';
 
 export const CaseStudiesPage: React.FC = () => {
-  const { config, industryKey } = useIndustryContext();
+  const { config } = useIndustryContext();
   const currentIndustryName = getIndustryName(config.industry);
   const [selectedIndustry, setSelectedIndustry] = useState<string>(currentIndustryName);
   const [selectedTimeline, setSelectedTimeline] = useState<string | null>(null);

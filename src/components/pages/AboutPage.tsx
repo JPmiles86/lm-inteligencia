@@ -3,12 +3,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext';
-// Removed unused getIndustryName import
+// Removed unused imports
 import { universalContent } from '../../config/universal-content';
 
 export const AboutPage: React.FC = () => {
-  const { industryKey } = useIndustryContext();
+  // industryKey not needed in this component
   // Removed unused industryName variable
 
   // Use universal content that's identical across all industries

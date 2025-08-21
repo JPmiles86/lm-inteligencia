@@ -16,8 +16,7 @@ interface AboutTeaserSectionProps {
 export const AboutTeaserSection: React.FC<AboutTeaserSectionProps> = ({ 
   team,
   industryTheme = 'default',
-  learnMoreCta,
-  industryPath = ''
+  learnMoreCta
 }) => {
   // Industry theme will be used for custom styling in future versions
   void industryTheme;

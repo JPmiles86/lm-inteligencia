@@ -8,7 +8,7 @@ interface BlogSectionProps {
   industryPath: string;
 }
 
-export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
+export const BlogSection: React.FC<BlogSectionProps> = () => {
   // Get the 3 most recent featured posts or just the 3 most recent posts
   const featuredPosts = blogPosts
     .filter(post => post.featured)

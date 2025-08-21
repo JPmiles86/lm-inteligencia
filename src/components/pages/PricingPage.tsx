@@ -8,7 +8,7 @@ import { getIndustryName } from '../../types/Industry';
 // Removed unused universalContent import
 
 export const PricingPage: React.FC = () => {
-  const { config, industryKey } = useIndustryContext();
+  const { config } = useIndustryContext();
   const industryName = getIndustryName(config.industry);
   const pricing = config.content.pricing;
   const pricingPageContent = config.content.pricingPageContent || {

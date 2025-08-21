@@ -7,7 +7,7 @@ import { useIndustryContext } from '../../contexts/IndustryContext';
 import type { PricingContent } from '../../types/Industry';
 
 export const SimplifiedPricingSection: React.FC = () => {
-  const { config, industryPath } = useIndustryContext();
+  const { config } = useIndustryContext();
   const pricing = config.content.pricing;
 
   return (

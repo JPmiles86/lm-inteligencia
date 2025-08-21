@@ -95,7 +95,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   services,
   industryTheme = 'default',
   viewAllCta,
-  industryPath = '',
   title = 'Marketing That Moves The Metrics That Matter',
   subtitle = 'AI-Driven Strategy for Your Business'
 }) => {
