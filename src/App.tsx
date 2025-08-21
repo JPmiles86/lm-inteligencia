@@ -9,8 +9,8 @@ import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaA
 import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
 
-// Debug Component (temporary for testing)
-import { RoutingDebugger } from './components/debug/RoutingDebugger';
+// Debug Component (temporary for testing) - REMOVE IN PRODUCTION
+// import { RoutingDebugger } from './components/debug/RoutingDebugger';
 
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
@@ -79,8 +79,8 @@ const App: React.FC = () => {
   return (
     <HelmetProvider>
       <Router>
-        {/* Add routing debugger for testing - remove in production */}
-        <RoutingDebugger />
+        {/* Add routing debugger for testing - REMOVE IN PRODUCTION */}
+        {/* <RoutingDebugger /> */}
         
         <Routes>
           {/* Admin route MUST come BEFORE the catch-all route */}
