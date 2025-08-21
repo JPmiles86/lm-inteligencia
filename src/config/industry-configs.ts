@@ -100,6 +100,22 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           image: '/images/RestaurantMarketing.png',
           learnMoreLink: '/services#restaurant-marketing',
         },
+        {
+          title: 'Alternative Channel Marketing',
+          description: 'Expand your reach beyond the major platforms with targeted campaigns on alternative channels that fit your audience.',
+          keyBenefit: 'Access new audiences with 20-30% lower costs',
+          icon: 'globe',
+          image: '/images/AlternativeChannelMarketing.png',
+          learnMoreLink: '/services#alternative-channel-marketing',
+        },
+        {
+          title: 'Conversion Rate Optimization (CRO)',
+          description: 'Turn more clicks into customers with data-driven website and funnel optimization.',
+          keyBenefit: '25-40% increase in booking conversion rates',
+          icon: 'trending-up',
+          image: '/images/ConversionRateOptimization.png',
+          learnMoreLink: '/services#conversion-rate-optimization',
+        },
       ],
       // NOTE: About page content moved to universal-content.ts for consistency across all industries
       team: [
@@ -416,6 +432,82 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
                 description: 'Enterprise email marketing with CRM',
                 features: ['Custom CRM integration', 'Predictive analytics', 'Personalization engine', 'Revenue attribution'],
                 suitable: 'Large hotels, resort chains'
+              }
+            }
+          },
+          {
+            id: 'alternative-channel-marketing',
+            title: 'Alternative Channel Marketing',
+            fullDescription: 'Expand your reach beyond the major platforms with targeted campaigns on alternative channels that fit your audience.',
+            features: ['Microsoft (Bing Ads)', 'X (Formerly Twitter) Ads', 'Snapchat Ads', 'Niche Platform Campaigns'],
+            process: ['Channel analysis & selection', 'Platform setup & optimization', 'Campaign creation & management', 'Cross-channel performance tracking'],
+            results: 'Access new audience segments with 20-30% lower competition costs',
+            caseStudyLink: '/case-studies#alternative-channels',
+            caseStudyText: 'See how boutique hotels found their ideal guests on alternative platforms →',
+            icon: '🌐',
+            pricing: {
+              starter: {
+                name: 'Alternative Channels Starter',
+                price: '$1,000',
+                duration: '/month',
+                description: 'Test new channels with focused campaigns',
+                features: ['1-2 alternative platform setup', 'Basic campaign management', 'Performance monitoring', 'Channel comparison reports'],
+                suitable: 'Small to medium hotels looking to diversify'
+              },
+              growth: {
+                name: 'Alternative Channels Growth',
+                price: '$2,200',
+                duration: '/month',
+                description: 'Multi-platform alternative channel strategy',
+                features: ['3-4 platform management', 'Advanced audience targeting', 'Cross-platform optimization', 'Detailed analytics'],
+                recommended: true,
+                suitable: 'Hotels ready to expand beyond Google/Meta'
+              },
+              pro: {
+                name: 'Alternative Channels Pro+',
+                price: '$3,800',
+                duration: '/month',
+                description: 'Enterprise alternative channel marketing',
+                features: ['Full channel diversification', 'Custom platform integrations', 'Advanced attribution', 'Strategic channel consulting'],
+                suitable: 'Large hotels, resort chains'
+              }
+            }
+          },
+          {
+            id: 'conversion-rate-optimization',
+            title: 'Conversion Rate Optimization (CRO)',
+            fullDescription: 'Turn more clicks into customers with data-driven website and funnel optimization.',
+            features: ['Landing Page Optimization', 'A/B Testing', 'User Experience (UX) Enhancements', 'Heatmaps & Behavior Analysis'],
+            process: ['Website audit & analysis', 'Conversion funnel mapping', 'Test design & implementation', 'Results analysis & optimization'],
+            results: 'Average 25-40% increase in booking conversion rates',
+            caseStudyLink: '/case-studies#cro-success',
+            caseStudyText: 'Discover how we doubled a resort\'s booking conversion rate →',
+            icon: '📊',
+            pricing: {
+              starter: {
+                name: 'CRO Starter',
+                price: '$1,200',
+                duration: '/month',
+                description: 'Essential conversion optimization',
+                features: ['Website conversion audit', 'Basic A/B testing', 'Landing page improvements', 'Monthly performance reports'],
+                suitable: 'Hotels with existing traffic wanting better conversions'
+              },
+              growth: {
+                name: 'CRO Growth',
+                price: '$2,800',
+                duration: '/month',
+                description: 'Comprehensive conversion optimization',
+                features: ['Advanced testing program', 'UX analysis & improvements', 'Heat mapping & user recordings', 'Conversion funnel optimization'],
+                recommended: true,
+                suitable: 'Hotels focused on maximizing booking rates'
+              },
+              pro: {
+                name: 'CRO Pro+',
+                price: '$4,500',
+                duration: '/month',
+                description: 'Enterprise conversion optimization',
+                features: ['Full funnel redesign', 'Personalization engine', 'Advanced analytics', 'Revenue optimization consulting'],
+                suitable: 'Large hotels, resort chains with high traffic'
               }
             }
           }

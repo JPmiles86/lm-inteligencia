@@ -9,6 +9,9 @@ import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaA
 import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
 
+// Debug Component (temporary for testing)
+import { RoutingDebugger } from './components/debug/RoutingDebugger';
+
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
 
@@ -22,8 +25,16 @@ const App: React.FC = () => {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
     
+    console.log('[App.tsx] App loaded - Route check:', {
+      hostname,
+      pathname,
+      fullURL: window.location.href,
+      timestamp: new Date().toISOString()
+    });
+    
     // Skip redirect for admin route
     if (pathname === '/admin') {
+      console.log('[App.tsx] Admin route detected - skipping redirect');
       return;
     }
     
@@ -63,22 +74,40 @@ const App: React.FC = () => {
   // Preload videos after landing area is ready
   useVideoPreloaderWithTrigger(landingAreaLoaded);
   
+  console.log('[App.tsx] Rendering App component with routes');
+  
   return (
     <HelmetProvider>
       <Router>
+        {/* Add routing debugger for testing - remove in production */}
+        <RoutingDebugger />
+        
         <Routes>
           {/* Admin route MUST come BEFORE the catch-all route */}
           <Route 
             path="/admin" 
             element={
-              <AdminAuth>
-                <AdminPanel />
-              </AdminAuth>
+              (() => {
+                console.log('[App.tsx] Admin route matched! Rendering AdminAuth + AdminPanel');
+                return (
+                  <AdminAuth>
+                    <AdminPanel />
+                  </AdminAuth>
+                );
+              })()
             } 
           />
           
           {/* Main app with seamless transitions - catch-all route comes last */}
-          <Route path="/*" element={<UnifiedInteligenciaApp />} />
+          <Route 
+            path="/*" 
+            element={
+              (() => {
+                console.log('[App.tsx] Catch-all route matched. Current path:', window.location.pathname);
+                return <UnifiedInteligenciaApp />;
+              })()
+            } 
+          />
         </Routes>
       </Router>
     </HelmetProvider>

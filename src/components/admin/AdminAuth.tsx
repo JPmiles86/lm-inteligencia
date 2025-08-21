@@ -6,6 +6,8 @@ interface AdminAuthProps {
 }
 
 export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
+  console.log('[AdminAuth] Component mounting/rendering');
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -17,8 +19,12 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
 
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin_authenticated');
+    console.log('[AdminAuth] Checking auth status:', { authStatus });
     if (authStatus === 'true') {
+      console.log('[AdminAuth] User already authenticated');
       setIsAuthenticated(true);
+    } else {
+      console.log('[AdminAuth] User not authenticated, showing login form');
     }
   }, []);
 
@@ -36,8 +42,11 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
   };
 
   if (isAuthenticated) {
+    console.log('[AdminAuth] User authenticated, rendering children (AdminPanel)');
     return <>{children}</>;
   }
+
+  console.log('[AdminAuth] User not authenticated, rendering login form');
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">

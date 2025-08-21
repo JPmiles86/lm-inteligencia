@@ -62,22 +62,30 @@ export const getCurrentSubdomain = (): string | null => {
   
   const hostname = window.location.hostname;
   
+  console.log('[getCurrentSubdomain] Analyzing hostname:', hostname);
+  
   // Handle localhost
   if (hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+    console.log('[getCurrentSubdomain] Localhost detected, returning null');
     return null;
   }
   
   // Extract subdomain from inteligenciadm.com
   const parts = hostname.split('.');
+  console.log('[getCurrentSubdomain] Hostname parts:', parts);
   
   if (parts.length >= 3 && parts[parts.length - 2] === 'inteligenciadm') {
-    return parts[0] || null;
+    const subdomain = parts[0] || null;
+    console.log('[getCurrentSubdomain] Subdomain extracted:', subdomain);
+    return subdomain;
   }
   
   // Handle www and root domain
   if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
+    console.log('[getCurrentSubdomain] Main domain detected, returning "main"');
     return 'main';
   }
   
+  console.log('[getCurrentSubdomain] No matching pattern, returning null');
   return null;
 };

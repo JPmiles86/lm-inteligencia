@@ -103,39 +103,72 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   // Check if this is admin route first
   const isAdminRoute = pathSegments[0] === 'admin' || (subdomain && pathSegments[0] === 'admin');
   
-  // Debug logging
-  console.log('[UnifiedApp] Route Debug:', {
+  // Enhanced debug logging for admin route detection
+  console.log('[UnifiedApp] === ROUTE ANALYSIS ===');
+  console.log('[UnifiedApp] Current location:', {
     pathname: location.pathname,
-    pathSegments,
-    subdomain,
-    isAdminRoute,
-    firstSegment: pathSegments[0]
+    search: location.search,
+    hash: location.hash,
+    href: window.location.href
   });
+  console.log('[UnifiedApp] Path breakdown:', {
+    pathSegments,
+    firstSegment: pathSegments[0],
+    segmentCount: pathSegments.length
+  });
+  console.log('[UnifiedApp] Domain info:', {
+    hostname: window.location.hostname,
+    subdomain,
+    isOnHospitalitySubdomain: subdomain === 'hospitality'
+  });
+  // Define isRootPage before using it
+  const isRootPage = location.pathname === '/';
+  
+  console.log('[UnifiedApp] Route flags:', {
+    isAdminRoute,
+    adminCheck1: pathSegments[0] === 'admin',
+    adminCheck2: subdomain && pathSegments[0] === 'admin',
+    isRootPage,
+    isSubpage: pathSegments.length > 1 || (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality')
+  });
+  console.log('[UnifiedApp] === END ROUTE ANALYSIS ===');
   
   // On subdomain, adjust path interpretation
   if (subdomain === 'hospitality') {
+    console.log('[UnifiedApp] On hospitality subdomain - adjusting path interpretation');
     // On hospitality subdomain, root should be hospitality
     if (location.pathname === '/') {
       industryKey = 'hospitality';
+      console.log('[UnifiedApp] Root path on hospitality subdomain, setting industryKey to hospitality');
     }
     // On subdomain, first segment is the subpage (not industry)
     // BUT skip this logic for admin route
     if (pathSegments.length >= 1 && pathSegments[0] !== 'hospitality' && !isAdminRoute) {
       subPage = pathSegments[0];
       industryKey = 'hospitality';
+      console.log('[UnifiedApp] Subdomain logic: set subPage to', subPage, 'and industryKey to hospitality');
     }
   }
+  
+  console.log('[UnifiedApp] Final path variables:', {
+    industryKey,
+    subPage,
+    isAdminRoute,
+    pathSegments
+  });
   
   // Use centralized mapping
   const currentIndustry = subdomain === 'hospitality' && location.pathname === '/' 
     ? 'hospitality' 
     : getIndustryFromPath(location.pathname);
-  const isRootPage = location.pathname === '/';
   const isIndustryHomepage = (pathSegments.length === 1 && currentIndustry !== null) || 
                              (subdomain === 'hospitality' && location.pathname === '/');
   const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
-  const isSubpage = isAdminRoute || (pathSegments.length > 1) || 
-                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Admin and paths with multiple segments are subpages
+  
+  // Fix isSubpage calculation - admin route should ALWAYS be a subpage
+  const isSubpage = isAdminRoute || 
+                    (pathSegments.length > 1) || 
+                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality');
   
   // Handle subdomain detection and auto-selection
   useEffect(() => {
@@ -277,9 +310,23 @@ export const UnifiedInteligenciaApp: React.FC = () => {
 
   // Render appropriate page component for subpages
   const renderSubpage = () => {
+    console.log('[UnifiedApp] === RENDERSUBPAGE FUNCTION ===');
+    console.log('[UnifiedApp] renderSubpage called with:', {
+      isAdminRoute,
+      pathSegments,
+      selectedIndustry,
+      subPage,
+      config: !!config
+    });
+    
     // Check if this is admin route first - no industry needed
     if (isAdminRoute) {
-      console.log('[UnifiedApp] Rendering admin panel');
+      console.log('[UnifiedApp] ✅ ADMIN ROUTE DETECTED - Rendering AdminAuth + AdminPanel');
+      console.log('[UnifiedApp] Admin route details:', {
+        pathSegments,
+        firstSegment: pathSegments[0],
+        adminCheck: pathSegments[0] === 'admin'
+      });
       return (
         <AdminAuth>
           <AdminPanel />
@@ -385,6 +432,20 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       </AnimatePresence>
 
       {/* Conditional rendering based on route type */}
+      {(() => {
+        console.log('[UnifiedApp] === MAIN RENDER DECISION ===');
+        console.log('[UnifiedApp] Route type determination:', {
+          isSubpage,
+          isHomepage,
+          isAdminRoute,
+          pathSegments,
+          selectedIndustry
+        });
+        console.log('[UnifiedApp] Will render:', isSubpage ? 'SUBPAGE' : 'HOMEPAGE');
+        console.log('[UnifiedApp] === END MAIN RENDER DECISION ===');
+        return null;
+      })()}
+      
       {isSubpage ? (
         // Subpage layout - no landing area, just navbar and content
         <>
@@ -407,8 +468,19 @@ export const UnifiedInteligenciaApp: React.FC = () => {
           {(isAdminRoute || (!loading && !error)) && (
             <>
               {(() => {
+                console.log('[UnifiedApp] === FINAL SUBPAGE RENDER ===');
+                console.log('[UnifiedApp] About to call renderSubpage() for:', {
+                  isAdminRoute,
+                  loading,
+                  error,
+                  pathSegments
+                });
                 const result = renderSubpage();
-                console.log('[UnifiedApp] Subpage render result:', result);
+                console.log('[UnifiedApp] renderSubpage() returned:', {
+                  hasResult: !!result,
+                  resultType: result?.type?.name || typeof result
+                });
+                console.log('[UnifiedApp] === END FINAL SUBPAGE RENDER ===');
                 return result;
               })()}
               {selectedIndustry && !isAdminRoute && <Footer selectedIndustry={selectedIndustry as IndustryType} />}
