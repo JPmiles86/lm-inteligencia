@@ -103,6 +103,15 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   // Check if this is admin route first
   const isAdminRoute = pathSegments[0] === 'admin' || (subdomain && pathSegments[0] === 'admin');
   
+  // Debug logging
+  console.log('[UnifiedApp] Route Debug:', {
+    pathname: location.pathname,
+    pathSegments,
+    subdomain,
+    isAdminRoute,
+    firstSegment: pathSegments[0]
+  });
+  
   // On subdomain, adjust path interpretation
   if (subdomain === 'hospitality') {
     // On hospitality subdomain, root should be hospitality
@@ -110,7 +119,8 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       industryKey = 'hospitality';
     }
     // On subdomain, first segment is the subpage (not industry)
-    if (pathSegments.length >= 1 && pathSegments[0] !== 'hospitality') {
+    // BUT skip this logic for admin route
+    if (pathSegments.length >= 1 && pathSegments[0] !== 'hospitality' && !isAdminRoute) {
       subPage = pathSegments[0];
       industryKey = 'hospitality';
     }
@@ -269,6 +279,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const renderSubpage = () => {
     // Check if this is admin route first - no industry needed
     if (isAdminRoute) {
+      console.log('[UnifiedApp] Rendering admin panel');
       return (
         <AdminAuth>
           <AdminPanel />
@@ -278,7 +289,10 @@ export const UnifiedInteligenciaApp: React.FC = () => {
     
     // Subpage rendering debug removed
     
-    if (!selectedIndustry || !config) return null;
+    if (!selectedIndustry || !config) {
+      console.log('[UnifiedApp] No industry/config, returning null');
+      return null;
+    }
 
     // Create context value for pages
     const subdomain = getCurrentSubdomain();
@@ -307,6 +321,13 @@ export const UnifiedInteligenciaApp: React.FC = () => {
           const blogSlug = pathSegments[2];
           return <BlogRedirect isPostPage={!!blogSlug} />;
         }
+        case 'admin':
+          // This shouldn't be reached if isAdminRoute check works, but adding as fallback
+          return (
+            <AdminAuth>
+              <AdminPanel />
+            </AdminAuth>
+          );
         default:
           return null;
       }
@@ -367,13 +388,14 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       {isSubpage ? (
         // Subpage layout - no landing area, just navbar and content
         <>
-          {loading && (
+          {/* Skip loading/error states for admin route */}
+          {!isAdminRoute && loading && (
             <div className="flex items-center justify-center min-h-screen pt-20">
               <PageLoadingSpinner />
             </div>
           )}
           
-          {error && (
+          {!isAdminRoute && error && (
             <div className="flex items-center justify-center min-h-screen pt-20">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Content</h2>
@@ -382,9 +404,13 @@ export const UnifiedInteligenciaApp: React.FC = () => {
             </div>
           )}
           
-          {!loading && !error && (
+          {(isAdminRoute || (!loading && !error)) && (
             <>
-              {renderSubpage()}
+              {(() => {
+                const result = renderSubpage();
+                console.log('[UnifiedApp] Subpage render result:', result);
+                return result;
+              })()}
               {selectedIndustry && !isAdminRoute && <Footer selectedIndustry={selectedIndustry as IndustryType} />}
             </>
           )}
