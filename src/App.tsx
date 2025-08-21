@@ -20,6 +20,12 @@ const App: React.FC = () => {
   // Check for redirect on app load but don't block rendering
   useEffect(() => {
     const hostname = window.location.hostname;
+    const pathname = window.location.pathname;
+    
+    // Skip redirect for admin route
+    if (pathname === '/admin') {
+      return;
+    }
     
     // Direct check - if on main domain, redirect to hospitality
     if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {

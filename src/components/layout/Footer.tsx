@@ -66,7 +66,15 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
       <footer className="bg-black text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <div className="text-2xl font-bold mb-4">Inteligencia</div>
+            <div className="flex items-center gap-2 mb-4 justify-center">
+              <img 
+                src="/LM_inteligencia/Inteligencia-logo-new.png" 
+                alt="Inteligencia" 
+                className="h-8"
+                style={{ objectFit: 'contain' }}
+              />
+              <span className="text-2xl font-bold">Inteligencia</span>
+            </div>
             <p className="text-gray-400 mb-4">Smart marketing solutions that drive real results.</p>
             <div className="border-t border-gray-800 mt-8 pt-8 text-gray-400">
               <p>&copy; 2025 Inteligencia. All rights reserved.</p>
@@ -83,7 +91,15 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="text-2xl font-bold mb-4">Inteligencia</div>
+            <div className="flex items-center gap-2 mb-4">
+              <img 
+                src="/LM_inteligencia/Inteligencia-logo-new.png" 
+                alt="Inteligencia" 
+                className="h-8"
+                style={{ objectFit: 'contain' }}
+              />
+              <span className="text-2xl font-bold">Inteligencia</span>
+            </div>
             <p className="text-gray-400 mb-4">
               Smart marketing solutions that drive real results for {industries.find(i => i.industry === selectedIndustry)?.label}.
             </p>
