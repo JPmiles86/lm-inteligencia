@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Users, BookOpen, LogOut, Eye, EyeOff } from 'lucide-react';
+import { Save, Users, BookOpen, LogOut, Eye, EyeOff, PenTool, Layout } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminSettings {
   showStaffSection: boolean;
@@ -8,6 +9,7 @@ interface AdminSettings {
 
 export const AdminPanel: React.FC = () => {
   console.log('[AdminPanel] AdminPanel component mounting/rendering');
+  const navigate = useNavigate();
   
   const [settings, setSettings] = useState<AdminSettings>({
     showStaffSection: true,
@@ -150,6 +152,72 @@ export const AdminPanel: React.FC = () => {
                 <Save className="w-4 h-4" />
                 {saved ? 'Saved!' : 'Save Settings'}
               </button>
+            </div>
+            
+            {/* Blog Management Section */}
+            <div className="mt-8 border-t pt-8">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+                Blog Management 📝
+              </h2>
+              <p className="text-gray-600 mb-6">
+                Create and manage blog posts with our powerful editors
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <PenTool className="w-8 h-8 text-purple-600" />
+                    <div>
+                      <h3 className="font-bold text-lg">Rich Text Editor</h3>
+                      <p className="text-sm text-gray-600">Traditional WYSIWYG editing</p>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-gray-600 mb-4 space-y-1">
+                    <li>✓ Familiar Word-like interface</li>
+                    <li>✓ Formatting toolbar</li>
+                    <li>✓ Drag & drop images</li>
+                    <li>✓ Auto-save every 30s</li>
+                  </ul>
+                  <button
+                    onClick={() => navigate('/admin/blog/new?editor=rich')}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
+                  >
+                    Open Rich Text Editor
+                  </button>
+                </div>
+                
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Layout className="w-8 h-8 text-blue-600" />
+                    <div>
+                      <h3 className="font-bold text-lg">Block Editor</h3>
+                      <p className="text-sm text-gray-600">Modern Gutenberg-style</p>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-gray-600 mb-4 space-y-1">
+                    <li>✓ Drag & drop blocks</li>
+                    <li>✓ 13+ block types</li>
+                    <li>✓ Slash commands</li>
+                    <li>✓ Block templates</li>
+                  </ul>
+                  <button
+                    onClick={() => navigate('/admin/blog/new?editor=block')}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
+                  >
+                    Open Block Editor
+                  </button>
+                </div>
+              </div>
+              
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => navigate('/admin/blog')}
+                  className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  View All Blog Posts
+                </button>
+              </div>
             </div>
           </div>
         </div>

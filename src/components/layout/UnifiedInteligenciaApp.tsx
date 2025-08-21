@@ -32,6 +32,8 @@ import { ContactPage } from '../pages/ContactPage';
 import { BlogRedirect } from '../routing/BlogRedirect';
 import { AdminPanel } from '../admin/AdminPanel';
 import { AdminAuth } from '../admin/AdminAuth';
+import { BlogManagement } from '../admin/BlogManagement';
+import { EnhancedBlogEditor } from '../admin/BlogManagement/EnhancedBlogEditor';
 
 interface Industry {
   industry: IndustryType;
@@ -102,6 +104,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   
   // Check if this is admin route first
   const isAdminRoute = pathSegments[0] === 'admin' || (subdomain && pathSegments[0] === 'admin');
+  const isAdminBlogRoute = isAdminRoute && (pathSegments[1] === 'blog');
+  const isAdminBlogNew = isAdminBlogRoute && pathSegments[2] === 'new';
+  const isAdminBlogEdit = isAdminBlogRoute && pathSegments[2] === 'edit';
   
   // Enhanced debug logging for admin route detection
   console.log('[UnifiedApp] === ROUTE ANALYSIS ===');
@@ -321,17 +326,35 @@ export const UnifiedInteligenciaApp: React.FC = () => {
     
     // Check if this is admin route first - no industry needed
     if (isAdminRoute) {
-      console.log('[UnifiedApp] ✅ ADMIN ROUTE DETECTED - Rendering AdminAuth + AdminPanel');
+      console.log('[UnifiedApp] ✅ ADMIN ROUTE DETECTED');
       console.log('[UnifiedApp] Admin route details:', {
         pathSegments,
-        firstSegment: pathSegments[0],
-        adminCheck: pathSegments[0] === 'admin'
+        isAdminBlogRoute,
+        isAdminBlogNew,
+        isAdminBlogEdit
       });
-      return (
-        <AdminAuth>
-          <AdminPanel />
-        </AdminAuth>
-      );
+      
+      // Handle different admin routes
+      if (isAdminBlogNew) {
+        return (
+          <AdminAuth>
+            <EnhancedBlogEditor />
+          </AdminAuth>
+        );
+      } else if (isAdminBlogRoute) {
+        return (
+          <AdminAuth>
+            <BlogManagement />
+          </AdminAuth>
+        );
+      } else {
+        // Default admin panel
+        return (
+          <AdminAuth>
+            <AdminPanel />
+          </AdminAuth>
+        );
+      }
     }
     
     // Subpage rendering debug removed
