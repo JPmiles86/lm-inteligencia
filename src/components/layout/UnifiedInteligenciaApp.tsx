@@ -30,6 +30,8 @@ import { AboutPage } from '../pages/AboutPage';
 import { CaseStudiesPage } from '../pages/CaseStudiesPage';
 import { ContactPage } from '../pages/ContactPage';
 import { BlogRedirect } from '../routing/BlogRedirect';
+import { AdminPanel } from '../admin/AdminPanel';
+import { AdminAuth } from '../admin/AdminAuth';
 
 interface Industry {
   industry: IndustryType;
@@ -98,6 +100,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   let industryKey = pathSegments[0] || '';
   let subPage = pathSegments[1];
   
+  // Check if this is admin route first
+  const isAdminRoute = pathSegments[0] === 'admin' || (subdomain && pathSegments[0] === 'admin');
+  
   // On subdomain, adjust path interpretation
   if (subdomain === 'hospitality') {
     // On hospitality subdomain, root should be hospitality
@@ -119,8 +124,8 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   const isIndustryHomepage = (pathSegments.length === 1 && currentIndustry !== null) || 
                              (subdomain === 'hospitality' && location.pathname === '/');
   const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
-  const isSubpage = (pathSegments.length > 1) || 
-                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Only paths with multiple segments are subpages
+  const isSubpage = isAdminRoute || (pathSegments.length > 1) || 
+                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality'); // Admin and paths with multiple segments are subpages
   
   // Handle subdomain detection and auto-selection
   useEffect(() => {
@@ -262,6 +267,15 @@ export const UnifiedInteligenciaApp: React.FC = () => {
 
   // Render appropriate page component for subpages
   const renderSubpage = () => {
+    // Check if this is admin route first - no industry needed
+    if (isAdminRoute) {
+      return (
+        <AdminAuth>
+          <AdminPanel />
+        </AdminAuth>
+      );
+    }
+    
     // Subpage rendering debug removed
     
     if (!selectedIndustry || !config) return null;
@@ -332,9 +346,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
 
   return (
     <div ref={containerRef} className="bg-white">
-      {/* Navbar - always visible on subpages, appears on scroll for homepage */}
+      {/* Navbar - always visible on subpages, appears on scroll for homepage, but not on admin */}
       <AnimatePresence>
-        {showNavbar && selectedIndustry && config && (
+        {showNavbar && selectedIndustry && config && !isAdminRoute && (
           <motion.div
             initial={{ y: -100 }}
             animate={{ y: 0 }}
@@ -371,7 +385,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
           {!loading && !error && (
             <>
               {renderSubpage()}
-              {selectedIndustry && <Footer selectedIndustry={selectedIndustry as IndustryType} />}
+              {selectedIndustry && !isAdminRoute && <Footer selectedIndustry={selectedIndustry as IndustryType} />}
             </>
           )}
         </>
