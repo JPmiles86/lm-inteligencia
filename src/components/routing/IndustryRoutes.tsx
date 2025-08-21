@@ -11,8 +11,7 @@ import { ServicesPage } from '../pages/ServicesPage';
 import { AboutPage } from '../pages/AboutPage';
 import { ContactPage } from '../pages/ContactPage';
 import { CaseStudiesPage } from '../pages/CaseStudiesPage';
-import { BlogListingPage } from '../pages/BlogListingPage';
-import { BlogPostPage } from '../pages/BlogPostPage';
+import { BlogRedirect } from './BlogRedirect';
 import { AdminDashboard } from '../admin/AdminDashboard';
 import { NotFoundPage } from '../layout/ErrorPage';
 
@@ -52,11 +51,9 @@ export const IndustryRoutes: React.FC<IndustryRoutesProps> = ({ config }) => {
       {/* Case studies page - /hotels/case-studies */}
       <Route path="case-studies" element={<CaseStudiesPage />} />
       
-      {/* Blog listing page - /hotels/blog */}
-      <Route path="blog" element={<BlogListingPage />} />
-      
-      {/* Individual blog post - /hotels/blog/:slug */}
-      <Route path="blog/:slug" element={<BlogPostPage />} />
+      {/* Blog routes - check if blog is enabled and redirect if not */}
+      <Route path="blog" element={<BlogRedirect />} />
+      <Route path="blog/:slug" element={<BlogRedirect isPostPage={true} />} />
       
       {/* Admin dashboard - /hotels/admin */}
       <Route path="admin" element={<AdminDashboard tenantId="laurie-inteligencia" />} />

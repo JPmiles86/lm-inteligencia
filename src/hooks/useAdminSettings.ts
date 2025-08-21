@@ -8,7 +8,7 @@ interface AdminSettings {
 export const useAdminSettings = () => {
   const [settings, setSettings] = useState<AdminSettings>({
     showStaffSection: true,
-    showBlog: true
+    showBlog: false  // Default to false to hide blog
   });
 
   useEffect(() => {

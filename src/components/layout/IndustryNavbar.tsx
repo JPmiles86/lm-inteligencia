@@ -290,13 +290,15 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               {navItems.caseStudies}
             </Link>
 
-            <Link
-              to={industryKey ? `/${industryKey}/blog` : '/blog'}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-            >
-              {navItems.blog}
-            </Link>
+            {adminSettings.showBlog && (
+              <Link
+                to={industryKey ? `/${industryKey}/blog` : '/blog'}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
+              >
+                {navItems.blog}
+              </Link>
+            )}
 
             {isSeamlessPage ? (
               <button
@@ -597,13 +599,15 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               {navItems.caseStudies}
             </Link>
 
-            <Link
-              to={industryKey ? `/${industryKey}/blog` : '/blog'}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-            >
-              {navItems.blog}
-            </Link>
+            {adminSettings.showBlog && (
+              <Link
+                to={industryKey ? `/${industryKey}/blog` : '/blog'}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
+              >
+                {navItems.blog}
+              </Link>
+            )}
 
             {isSeamlessPage ? (
               <button

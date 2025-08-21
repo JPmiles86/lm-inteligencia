@@ -29,8 +29,7 @@ import { ServicesPage } from '../pages/ServicesPage';
 import { AboutPage } from '../pages/AboutPage';
 import { CaseStudiesPage } from '../pages/CaseStudiesPage';
 import { ContactPage } from '../pages/ContactPage';
-import { BlogListingPage } from '../pages/BlogListingPage';
-import { BlogPostPage } from '../pages/BlogPostPage';
+import { BlogRedirect } from '../routing/BlogRedirect';
 
 interface Industry {
   industry: IndustryType;
@@ -290,22 +289,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
         case 'contact':
           return <ContactPage />;
         case 'blog': {
-          // Check if blog is disabled
-          const adminSettings = localStorage.getItem('admin_settings');
-          if (adminSettings) {
-            const settings = JSON.parse(adminSettings);
-            if (!settings.showBlog) {
-              // Redirect to homepage if blog is disabled
-              window.location.href = isOnHospitalitySubdomain ? '/' : `/${industryKey}`;
-              return null;
-            }
-          }
           // Check if we have a blog post slug
           const blogSlug = pathSegments[2];
-          if (blogSlug) {
-            return <BlogPostPage />;
-          }
-          return <BlogListingPage />;
+          return <BlogRedirect isPostPage={!!blogSlug} />;
         }
         default:
           return null;
