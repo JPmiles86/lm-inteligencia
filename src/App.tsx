@@ -67,10 +67,7 @@ const App: React.FC = () => {
     <HelmetProvider>
       <Router>
         <Routes>
-          {/* Main app with seamless transitions */}
-          <Route path="/*" element={<UnifiedInteligenciaApp />} />
-          
-          {/* Admin route (separate from main app) */}
+          {/* Admin route MUST come BEFORE the catch-all route */}
           <Route 
             path="/admin" 
             element={
@@ -79,6 +76,9 @@ const App: React.FC = () => {
               </AdminAuth>
             } 
           />
+          
+          {/* Main app with seamless transitions - catch-all route comes last */}
+          <Route path="/*" element={<UnifiedInteligenciaApp />} />
         </Routes>
       </Router>
     </HelmetProvider>
