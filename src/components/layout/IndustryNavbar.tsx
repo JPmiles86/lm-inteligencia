@@ -117,29 +117,28 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 lg:h-24 py-2">
-            {/* Logo and Industry Selector */}
-            <div className="flex flex-col items-start">
+            {/* Logo and Brand Name */}
+            <div className="flex items-center">
               <Link
                 to={industry === 'main' || !industry ? '/' : (industryKey ? `/${industryKey}` : '/')}
                 className="group"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center"
+                  className="flex items-center gap-3"
                 >
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-12 lg:h-14"
+                    className="h-10 lg:h-12"
                     style={{ objectFit: 'contain' }}
                   />
+                  <span className="text-2xl font-medium text-primary" style={{ fontFamily: 'inherit' }}>
+                    Inteligencia
+                  </span>
                 </motion.div>
               </Link>
-              <div className="relative industry-dropdown-container">
-                {/* Temporarily show brand name instead of dropdown for single vertical launch */}
-                <div className="text-lg text-primary mt-1" style={{ fontFamily: 'inherit' }}>
-                  Inteligencia
-                </div>
+              <div className="relative industry-dropdown-container hidden">
                 
                 {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
                 <button
@@ -425,29 +424,28 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20 lg:h-24 py-2">
-            {/* Logo and Industry Selector */}
-            <div className="flex flex-col items-start">
+            {/* Logo and Brand Name */}
+            <div className="flex items-center">
               <Link
                 to={industry === 'main' || !industry ? '/' : (industryKey ? `/${industryKey}` : '/')}
                 className="group"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className="flex items-center"
+                  className="flex items-center gap-3"
                 >
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-12 lg:h-14"
+                    className="h-10 lg:h-12"
                     style={{ objectFit: 'contain' }}
                   />
+                  <span className="text-2xl font-medium text-primary" style={{ fontFamily: 'inherit' }}>
+                    Inteligencia
+                  </span>
                 </motion.div>
               </Link>
-              <div className="relative industry-dropdown-container">
-                {/* Temporarily show brand name instead of dropdown for single vertical launch */}
-                <div className="text-lg text-primary mt-1" style={{ fontFamily: 'inherit' }}>
-                  Inteligencia
-                </div>
+              <div className="relative industry-dropdown-container hidden">
                 
                 {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
                 <button
