@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 // Removed unused imports
 import { universalContent } from '../../config/universal-content';
+import { useAdminSettings } from '../../hooks/useAdminSettings';
 
 export const AboutPage: React.FC = () => {
   // industryKey not needed in this component
   // Removed unused industryName variable
+  const adminSettings = useAdminSettings();
 
   // Use universal content that's identical across all industries
   const aboutContent = universalContent.about;
@@ -173,8 +175,9 @@ export const AboutPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Team Section - Hidden per client request, will be updated later */}
-      <section className="py-20 bg-white hidden">
+      {/* Team Section - Visibility controlled by admin settings */}
+      {adminSettings.showStaffSection && (
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -232,6 +235,7 @@ export const AboutPage: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">

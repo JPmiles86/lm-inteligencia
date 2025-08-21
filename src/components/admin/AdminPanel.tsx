@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Users, BookOpen, LogOut } from 'lucide-react';
+import { Save, Users, BookOpen, LogOut, Eye, EyeOff } from 'lucide-react';
 
 interface AdminSettings {
   showStaffSection: boolean;
@@ -66,47 +66,73 @@ export const AdminPanel: React.FC = () => {
             <div className="border rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">Content Visibility Settings</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-gray-600" />
+                    <Users className="w-5 h-5 text-purple-600" />
                     <div>
-                      <p className="font-medium">Staff Section</p>
-                      <p className="text-sm text-gray-600">Show team members on About page</p>
+                      <p className="font-medium text-gray-900">Staff Section</p>
+                      <p className="text-sm text-gray-600">Team members on About page</p>
+                      <p className="text-xs mt-1">
+                        <span className={`font-semibold ${settings.showStaffSection ? 'text-green-600' : 'text-gray-500'}`}>
+                          Status: {settings.showStaffSection ? '✅ VISIBLE' : '🚫 HIDDEN'}
+                        </span>
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleToggle('showStaffSection')}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.showStaffSection ? 'bg-green-600' : 'bg-gray-300'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      settings.showStaffSection 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-green-500 hover:bg-green-600 text-white'
                     }`}
                   >
-                    <span
-                      className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        settings.showStaffSection ? 'translate-x-6' : ''
-                      }`}
-                    />
+                    {settings.showStaffSection ? (
+                      <>
+                        <EyeOff className="w-4 h-4" />
+                        Hide Staff
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-4 h-4" />
+                        Show Staff
+                      </>
+                    )}
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-pink-50 rounded-lg border border-pink-200">
                   <div className="flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-gray-600" />
+                    <BookOpen className="w-5 h-5 text-pink-600" />
                     <div>
-                      <p className="font-medium">Blog</p>
-                      <p className="text-sm text-gray-600">Show blog section and navigation</p>
+                      <p className="font-medium text-gray-900">Blog Section</p>
+                      <p className="text-sm text-gray-600">Blog pages and navigation</p>
+                      <p className="text-xs mt-1">
+                        <span className={`font-semibold ${settings.showBlog ? 'text-green-600' : 'text-gray-500'}`}>
+                          Status: {settings.showBlog ? '✅ VISIBLE' : '🚫 HIDDEN'}
+                        </span>
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={() => handleToggle('showBlog')}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      settings.showBlog ? 'bg-green-600' : 'bg-gray-300'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                      settings.showBlog 
+                        ? 'bg-red-500 hover:bg-red-600 text-white' 
+                        : 'bg-green-500 hover:bg-green-600 text-white'
                     }`}
                   >
-                    <span
-                      className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                        settings.showBlog ? 'translate-x-6' : ''
-                      }`}
-                    />
+                    {settings.showBlog ? (
+                      <>
+                        <EyeOff className="w-4 h-4" />
+                        Hide Blog
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="w-4 h-4" />
+                        Show Blog
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
