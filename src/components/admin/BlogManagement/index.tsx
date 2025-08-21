@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogList } from './BlogList';
-import { BlogEditor } from './BlogEditor';
+import { EnhancedBlogEditor } from './EnhancedBlogEditor';
 import { MediaUploader } from './MediaUploader';
 import { BlogPost } from '../../../data/blogData';
 
@@ -103,7 +103,7 @@ export const BlogManagement: React.FC = () => {
             className="h-full overflow-auto"
           >
             {renderBreadcrumbs()}
-            <BlogEditor
+            <EnhancedBlogEditor
               post={editingPost}
               onSave={handleSavePost}
               onCancel={handleCancelEdit}

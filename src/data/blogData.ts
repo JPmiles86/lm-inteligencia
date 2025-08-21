@@ -6,6 +6,8 @@ export interface BlogPost {
   slug: string;
   excerpt: string;
   content: string;
+  blocks?: any[] | undefined; // Block-based content (imported as any to avoid circular dependency)
+  editorType?: 'rich' | 'block'; // Track which editor was used
   author: {
     name: string;
     title: string;

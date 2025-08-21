@@ -1,27 +1,31 @@
-// Blog Editor Component - Multi-editor support for creating and editing blog posts
+// Enhanced Blog Editor Component - Supports both Rich Text and Block editors
 
 import React, { useState, useEffect } from 'react';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
-import { RichTextEditor } from './RichTextEditor';
+import { BlockEditor } from './BlockEditor';
+import { Block } from './types';
+import { createBlock, htmlToBlocks } from './utils/blockHelpers';
 
-interface BlogEditorProps {
+interface EnhancedBlogEditorProps {
   post?: BlogPost | null;
   onSave: (post: BlogPost) => void;
   onCancel: () => void;
 }
 
-export const BlogEditor: React.FC<BlogEditorProps> = ({
+export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   post,
   onSave,
   onCancel
 }) => {
-  const [editorType, setEditorType] = useState<'rich' | 'block'>('rich');
+  const [editorType, setEditorType] = useState<'rich' | 'block'>('block');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
+    blocks: [createBlock('paragraph')],
+    editorType: 'block',
     category: 'Digital Marketing Tips',
     tags: [],
     featuredImage: '',
@@ -46,11 +50,19 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   // Load post data when editing
   useEffect(() => {
     if (post) {
+      const initialBlocks = post.blocks && post.blocks.length > 0
+        ? post.blocks as Block[]
+        : post.content 
+          ? htmlToBlocks(post.content)
+          : [createBlock('paragraph')];
+
       setFormData({
         title: post.title,
         slug: post.slug,
         excerpt: post.excerpt,
         content: post.content,
+        blocks: initialBlocks,
+        editorType: post.editorType || 'rich',
         category: post.category,
         tags: post.tags,
         featuredImage: post.featuredImage,
@@ -59,6 +71,8 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         author: post.author,
         readTime: post.readTime
       });
+      
+      setEditorType(post.editorType || 'rich');
     }
   }, [post]);
 
@@ -80,6 +94,25 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+  };
+
+  const handleBlocksChange = (blocks: Block[]) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      blocks,
+      content: '' // Clear rich text content when using blocks
+    }));
+  };
+
+  const handleEditorTypeChange = (newType: 'rich' | 'block') => {
+    setEditorType(newType);
+    setFormData(prev => ({ 
+      ...prev, 
+      editorType: newType,
+      // Reset content when switching editors
+      content: newType === 'rich' ? prev.content : '',
+      blocks: newType === 'block' ? (prev.blocks || [createBlock('paragraph')]) : []
+    }));
   };
 
   const handleAddTag = () => {
@@ -116,8 +149,26 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       newErrors.excerpt = 'Excerpt must be 200 characters or less';
     }
 
-    if (!formData.content.trim()) {
-      newErrors.content = 'Content is required';
+    // Validate content based on editor type
+    if (editorType === 'rich') {
+      if (!formData.content.trim()) {
+        newErrors.content = 'Content is required';
+      }
+    } else {
+      // For block editor, check if there's at least one non-empty block
+      const hasContent = formData.blocks && formData.blocks.some(block => {
+        if (block.type === 'paragraph' && block.data.text?.trim()) return true;
+        if (block.type === 'heading' && block.data.text?.trim()) return true;
+        if (block.type === 'image' && block.data.url?.trim()) return true;
+        if (block.type === 'list' && block.data.items?.some(item => item.trim())) return true;
+        if (block.type === 'quote' && block.data.quote?.trim()) return true;
+        if (block.type === 'callout' && (block.data.title?.trim() || block.data.text?.trim())) return true;
+        return false;
+      });
+      
+      if (!hasContent) {
+        newErrors.content = 'Please add some content blocks';
+      }
     }
 
     if (!formData.featuredImage.trim()) {
@@ -200,7 +251,17 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       </p>
       
       <div className="whitespace-pre-wrap">
-        {formData.content}
+        {editorType === 'rich' ? formData.content : 
+         formData.blocks ? 
+           <div dangerouslySetInnerHTML={{ __html: formData.blocks.map(block => 
+             // Simple preview rendering
+             block.type === 'paragraph' ? `<p>${block.data.text || ''}</p>` :
+             block.type === 'heading' ? `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>` :
+             block.type === 'image' ? `<img src="${block.data.url || ''}" alt="${block.data.alt || ''}" class="max-w-full h-auto" />` :
+             ''
+           ).join('') }} /> : 
+           'No content'
+        }
       </div>
       
       <div className="flex flex-wrap gap-2 mt-8">
@@ -216,7 +277,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     </div>
   );
 
-  const renderEditor = () => (
+  const renderMetaFields = () => (
     <div className="space-y-8">
       {/* Title and Slug */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -275,28 +336,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         {errors.excerpt && (
           <p className="mt-1 text-sm text-red-600">{errors.excerpt}</p>
         )}
-      </div>
-
-      {/* Content */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Content *
-        </label>
-        <textarea
-          value={formData.content}
-          onChange={(e) => handleInputChange('content', e.target.value)}
-          rows={20}
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm ${
-            errors.content ? 'border-red-300' : 'border-gray-300'
-          }`}
-          placeholder="Write your blog post content here... You can use Markdown formatting."
-        />
-        {errors.content && (
-          <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-        )}
-        <p className="mt-2 text-sm text-gray-600">
-          Tip: You can use Markdown formatting for headings, links, lists, and more.
-        </p>
       </div>
 
       {/* Category and Featured Image */}
@@ -421,16 +460,84 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     </div>
   );
 
-  // If Rich Text Editor is selected, use that component
-  if (editorType === 'rich') {
-    return (
-      <RichTextEditor
-        post={post}
-        onSave={onSave}
-        onCancel={onCancel}
-      />
-    );
-  }
+  const renderEditor = () => (
+    <div className="space-y-8">
+      {/* Editor Type Selector */}
+      <div className="border-b border-gray-200 pb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-3">
+          Editor Type
+        </label>
+        <div className="flex gap-4">
+          <button
+            onClick={() => handleEditorTypeChange('block')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              editorType === 'block'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            🧱 Block Editor
+          </button>
+          <button
+            onClick={() => handleEditorTypeChange('rich')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              editorType === 'rich'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            📝 Rich Text Editor
+          </button>
+        </div>
+        <p className="text-sm text-gray-600 mt-2">
+          {editorType === 'block' 
+            ? 'Use the modern block-based editor for rich, structured content'
+            : 'Use the traditional rich text editor for simple text content'
+          }
+        </p>
+      </div>
+
+      {/* Meta fields */}
+      {renderMetaFields()}
+
+      {/* Content Editor */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Content *
+        </label>
+        
+        {editorType === 'block' ? (
+          <div className={`border rounded-lg ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
+            <BlockEditor
+              initialBlocks={formData.blocks || [createBlock('paragraph')]}
+              onChange={handleBlocksChange}
+              className="min-h-[400px]"
+            />
+          </div>
+        ) : (
+          <textarea
+            value={formData.content}
+            onChange={(e) => handleInputChange('content', e.target.value)}
+            rows={20}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm ${
+              errors.content ? 'border-red-300' : 'border-gray-300'
+            }`}
+            placeholder="Write your blog post content here... You can use Markdown formatting."
+          />
+        )}
+        
+        {errors.content && (
+          <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+        )}
+        
+        {editorType === 'rich' && (
+          <p className="mt-2 text-sm text-gray-600">
+            Tip: You can use Markdown formatting for headings, links, lists, and more.
+          </p>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6">
@@ -447,30 +554,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Editor Type Selection */}
-            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setEditorType('rich')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  editorType === 'rich'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Rich Text
-              </button>
-              <button
-                onClick={() => setEditorType('block')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  editorType === 'block'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Block Editor
-              </button>
-            </div>
-
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -503,6 +586,10 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
                   {isEditing ? 'Last updated: ' + new Date().toLocaleString() : 'Draft will be auto-saved'}
+                  <br />
+                  <span className="text-xs">
+                    Using: {editorType === 'block' ? 'Block Editor' : 'Rich Text Editor'}
+                  </span>
                 </div>
                 
                 <div className="flex gap-3">
