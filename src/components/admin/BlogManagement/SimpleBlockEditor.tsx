@@ -208,7 +208,7 @@ export const SimpleBlockEditor: React.FC<SimpleBlockEditorProps> = ({
               {index === 0 && (
                 <div className="flex justify-center mb-4">
                   <button
-                    onClick={() => handleAddBlockAt(0)}
+                    onClick={() => handleAddBlockAt()}
                     className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     <span>+</span> Add block
@@ -222,7 +222,7 @@ export const SimpleBlockEditor: React.FC<SimpleBlockEditorProps> = ({
               {/* Block Inserter Below */}
               <div className="flex justify-center mt-4">
                 <button
-                  onClick={() => handleAddBlockAt(index + 1)}
+                  onClick={() => handleAddBlockAt()}
                   className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                 >
                   <span>+</span> Add block

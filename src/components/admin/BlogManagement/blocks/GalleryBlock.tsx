@@ -71,7 +71,7 @@ export const GalleryBlock: React.FC<GalleryBlockProps> = ({
   };
 
   const handleLayoutChange = (layout: string) => {
-    const newData = { ...localData, layout };
+    const newData = { ...localData, layout: layout as 'grid' | 'carousel' | 'masonry' };
     setLocalData(newData);
     onUpdate({
       ...block,

@@ -338,7 +338,10 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       if (isAdminBlogNew) {
         return (
           <AdminAuth>
-            <EnhancedBlogEditor />
+            <EnhancedBlogEditor 
+              onSave={() => window.location.href = '/admin/blog'}
+              onCancel={() => window.location.href = '/admin'}
+            />
           </AdminAuth>
         );
       } else if (isAdminBlogRoute) {

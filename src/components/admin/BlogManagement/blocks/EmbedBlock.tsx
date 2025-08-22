@@ -60,10 +60,10 @@ export const EmbedBlock: React.FC<EmbedBlockProps> = ({
     }
   }, [isEditing, localData.embedType]);
 
-  const detectEmbedType = (url: string): string => {
+  const detectEmbedType = (url: string): 'youtube' | 'vimeo' | 'twitter' | 'instagram' | 'codepen' | 'custom' => {
     for (const type of EMBED_TYPES) {
       if (type.pattern && type.pattern.test(url)) {
-        return type.value;
+        return type.value as 'youtube' | 'vimeo' | 'twitter' | 'instagram' | 'codepen' | 'custom';
       }
     }
     return 'custom';
@@ -130,19 +130,18 @@ export const EmbedBlock: React.FC<EmbedBlockProps> = ({
 
   const handleUrlChange = (url: string) => {
     const detectedType = detectEmbedType(url);
-    setLocalData(prev => ({
-      ...prev,
+    setLocalData({
       embedUrl: url,
       embedType: detectedType,
-      embedCode: detectedType !== 'custom' ? generateEmbedCode(url, detectedType) : prev.embedCode
-    }));
+      embedCode: detectedType !== 'custom' ? generateEmbedCode(url, detectedType) : localData.embedCode
+    });
   };
 
   const handleTypeChange = (type: string) => {
     setLocalData(prev => ({
       ...prev,
-      embedType: type,
-      embedCode: type !== 'custom' && prev.embedUrl ? generateEmbedCode(prev.embedUrl, type) : prev.embedCode
+      embedType: type as typeof prev.embedType,
+      embedCode: type !== 'custom' && prev.embedUrl ? generateEmbedCode(prev.embedUrl, type as typeof prev.embedType) : prev.embedCode
     }));
   };
 

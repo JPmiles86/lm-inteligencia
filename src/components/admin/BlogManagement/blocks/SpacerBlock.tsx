@@ -44,18 +44,18 @@ export const SpacerBlock: React.FC<SpacerBlockProps> = ({
   const [dividerStyle, setDividerStyle] = useState(block.data.dividerStyle || 'none');
 
   const handleSizeChange = (size: string) => {
-    setSpacerSize(size);
+    setSpacerSize(size as 'small' | 'medium' | 'large' | 'xlarge');
     onUpdate({
       ...block,
-      data: { ...block.data, spacerSize: size }
+      data: { ...block.data, spacerSize: size as 'small' | 'medium' | 'large' | 'xlarge' }
     });
   };
 
   const handleStyleChange = (style: string) => {
-    setDividerStyle(style);
+    setDividerStyle(style as 'none' | 'solid' | 'dashed' | 'dotted' | 'stars' | 'dots');
     onUpdate({
       ...block,
-      data: { ...block.data, dividerStyle: style }
+      data: { ...block.data, dividerStyle: style as 'none' | 'solid' | 'dashed' | 'dotted' | 'stars' | 'dots' }
     });
   };
 

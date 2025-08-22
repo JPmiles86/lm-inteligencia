@@ -1,7 +1,7 @@
 // Columns Block Component
 
 import React, { useState } from 'react';
-import { Block } from '../types';
+import { Block, BlockType } from '../types';
 
 interface ColumnsBlockProps {
   block: Block;
@@ -60,7 +60,7 @@ export const ColumnsBlock: React.FC<ColumnsBlockProps> = ({
   const addContentToColumn = (columnIndex: number) => {
     const newContent = {
       id: `col-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      type: 'paragraph',
+      type: 'paragraph' as BlockType,
       data: { text: `Content for column ${columnIndex + 1}` },
       settings: {}
     };

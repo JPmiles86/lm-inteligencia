@@ -151,7 +151,7 @@ export const CalloutBlock: React.FC<CalloutBlockProps> = ({
             return (
               <button
                 key={type}
-                onClick={(e) => { e.stopPropagation(); handleTypeChange(type); }}
+                onClick={(e) => { e.stopPropagation(); handleTypeChange(type as 'info' | 'warning' | 'error' | 'success'); }}
                 className={`px-2 py-1 text-xs rounded ${
                   (block.data.calloutType || 'info') === type
                     ? 'bg-blue-600 text-white'
