@@ -408,7 +408,12 @@ export const UnifiedInteligenciaApp: React.FC = () => {
         case 'blog': {
           // Check if we have a blog post slug
           const blogSlug = pathSegments[2];
-          return <BlogRedirect isPostPage={!!blogSlug} />;
+          // If we have a slug, render BlogPostPage directly
+          if (blogSlug) {
+            return <BlogRedirect isPostPage={true} />;
+          }
+          // Otherwise render the blog listing
+          return <BlogRedirect isPostPage={false} />;
         }
         case 'admin':
           // This shouldn't be reached if isAdminRoute check works, but adding as fallback

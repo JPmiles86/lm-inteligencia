@@ -10,6 +10,11 @@ interface BlogRedirectProps {
 export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }) => {
   const params = useParams<{ slug?: string }>();
   
+  // Extract slug from URL path if not in params
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  const urlSlug = isPostPage ? pathSegments[pathSegments.length - 1] : undefined;
+  const slug = params.slug || urlSlug;
+  
   // Check if blog is enabled
   const adminSettings = localStorage.getItem('admin_settings');
   let showBlog = false; // Default to false
@@ -36,8 +41,9 @@ export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }
   }
   
   // If blog is enabled, show the appropriate page
-  if (isPostPage && params.slug) {
-    return <BlogPostPage />;
+  if (isPostPage && slug) {
+    // Pass the slug as a prop since useParams won't work
+    return <BlogPostPage slug={slug} />;
   }
   
   return <BlogListingPage />;

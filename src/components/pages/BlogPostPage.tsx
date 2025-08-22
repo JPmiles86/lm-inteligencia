@@ -9,9 +9,14 @@ import { blogPosts, type BlogPost } from '../../data/blogData';
 import { getIndustryPath } from '../../utils/subdomainDetection';
 import { isMarkdown, markdownToHtml } from '../../utils/markdownToHtml';
 
-export const BlogPostPage: React.FC = () => {
+interface BlogPostPageProps {
+  slug?: string;
+}
+
+export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) => {
   const { config } = useIndustryContext();
-  const { slug } = useParams<{ slug: string }>();
+  const { slug: paramSlug } = useParams<{ slug: string }>();
+  const slug = propSlug || paramSlug; // Use prop if provided, otherwise use params
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [showShareMenu, setShowShareMenu] = useState(false);
