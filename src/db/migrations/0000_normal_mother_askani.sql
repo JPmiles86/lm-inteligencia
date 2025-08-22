@@ -1,0 +1,21 @@
+CREATE TABLE "blog_posts" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"title" varchar(255) NOT NULL,
+	"slug" varchar(255) NOT NULL,
+	"excerpt" text,
+	"content" text NOT NULL,
+	"featured_image" varchar(500),
+	"category" varchar(100) NOT NULL,
+	"tags" json DEFAULT '[]'::json,
+	"featured" boolean DEFAULT false,
+	"published" boolean DEFAULT false,
+	"published_date" varchar(50),
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	"author_name" varchar(100) NOT NULL,
+	"author_title" varchar(150),
+	"author_image" varchar(500),
+	"read_time" integer DEFAULT 5,
+	"editor_type" varchar(20) DEFAULT 'rich',
+	CONSTRAINT "blog_posts_slug_unique" UNIQUE("slug")
+);
