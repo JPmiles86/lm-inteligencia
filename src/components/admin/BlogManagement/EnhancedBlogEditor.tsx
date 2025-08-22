@@ -1,6 +1,7 @@
 // Enhanced Blog Editor Component - Supports both Rich Text and Block editors
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Editor } from '@tinymce/tinymce-react';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
 import { BlockEditor } from './BlockEditor';
@@ -43,6 +44,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const editorRef = useRef<any>(null);
 
   const categories = blogService.getCategories();
   const isEditing = !!post;
@@ -105,14 +107,36 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   };
 
   const handleEditorTypeChange = (newType: 'rich' | 'block') => {
-    setEditorType(newType);
-    setFormData(prev => ({ 
-      ...prev, 
-      editorType: newType,
-      // Reset content when switching editors
-      content: newType === 'rich' ? prev.content : '',
-      blocks: newType === 'block' ? (prev.blocks || [createBlock('paragraph')]) : []
-    }));
+    // Preserve content when switching editors
+    if (newType !== editorType) {
+      let preservedContent = formData.content;
+      let preservedBlocks = formData.blocks || [createBlock('paragraph')];
+
+      // If switching from block to rich, convert blocks to HTML
+      if (editorType === 'block' && newType === 'rich' && formData.blocks) {
+        // Convert blocks to simple HTML for rich text editor
+        preservedContent = formData.blocks.map(block => {
+          if (block.type === 'paragraph') return `<p>${block.data.text || ''}</p>`;
+          if (block.type === 'heading') return `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>`;
+          if (block.type === 'image') return `<img src="${block.data.url || ''}" alt="${block.data.alt || ''}" />`;
+          if (block.type === 'quote') return `<blockquote>${block.data.quote || ''}</blockquote>`;
+          return '';
+        }).join('\n');
+      }
+      
+      // If switching from rich to block, convert HTML to blocks
+      if (editorType === 'rich' && newType === 'block' && formData.content) {
+        preservedBlocks = htmlToBlocks(formData.content);
+      }
+
+      setEditorType(newType);
+      setFormData(prev => ({ 
+        ...prev, 
+        editorType: newType,
+        content: preservedContent,
+        blocks: preservedBlocks
+      }));
+    }
   };
 
   const handleAddTag = () => {
@@ -515,15 +539,37 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             />
           </div>
         ) : (
-          <textarea
-            value={formData.content}
-            onChange={(e) => handleInputChange('content', e.target.value)}
-            rows={20}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm ${
-              errors.content ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="Write your blog post content here... You can use Markdown formatting."
-          />
+          <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
+            <Editor
+              apiKey="no-api-key" // In production, use your TinyMCE API key
+              value={formData.content}
+              onEditorChange={(content) => handleInputChange('content', content)}
+              onInit={(evt, editor) => editorRef.current = editor}
+              init={{
+                height: 400,
+                menubar: true,
+                plugins: [
+                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons', 'template',
+                  'codesample', 'quickbars'
+                ],
+                toolbar: [
+                  'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
+                  'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist',
+                  'forecolor backcolor | link image media table | emoticons charmap | code preview fullscreen'
+                ].join(' | '),
+                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+                quickbars_insert_toolbar: 'quickimage quicktable',
+                contextmenu: 'link image table',
+                skin: 'oxide',
+                content_css: 'default',
+                branding: false,
+                promotion: false,
+                placeholder: 'Start writing your blog post content here...',
+              }}
+            />
+          </div>
         )}
         
         {errors.content && (
@@ -532,7 +578,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         
         {editorType === 'rich' && (
           <p className="mt-2 text-sm text-gray-600">
-            Tip: You can use Markdown formatting for headings, links, lists, and more.
+            WYSIWYG Rich Text Editor with full formatting toolbar. Use the toolbar buttons to format your content like Microsoft Word.
           </p>
         )}
       </div>

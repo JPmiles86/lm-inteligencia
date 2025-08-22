@@ -45,13 +45,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       badge: 'New'
     },
     {
-      id: 'customization',
-      label: 'Site Customization',
-      icon: '🎨',
-      description: 'Branding and design settings',
-      badge: 'Pro'
-    },
-    {
       id: 'analytics',
       label: 'Analytics',
       icon: '📈',
@@ -61,7 +54,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       id: 'settings',
       label: 'Settings',
       icon: '⚙️',
-      description: 'System configuration'
+      description: 'System configuration and content visibility'
     }
   ];
 
@@ -82,9 +75,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">I</span>
-                </div>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Inteligencia</h1>
                   <p className="text-sm text-gray-500">Admin Portal</p>
@@ -92,10 +82,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               </div>
               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
             </div>

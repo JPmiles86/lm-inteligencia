@@ -6,7 +6,7 @@ import { AdminLayout, AdminSection } from './AdminLayout';
 import { CSVImporter } from './CSVImporter';
 import { ContentEditor } from './ContentEditor';
 import { BlogManagement } from './BlogManagement';
-import { SiteCustomization } from './SiteCustomization';
+import { AdminPanel } from './AdminPanel';
 import type { IndustryType } from '../../types/Industry';
 import type { CSVImportResult } from '../../types/Content';
 import { ContentService } from '../../services/contentService';
@@ -154,12 +154,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
               </button>
               
               <button
-                onClick={() => setCurrentSection('customization')}
+                onClick={() => setCurrentSection('settings')}
                 className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
               >
-                <div className="text-2xl mb-2">🎨</div>
-                <div className="font-medium text-gray-900">Customize Site</div>
-                <div className="text-sm text-gray-600">Update branding & design</div>
+                <div className="text-2xl mb-2">⚙️</div>
+                <div className="font-medium text-gray-900">Settings</div>
+                <div className="text-sm text-gray-600">Content visibility & configuration</div>
               </button>
               
               <button
@@ -245,8 +245,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
         return renderDashboard();
       case 'blog':
         return <BlogManagement />;
-      case 'customization':
-        return <SiteCustomization />;
       case 'analytics':
         return (
           <div className="p-6">
@@ -258,15 +256,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
           </div>
         );
       case 'settings':
-        return (
-          <div className="p-6 text-center py-16">
-            <div className="text-6xl mb-4">⚙️</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Settings</h3>
-            <p className="text-gray-600">
-              Advanced settings and configurations coming soon.
-            </p>
-          </div>
-        );
+        return <AdminPanel />;
       default:
         return renderDashboard();
     }
