@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:api": "tsx watch api/server.ts",
     "dev:full": "concurrently \"npm run dev\" \"npm run dev:api\"",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "build:bypass": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

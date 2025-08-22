@@ -2,7 +2,7 @@
 // Handles content transformation and validation
 
 export interface BlogPostData {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   excerpt: string;
@@ -12,7 +12,7 @@ export interface BlogPostData {
     title: string;
     image: string;
   };
-  publishedDate: string;
+  publishedDate: string | null;
   readTime: number;
   category: string;
   tags: string[];
@@ -94,8 +94,12 @@ export class ContentProcessor {
   /**
    * Format date to ISO string
    */
-  private formatDate(dateString: string): string {
+  private formatDate(dateString: string | null): string {
     try {
+      if (!dateString) {
+        // If date is null, use current date
+        return new Date().toISOString().split('T')[0];
+      }
       const date = new Date(dateString);
       if (isNaN(date.getTime())) {
         // If date is invalid, use current date

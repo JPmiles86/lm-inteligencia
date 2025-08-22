@@ -8,7 +8,7 @@ import ContentProcessor from './contentProcessor.js';
 import { MigrationLogger } from './migrationUtils.js';
 
 interface TestMigrationResult {
-  postId: string;
+  postId: number;
   title: string;
   extractedImages: string[];
   processedPost: any;

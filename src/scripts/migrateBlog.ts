@@ -19,7 +19,7 @@ import {
 interface MigrationResult {
   success: boolean;
   postId?: number;
-  originalPostId: string;
+  originalPostId: number;
   imageResults: any[];
   error?: string;
 }

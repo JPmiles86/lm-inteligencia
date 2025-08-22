@@ -8,7 +8,7 @@ import ContentProcessor from './contentProcessor.js';
 import { MigrationLogger } from './migrationUtils.js';
 
 interface MockMigrationResult {
-  postId: string;
+  postId: number;
   title: string;
   originalImages: string[];
   mockGcsImages: string[];
