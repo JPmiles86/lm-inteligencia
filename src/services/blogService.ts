@@ -3,6 +3,7 @@
 import { BlogPost, blogPosts as initialBlogPosts, blogCategories } from '../data/blogData';
 import { Block } from '../components/admin/BlogManagement/types';
 import { blocksToHtml } from '../components/admin/BlogManagement/utils/blockHelpers';
+import { isMarkdown, markdownToHtml } from '../utils/markdownToHtml';
 
 export interface BlogFormData {
   title: string;
@@ -56,14 +57,26 @@ class BlogService {
     try {
       const stored = localStorage.getItem(this.storageKey);
       if (stored) {
-        return JSON.parse(stored);
+        const posts = JSON.parse(stored);
+        // Convert any markdown content to HTML for consistency
+        return posts.map((post: BlogPost) => ({
+          ...post,
+          content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
+        }));
       }
       // Initialize with default posts if none exist
-      this.savePosts(initialBlogPosts);
-      return initialBlogPosts;
+      const processedInitialPosts = initialBlogPosts.map(post => ({
+        ...post,
+        content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
+      }));
+      this.savePosts(processedInitialPosts);
+      return processedInitialPosts;
     } catch (error) {
       console.error('Error loading blog posts:', error);
-      return initialBlogPosts;
+      return initialBlogPosts.map(post => ({
+        ...post,
+        content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
+      }));
     }
   }
 
@@ -71,7 +84,15 @@ class BlogService {
   getAllDrafts(): BlogPost[] {
     try {
       const stored = localStorage.getItem(this.draftsKey);
-      return stored ? JSON.parse(stored) : [];
+      if (stored) {
+        const drafts = JSON.parse(stored);
+        // Convert any markdown content to HTML for consistency
+        return drafts.map((post: BlogPost) => ({
+          ...post,
+          content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
+        }));
+      }
+      return [];
     } catch (error) {
       console.error('Error loading draft posts:', error);
       return [];

@@ -7,6 +7,7 @@ import { BlockEditor } from './BlockEditor';
 import { QuillEditor } from './QuillEditor';
 import { Block } from './types';
 import { createBlock, htmlToBlocks } from './utils/blockHelpers';
+import { markdownToHtml, isMarkdown } from '../../../utils/markdownToHtml';
 
 interface EnhancedBlogEditorProps {
   post?: BlogPost | null;
@@ -51,17 +52,23 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   // Load post data when editing
   useEffect(() => {
     if (post) {
+      // Convert markdown content to HTML if needed
+      let processedContent = post.content;
+      if (isMarkdown(post.content)) {
+        processedContent = markdownToHtml(post.content);
+      }
+
       const initialBlocks = post.blocks && post.blocks.length > 0
         ? post.blocks as Block[]
-        : post.content 
-          ? htmlToBlocks(post.content)
+        : processedContent 
+          ? htmlToBlocks(processedContent)
           : [createBlock('paragraph')];
 
       setFormData({
         title: post.title,
         slug: post.slug,
         excerpt: post.excerpt,
-        content: post.content,
+        content: processedContent,
         blocks: initialBlocks,
         editorType: post.editorType || 'rich',
         category: post.category,
@@ -273,18 +280,20 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         {formData.excerpt}
       </p>
       
-      <div className="whitespace-pre-wrap">
-        {editorType === 'rich' ? formData.content : 
-         formData.blocks ? 
-           <div dangerouslySetInnerHTML={{ __html: formData.blocks.map(block => 
-             // Simple preview rendering
-             block.type === 'paragraph' ? `<p>${block.data.text || ''}</p>` :
-             block.type === 'heading' ? `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>` :
-             block.type === 'image' ? `<img src="${block.data.url || ''}" alt="${block.data.alt || ''}" class="max-w-full h-auto" />` :
-             ''
-           ).join('') }} /> : 
-           'No content'
-        }
+      <div className="prose prose-lg max-w-none">
+        {editorType === 'rich' ? (
+          <div dangerouslySetInnerHTML={{ __html: formData.content }} />
+        ) : (
+          formData.blocks ? 
+            <div dangerouslySetInnerHTML={{ __html: formData.blocks.map(block => 
+              // Simple preview rendering
+              block.type === 'paragraph' ? `<p>${block.data.text || ''}</p>` :
+              block.type === 'heading' ? `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>` :
+              block.type === 'image' ? `<img src="${block.data.url || ''}" alt="${block.data.alt || ''}" class="max-w-full h-auto" />` :
+              ''
+            ).join('') }} /> : 
+            <p className="text-gray-500 italic">No content</p>
+        )}
       </div>
       
       <div className="flex flex-wrap gap-2 mt-8">

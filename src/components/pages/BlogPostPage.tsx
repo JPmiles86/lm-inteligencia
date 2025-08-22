@@ -7,6 +7,7 @@ import { useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryName } from '../../types/Industry';
 import { blogPosts, type BlogPost } from '../../data/blogData';
 import { getIndustryPath } from '../../utils/subdomainDetection';
+import { isMarkdown, markdownToHtml } from '../../utils/markdownToHtml';
 
 export const BlogPostPage: React.FC = () => {
   const { config } = useIndustryContext();
@@ -109,125 +110,24 @@ export const BlogPostPage: React.FC = () => {
     );
   }
 
-  // Convert markdown-like content to HTML (improved implementation)
+  // Format content for display - handles both markdown and HTML
   const formatContent = (content: string) => {
-    const lines = content.split('\n');
-    const elements: JSX.Element[] = [];
-    let currentListItems: string[] = [];
-    let currentListType: 'ul' | 'ol' | null = null;
-    let elementIndex = 0;
+    if (!content) {
+      return <p className="text-gray-500 italic">No content available</p>;
+    }
 
-    const flushList = () => {
-      if (currentListItems.length > 0 && currentListType) {
-        const ListComponent = currentListType;
-        const className = currentListType === 'ul' 
-          ? "list-disc list-inside text-gray-700 mb-6 ml-4 space-y-2"
-          : "list-decimal list-inside text-gray-700 mb-6 ml-4 space-y-2";
-        
-        elements.push(
-          <ListComponent key={`list-${elementIndex++}`} className={className}>
-            {currentListItems.map((item, idx) => (
-              <li key={idx} dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(item) }} />
-            ))}
-          </ListComponent>
-        );
-        currentListItems = [];
-        currentListType = null;
-      }
-    };
+    // If content is markdown, convert to HTML
+    let htmlContent = content;
+    if (isMarkdown(content)) {
+      htmlContent = markdownToHtml(content);
+    }
 
-    const formatInlineMarkdown = (text: string) => {
-      return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">$1</code>');
-    };
-
-    lines.forEach((line) => {
-      // Images - handle ![alt text](image-url) syntax
-      if (line.includes('![')) {
-        flushList();
-        const imgMatch = line.match(/!\[([^\]]*)\]\(([^)]+)\)/);
-        if (imgMatch) {
-          const [, alt, src] = imgMatch;
-          elements.push(
-            <img 
-              key={`img-${elementIndex++}`}
-              src={src} 
-              alt={alt}
-              className="w-full max-w-2xl mx-auto h-auto object-contain rounded-lg my-6"
-              style={{ maxHeight: '70vh' }}
-            />
-          );
-        }
-      }
-      // Headers
-      else if (line.startsWith('# ')) {
-        flushList();
-        elements.push(
-          <h1 key={`h1-${elementIndex++}`} className="text-4xl font-bold text-gray-900 mb-6 mt-8 first:mt-0">
-            {line.slice(2)}
-          </h1>
-        );
-      } else if (line.startsWith('## ')) {
-        flushList();
-        elements.push(
-          <h2 key={`h2-${elementIndex++}`} className="text-3xl font-bold text-gray-900 mb-4 mt-8">
-            {line.slice(3)}
-          </h2>
-        );
-      } else if (line.startsWith('### ')) {
-        flushList();
-        elements.push(
-          <h3 key={`h3-${elementIndex++}`} className="text-2xl font-bold text-gray-900 mb-4 mt-6">
-            {line.slice(4)}
-          </h3>
-        );
-      }
-      // Unordered lists
-      else if (line.startsWith('- ')) {
-        if (currentListType !== 'ul') {
-          flushList();
-          currentListType = 'ul';
-        }
-        currentListItems.push(line.slice(2));
-      }
-      // Ordered lists
-      else if (/^\d+\. /.test(line)) {
-        if (currentListType !== 'ol') {
-          flushList();
-          currentListType = 'ol';
-        }
-        currentListItems.push(line.replace(/^\d+\. /, ''));
-      }
-      // Empty lines
-      else if (!line.trim()) {
-        flushList();
-        if (elements.length > 0) {
-          const lastElement = elements[elements.length - 1];
-          if (lastElement && lastElement.type !== 'br') {
-            elements.push(<br key={`br-${elementIndex++}`} />);
-          }
-        }
-      }
-      // Regular paragraphs
-      else {
-        flushList();
-        const formattedText = formatInlineMarkdown(line);
-        elements.push(
-          <p 
-            key={`p-${elementIndex++}`} 
-            className="text-gray-700 mb-4 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: formattedText }}
-          />
-        );
-      }
-    });
-
-    // Flush any remaining list
-    flushList();
-
-    return elements;
+    return (
+      <div 
+        className="prose prose-lg max-w-none"
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+      />
+    );
   };
 
   return (
@@ -358,7 +258,6 @@ export const BlogPostPage: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="prose prose-lg max-w-none"
         >
           <div className="text-lg leading-relaxed">
             {formatContent(post.content)}
