@@ -1,10 +1,10 @@
 // Enhanced Blog Editor Component - Supports both Rich Text and Block editors
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import React, { useState, useEffect } from 'react';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
 import { BlockEditor } from './BlockEditor';
+import { QuillEditor } from './QuillEditor';
 import { Block } from './types';
 import { createBlock, htmlToBlocks } from './utils/blockHelpers';
 
@@ -44,7 +44,6 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const editorRef = useRef<any>(null);
 
   const categories = blogService.getCategories();
   const isEditing = !!post;
@@ -539,74 +538,11 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             />
           </div>
         ) : (
-          <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
-            <Editor
+          <div className={`${errors.content ? 'ring-2 ring-red-300' : ''} rounded-lg`}>
+            <QuillEditor
               value={formData.content}
-              onEditorChange={(content) => handleInputChange('content', content)}
-              onInit={(evt, editor) => {
-                editorRef.current = editor;
-                // Force visual mode
-                editor.setMode('design');
-              }}
-              init={{
-                selector: 'textarea',
-                setup: function(editor) {
-                  editor.on('init', function() {
-                    // Ensure we're in visual mode after init
-                    editor.setMode('design');
-                  });
-                },
-                height: 400,
-                menubar: true,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons',
-                  'codesample', 'quickbars', 'help'
-                ],
-                toolbar: [
-                  'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
-                  'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist',
-                  'forecolor backcolor | link image media table | emoticons charmap | code preview fullscreen'
-                ].join(' | '),
-                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                quickbars_insert_toolbar: 'quickimage quicktable',
-                contextmenu: 'link image table',
-                skin: 'oxide',
-                content_css: 'default',
-                branding: false,
-                promotion: false,
-                placeholder: 'Start writing your blog post content here...',
-                content_style: 'body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 16px; line-height: 1.6; color: #1f2937; } p { margin-bottom: 1em; } h1 { font-size: 2em; font-weight: bold; } h2 { font-size: 1.5em; font-weight: bold; } h3 { font-size: 1.25em; font-weight: bold; }',
-                paste_as_text: false,
-                paste_auto_cleanup_on_paste: true,
-                paste_data_images: true,
-                image_advtab: true,
-                image_caption: true,
-                automatic_uploads: false,
-                convert_urls: false,
-                relative_urls: false,
-                entity_encoding: 'raw',
-                toolbar_mode: 'sliding',
-                toolbar_sticky: true,
-                visual: true,
-                visual_table_class: 'table',
-                table_default_attributes: {
-                  border: '0',
-                  cellpadding: '4',
-                  cellspacing: '0'
-                },
-                table_default_styles: {
-                  'border-collapse': 'collapse',
-                  'width': '100%'
-                },
-                formats: {
-                  alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-left' },
-                  aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-center' },
-                  alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-right' },
-                  alignjustify: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-justify' }
-                },
-              }}
+              onChange={(content) => handleInputChange('content', content)}
+              placeholder="Start writing your blog post content here..."
             />
           </div>
         )}
