@@ -213,22 +213,13 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 </Link>
               )}
 
-              {/* Contact - scroll on main page, navigate on subpages */}
-              {isSeamlessPage ? (
-                <button
-                  onClick={() => scrollToSection('contact')}
-                  className="font-medium transition-colors hover:text-primary text-gray-700"
-                >
-                  {navItems.contact}
-                </button>
-              ) : (
-                <Link
-                  to={industryKey ? `/${industryKey}/contact` : '/contact'}
-                  className="font-medium transition-colors hover:text-primary text-gray-700"
-                >
-                  {navItems.contact}
-                </Link>
-              )}
+              {/* Contact - always navigate to contact page */}
+              <Link
+                to={industryKey ? `/${industryKey}/contact` : '/contact'}
+                className="font-medium transition-colors hover:text-primary text-gray-700"
+              >
+                {navItems.contact}
+              </Link>
 
               <button
                 onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
@@ -300,22 +291,13 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               </Link>
             )}
 
-            {isSeamlessPage ? (
-              <button
-                onClick={() => handleNavigation('contact', true)}
-                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.contact}
-              </button>
-            ) : (
-              <Link
-                to={industryKey ? `/${industryKey}/contact` : '/contact'}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.contact}
-              </Link>
-            )}
+            <Link
+              to={industryKey ? `/${industryKey}/contact` : '/contact'}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
+            >
+              {navItems.contact}
+            </Link>
             
             <button
               onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
@@ -522,22 +504,13 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 </Link>
               )}
 
-              {/* Contact - scroll on main page, navigate on subpages */}
-              {isSeamlessPage ? (
-                <button
-                  onClick={() => scrollToSection('contact')}
-                  className="font-medium transition-colors hover:text-primary text-gray-700"
-                >
-                  {navItems.contact}
-                </button>
-              ) : (
-                <Link
-                  to={industryKey ? `/${industryKey}/contact` : '/contact'}
-                  className="font-medium transition-colors hover:text-primary text-gray-700"
-                >
-                  {navItems.contact}
-                </Link>
-              )}
+              {/* Contact - always navigate to contact page */}
+              <Link
+                to={industryKey ? `/${industryKey}/contact` : '/contact'}
+                className="font-medium transition-colors hover:text-primary text-gray-700"
+              >
+                {navItems.contact}
+              </Link>
 
               <button
                 onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
@@ -609,22 +582,13 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               </Link>
             )}
 
-            {isSeamlessPage ? (
-              <button
-                onClick={() => handleNavigation('contact', true)}
-                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.contact}
-              </button>
-            ) : (
-              <Link
-                to={industryKey ? `/${industryKey}/contact` : '/contact'}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.contact}
-              </Link>
-            )}
+            <Link
+              to={industryKey ? `/${industryKey}/contact` : '/contact'}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-2 transition-colors hover:text-primary text-gray-700"
+            >
+              {navItems.contact}
+            </Link>
             
             <button
               onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}

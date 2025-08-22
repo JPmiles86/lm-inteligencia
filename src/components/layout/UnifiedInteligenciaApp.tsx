@@ -209,6 +209,22 @@ export const UnifiedInteligenciaApp: React.FC = () => {
     }
   }, [industryKey, currentIndustry, isRootPage, navigate, subdomain]);
 
+  // Scroll to top when route changes (except when returning to homepage from subpage)
+  useEffect(() => {
+    const previousPath = previousPathRef.current;
+    const currentPath = location.pathname;
+    
+    // Don't scroll to top if coming from subpage to homepage (we handle that separately)
+    const previousSegments = previousPath.split('/').filter(Boolean);
+    const currentSegments = currentPath.split('/').filter(Boolean);
+    const isFromSubpageToHomepage = previousSegments.length > 1 && (currentSegments.length === 1 || currentPath === '/');
+    
+    // Always scroll to top for page navigation, except for homepage transitions
+    if (!isFromSubpageToHomepage && previousPath !== currentPath) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname]);
+
   // Debug logging removed
 
   useEffect(() => {
