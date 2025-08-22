@@ -8,12 +8,90 @@ import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaA
 // Admin Components
 import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
+import { AdminLayout } from './components/admin/AdminLayout';
+import { BlogManagement } from './components/admin/BlogManagement';
+import { BlogEditor } from './components/admin/BlogManagement/BlogEditor';
+import { AdminDashboard } from './components/admin/AdminDashboard';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
 
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
+
+/**
+ * AdminRoutes - Handles all admin section routing with proper navigation
+ */
+const AdminRoutes: React.FC = () => {
+  const [currentSection, setCurrentSection] = useState<'dashboard' | 'blog' | 'customization' | 'analytics' | 'settings'>('dashboard');
+  
+  // Parse URL to determine current section
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.includes('/admin/blog')) {
+      setCurrentSection('blog');
+    } else if (path.includes('/admin/customization')) {
+      setCurrentSection('customization');
+    } else if (path.includes('/admin/analytics')) {
+      setCurrentSection('analytics');
+    } else if (path.includes('/admin/settings')) {
+      setCurrentSection('settings');
+    } else {
+      setCurrentSection('dashboard');
+    }
+  }, []);
+
+  const handleSectionChange = (section: typeof currentSection) => {
+    setCurrentSection(section);
+    // Update URL without page reload
+    const basePath = `/admin/${section === 'dashboard' ? '' : section}`;
+    window.history.pushState({}, '', basePath);
+  };
+
+  const renderContent = () => {
+    const path = window.location.pathname;
+    
+    // Check for specific blog routes
+    if (path.includes('/admin/blog/new') || path.includes('/admin/blog/edit/')) {
+      return (
+        <BlogEditor 
+          onSave={() => {
+            setCurrentSection('blog');
+            window.history.pushState({}, '', '/admin/blog');
+          }} 
+          onCancel={() => {
+            setCurrentSection('blog');  
+            window.history.pushState({}, '', '/admin/blog');
+          }} 
+        />
+      );
+    }
+    
+    switch (currentSection) {
+      case 'blog':
+        return <BlogManagement />;
+      case 'customization':
+        return <div className="p-6">Site Customization - Coming Soon</div>;
+      case 'analytics':
+        return <div className="p-6">Analytics - Coming Soon</div>;
+      case 'settings':
+        return <div className="p-6">Settings - Coming Soon</div>;
+      case 'dashboard':
+      default:
+        return <AdminPanel />;
+    }
+  };
+
+  return (
+    <AdminLayout
+      currentSection={currentSection}
+      onSectionChange={handleSectionChange}
+      tenantId="hospitality"
+    >
+      {renderContent()}
+    </AdminLayout>
+  );
+};
 
 /**
  * App using the unified single-page architecture
@@ -83,18 +161,13 @@ const App: React.FC = () => {
         {/* <RoutingDebugger /> */}
         
         <Routes>
-          {/* Admin route MUST come BEFORE the catch-all route */}
+          {/* Admin routes with proper layout and navigation */}
           <Route 
-            path="/admin" 
+            path="/admin/*" 
             element={
-              (() => {
-                console.log('[App.tsx] Admin route matched! Rendering AdminAuth + AdminPanel');
-                return (
-                  <AdminAuth>
-                    <AdminPanel />
-                  </AdminAuth>
-                );
-              })()
+              <AdminAuth>
+                <AdminRoutes />
+              </AdminAuth>
             } 
           />
           

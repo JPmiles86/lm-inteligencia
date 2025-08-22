@@ -244,7 +244,9 @@ export const BlockInserter: React.FC<BlockInserterProps> = ({
         ref={containerRef}
         className="bg-white rounded-lg shadow-xl border max-w-md w-full mx-4 max-h-96 flex flex-col"
         style={{
-          transform: `translate(${Math.min(position.x, window.innerWidth - 400)}px, ${Math.min(position.y, window.innerHeight - 400)}px)`
+          // Center the modal on screen, no longer using position props that cause off-screen issues
+          position: 'relative',
+          transform: 'none'
         }}
       >
         {/* Header */}

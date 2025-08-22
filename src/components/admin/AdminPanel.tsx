@@ -179,7 +179,10 @@ export const AdminPanel: React.FC = () => {
                     <li>✓ Auto-save every 30s</li>
                   </ul>
                   <button
-                    onClick={() => navigate('/admin/blog/new?editor=rich')}
+                    onClick={() => {
+                      window.history.pushState({}, '', '/admin/blog/new?editor=rich');
+                      window.location.reload(); // Force reload to update AdminRoutes
+                    }}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
                   >
                     Open Rich Text Editor
@@ -201,7 +204,10 @@ export const AdminPanel: React.FC = () => {
                     <li>✓ Block templates</li>
                   </ul>
                   <button
-                    onClick={() => navigate('/admin/blog/new?editor=block')}
+                    onClick={() => {
+                      window.history.pushState({}, '', '/admin/blog/new?editor=block');
+                      window.location.reload(); // Force reload to update AdminRoutes
+                    }}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
                   >
                     Open Block Editor
@@ -211,7 +217,10 @@ export const AdminPanel: React.FC = () => {
               
               <div className="mt-6 text-center">
                 <button
-                  onClick={() => navigate('/admin/blog')}
+                  onClick={() => {
+                    window.history.pushState({}, '', '/admin/blog');
+                    window.location.reload(); // Force reload to update AdminRoutes
+                  }}
                   className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
                 >
                   <BookOpen className="w-5 h-5" />
