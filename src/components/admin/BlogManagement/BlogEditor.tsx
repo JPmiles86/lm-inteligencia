@@ -421,17 +421,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     </div>
   );
 
-  // If Rich Text Editor is selected, use that component
-  if (editorType === 'rich') {
-    return (
-      <RichTextEditor
-        post={post}
-        onSave={onSave}
-        onCancel={onCancel}
-      />
-    );
-  }
-
   return (
     <div className="p-6">
       <div className="max-w-6xl mx-auto">
@@ -494,7 +483,15 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         {/* Content */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200">
           <div className="p-8">
-            {isPreviewMode ? renderPreview() : renderEditor()}
+            {isPreviewMode ? renderPreview() : (
+              editorType === 'rich' ? (
+                <RichTextEditor
+                  post={post}
+                  onSave={onSave}
+                  onCancel={onCancel}
+                />
+              ) : renderEditor()
+            )}
           </div>
 
           {/* Footer Actions */}
