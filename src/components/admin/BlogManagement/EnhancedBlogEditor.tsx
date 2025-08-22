@@ -541,11 +541,21 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         ) : (
           <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
             <Editor
-              apiKey={process.env.REACT_APP_TINYMCE_API_KEY || "no-api-key"} // Uses environment variable or falls back to no-api-key
               value={formData.content}
               onEditorChange={(content) => handleInputChange('content', content)}
-              onInit={(evt, editor) => editorRef.current = editor}
+              onInit={(evt, editor) => {
+                editorRef.current = editor;
+                // Force visual mode
+                editor.setMode('design');
+              }}
               init={{
+                selector: 'textarea',
+                setup: function(editor) {
+                  editor.on('init', function() {
+                    // Ensure we're in visual mode after init
+                    editor.setMode('design');
+                  });
+                },
                 height: 400,
                 menubar: true,
                 plugins: [
