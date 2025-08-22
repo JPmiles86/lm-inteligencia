@@ -45,7 +45,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
       <div className="max-w-6xl mx-auto p-8">
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-purple-100">
           <div className="flex justify-between items-center mb-8">
@@ -146,7 +146,7 @@ export const AdminPanel: React.FC = () => {
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
                   saved 
                     ? 'bg-green-600 text-white' 
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
                 }`}
               >
                 <Save className="w-4 h-4" />
@@ -189,9 +189,9 @@ export const AdminPanel: React.FC = () => {
                   </button>
                 </div>
                 
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
                   <div className="flex items-center gap-3 mb-4">
-                    <Layout className="w-8 h-8 text-blue-600" />
+                    <Layout className="w-8 h-8 text-purple-600" />
                     <div>
                       <h3 className="font-bold text-lg">Block Editor</h3>
                       <p className="text-sm text-gray-600">Modern Gutenberg-style</p>
@@ -208,7 +208,7 @@ export const AdminPanel: React.FC = () => {
                       window.history.pushState({}, '', '/admin/blog/new?editor=block');
                       window.location.reload(); // Force reload to update AdminRoutes
                     }}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
                   >
                     Open Block Editor
                   </button>

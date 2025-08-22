@@ -73,9 +73,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
     return (
       <div className="p-6 space-y-8">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-8 text-white">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl p-8 text-white">
           <h1 className="text-3xl font-bold mb-2">Welcome to Inteligencia Admin</h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-purple-100 text-lg">
             Manage your content, customize your site, and track your performance all in one place.
           </p>
         </div>
@@ -84,8 +84,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -146,7 +146,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <button
                 onClick={() => setCurrentSection('blog')}
-                className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
+                className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
               >
                 <div className="text-2xl mb-2">📝</div>
                 <div className="font-medium text-gray-900">New Blog Post</div>
@@ -173,7 +173,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
               
               <button
                 onClick={() => window.open('/', '_blank')}
-                className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
+                className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
               >
                 <div className="text-2xl mb-2">👁️</div>
                 <div className="font-medium text-gray-900">View Live Site</div>
@@ -189,7 +189,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
               <div className="space-y-4">
                 {analytics.activityLogs.map((log, index) => (
                   <div key={index} className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900">
                         {log.action === 'csv_import' ? 'CSV Import Completed' : log.action}

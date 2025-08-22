@@ -175,7 +175,7 @@ export const SimpleBlockEditor: React.FC<SimpleBlockEditorProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={openInserter}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
             >
               <span className="text-lg">+</span>
               Add Block
@@ -209,7 +209,7 @@ export const SimpleBlockEditor: React.FC<SimpleBlockEditorProps> = ({
                 <div className="flex justify-center mb-4">
                   <button
                     onClick={() => handleAddBlockAt()}
-                    className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                   >
                     <span>+</span> Add block
                   </button>
@@ -223,7 +223,7 @@ export const SimpleBlockEditor: React.FC<SimpleBlockEditorProps> = ({
               <div className="flex justify-center mt-4">
                 <button
                   onClick={() => handleAddBlockAt()}
-                  className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-3 py-1 text-sm text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                 >
                   <span>+</span> Add block
                 </button>

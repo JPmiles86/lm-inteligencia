@@ -205,7 +205,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       </div>
       
       <div className="mb-6">
-        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
           {formData.category}
         </span>
       </div>
@@ -265,7 +265,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             type="text"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.title ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="Enter post title..."
@@ -283,7 +283,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             type="text"
             value={formData.slug}
             onChange={(e) => handleInputChange('slug', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.slug ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="post-slug"
@@ -304,7 +304,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
           onChange={(e) => handleInputChange('excerpt', e.target.value)}
           rows={3}
           maxLength={200}
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
+          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none ${
             errors.excerpt ? 'border-red-300' : 'border-gray-300'
           }`}
           placeholder="Brief description of the post..."
@@ -365,7 +365,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               value={formData.content}
               onChange={(e) => handleInputChange('content', e.target.value)}
               rows={20}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none font-mono text-sm ${
                 errors.content ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Write your blog post content here... You can use Markdown formatting."
@@ -389,7 +389,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
           <select
             value={formData.category}
             onChange={(e) => handleInputChange('category', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           >
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -407,7 +407,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             type="url"
             value={formData.featuredImage}
             onChange={(e) => handleInputChange('featuredImage', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.featuredImage ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="https://example.com/image.jpg"
@@ -435,13 +435,13 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   handleAddTag();
                 }
               }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="Add a tag..."
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
             >
               Add
             </button>
@@ -452,13 +452,13 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               {formData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(tag)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-purple-600 hover:text-purple-800"
                   >
                     ×
                   </button>
@@ -483,7 +483,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
             type="date"
             value={formData.publishedDate}
             onChange={(e) => handleInputChange('publishedDate', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
 
@@ -493,7 +493,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               type="checkbox"
               checked={formData.featured}
               onChange={(e) => handleInputChange('featured', e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
             />
             <span className="text-sm font-medium text-gray-700">Featured Post</span>
           </label>
@@ -546,7 +546,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 isPreviewMode
                   ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                  : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
               }`}
             >
               {isPreviewMode ? 'Edit' : 'Preview'}
@@ -595,7 +595,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
                   <button
                     onClick={() => handleSave(false)}
                     disabled={saving}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-colors disabled:opacity-50"
                   >
                     {saving ? 'Publishing...' : (isEditing ? 'Update Post' : 'Publish Post')}
                   </button>
@@ -636,7 +636,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
               </button>
               <button
                 onClick={confirmEditorSwitch}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
               >
                 Switch Editor
               </button>
