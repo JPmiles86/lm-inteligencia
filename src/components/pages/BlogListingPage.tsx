@@ -10,6 +10,8 @@ import { getIndustryPath } from '../../utils/subdomainDetection';
 export const BlogListingPage: React.FC = () => {
   const { config } = useIndustryContext();
   const industryPath = getIndustryPath();
+  
+  console.log('[BlogListingPage] Component rendered at path:', window.location.pathname);
 
   // Map industry types to blog categories
   const getDefaultCategory = () => {

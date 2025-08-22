@@ -15,6 +15,15 @@ export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }
   const urlSlug = isPostPage ? pathSegments[pathSegments.length - 1] : undefined;
   const slug = params.slug || urlSlug;
   
+  console.log('[BlogRedirect] Component rendered:', {
+    isPostPage,
+    paramsSlug: params.slug,
+    urlSlug,
+    finalSlug: slug,
+    pathSegments,
+    fullPath: window.location.pathname
+  });
+  
   // Check if blog is enabled
   const adminSettings = localStorage.getItem('admin_settings');
   let showBlog = false; // Default to false
@@ -28,6 +37,11 @@ export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }
     }
   }
   
+  console.log('[BlogRedirect] Blog settings:', {
+    showBlog,
+    adminSettings: !!adminSettings
+  });
+  
   // If blog is disabled, redirect to homepage
   if (!showBlog) {
     // Get the current subdomain to determine redirect path
@@ -37,14 +51,17 @@ export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }
     // On hospitality subdomain, redirect to root, otherwise to industry path
     const redirectPath = isHospitalitySubdomain ? '/' : window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}` : '/';
     
+    console.log('[BlogRedirect] Blog disabled, redirecting to:', redirectPath);
     return <Navigate to={redirectPath} replace />;
   }
   
   // If blog is enabled, show the appropriate page
   if (isPostPage && slug) {
+    console.log('[BlogRedirect] → Rendering BlogPostPage with slug:', slug);
     // Pass the slug as a prop since useParams won't work
     return <BlogPostPage slug={slug} />;
   }
   
+  console.log('[BlogRedirect] → Rendering BlogListingPage');
   return <BlogListingPage />;
 };

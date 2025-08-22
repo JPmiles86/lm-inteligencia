@@ -337,7 +337,9 @@ export const UnifiedInteligenciaApp: React.FC = () => {
       pathSegments,
       selectedIndustry,
       subPage,
-      config: !!config
+      config: !!config,
+      fullPath: location.pathname,
+      pathSegmentsDetail: pathSegments.map((seg, idx) => `[${idx}]: "${seg}"`)
     });
     
     // Check if this is admin route first - no industry needed
@@ -407,12 +409,28 @@ export const UnifiedInteligenciaApp: React.FC = () => {
           return <ContactPage />;
         case 'blog': {
           // Check if we have a blog post slug
-          const blogSlug = pathSegments[2];
+          // On subdomain: /blog/slug → pathSegments[1] is the slug
+          // On main domain: /industry/blog/slug → pathSegments[2] is the slug
+          const isOnSubdomain = getCurrentSubdomain() === 'hospitality';
+          const blogSlug = isOnSubdomain ? pathSegments[1] : pathSegments[2];
+          
+          console.log('[UnifiedApp] BLOG ROUTE DETECTED:', {
+            fullPath: window.location.pathname,
+            pathSegments,
+            isOnSubdomain,
+            blogSlug,
+            hasBlogSlug: !!blogSlug,
+            willRenderPostPage: !!blogSlug,
+            pathSegmentsDetail: pathSegments.map((seg, idx) => `[${idx}]: "${seg}"`)
+          });
+          
           // If we have a slug, render BlogPostPage directly
           if (blogSlug) {
+            console.log('[UnifiedApp] → Rendering BlogRedirect with isPostPage=TRUE for slug:', blogSlug);
             return <BlogRedirect isPostPage={true} />;
           }
           // Otherwise render the blog listing
+          console.log('[UnifiedApp] → Rendering BlogRedirect with isPostPage=FALSE (blog listing)');
           return <BlogRedirect isPostPage={false} />;
         }
         case 'admin':

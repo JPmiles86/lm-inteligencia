@@ -21,12 +21,29 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
   const [showShareMenu, setShowShareMenu] = useState(false);
   
+  console.log('[BlogPostPage] Component rendered:', {
+    propSlug,
+    paramSlug,
+    finalSlug: slug,
+    currentPath: window.location.pathname
+  });
+  
   const industryName = getIndustryName(config.industry);
   const industryPath = getIndustryPath();
 
   useEffect(() => {
+    console.log('[BlogPostPage] useEffect - searching for post:', {
+      slug,
+      totalPosts: blogPosts.length
+    });
+    
     if (slug) {
       const foundPost = blogPosts.find(p => p.slug === slug);
+      console.log('[BlogPostPage] Post search result:', {
+        found: !!foundPost,
+        postTitle: foundPost?.title,
+        postId: foundPost?.id
+      });
       setPost(foundPost || null);
       
       if (foundPost) {
