@@ -551,8 +551,8 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                 plugins: [
                   'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                   'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons', 'template',
-                  'codesample', 'quickbars'
+                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons',
+                  'codesample', 'quickbars', 'help'
                 ],
                 toolbar: [
                   'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
@@ -567,6 +567,35 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                 branding: false,
                 promotion: false,
                 placeholder: 'Start writing your blog post content here...',
+                content_style: 'body { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 16px; line-height: 1.6; color: #1f2937; } p { margin-bottom: 1em; } h1 { font-size: 2em; font-weight: bold; } h2 { font-size: 1.5em; font-weight: bold; } h3 { font-size: 1.25em; font-weight: bold; }',
+                paste_as_text: false,
+                paste_auto_cleanup_on_paste: true,
+                paste_data_images: true,
+                image_advtab: true,
+                image_caption: true,
+                automatic_uploads: false,
+                convert_urls: false,
+                relative_urls: false,
+                entity_encoding: 'raw',
+                toolbar_mode: 'sliding',
+                toolbar_sticky: true,
+                visual: true,
+                visual_table_class: 'table',
+                table_default_attributes: {
+                  border: '0',
+                  cellpadding: '4',
+                  cellspacing: '0'
+                },
+                table_default_styles: {
+                  'border-collapse': 'collapse',
+                  'width': '100%'
+                },
+                formats: {
+                  alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-left' },
+                  aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-center' },
+                  alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-right' },
+                  alignjustify: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img', classes: 'text-justify' }
+                },
               }}
             />
           </div>
