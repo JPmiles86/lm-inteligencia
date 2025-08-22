@@ -1,7 +1,7 @@
 // Sample blog data for the Inteligencia website
 
 export interface BlogPost {
-  id: string;
+  id: number;
   title: string;
   slug: string;
   excerpt: string;
@@ -13,7 +13,8 @@ export interface BlogPost {
     title: string;
     image: string;
   };
-  publishedDate: string;
+  publishedDate: string | null;
+  published?: boolean; // New field to track publish status
   readTime: number;
   category: string;
   tags: string[];
@@ -33,7 +34,7 @@ export const blogCategories = [
 
 export const blogPosts: BlogPost[] = [
   {
-    id: '1',
+    id: 1,
     title: 'How to Reduce Hotel OTA Commissions by 40% in 6 Months',
     slug: 'reduce-hotel-ota-commissions-40-percent',
     excerpt: 'Learn the proven strategies that helped Oceanview Resort Miami dramatically reduce their dependency on booking platforms while increasing direct bookings.',
@@ -133,7 +134,7 @@ The goal isn't to eliminate OTAs entirely, but to create a sustainable business 
     featured: true
   },
   {
-    id: '2',
+    id: 2,
     title: 'Restaurant Social Media Marketing: From Empty Tables to Full Reservations',
     slug: 'restaurant-social-media-marketing-strategy',
     excerpt: 'Discover how Bella Vista Italian Bistro used Instagram and Facebook to increase reservations by 65% and grow their social following by 400%.',
@@ -237,7 +238,7 @@ Today, Marco no longer worries about empty tables. Instead, he focuses on mainta
     featured: true
   },
   {
-    id: '3',
+    id: 3,
     title: 'HIPAA-Compliant Marketing: Growing Your Dental Practice Safely',
     slug: 'hipaa-compliant-dental-practice-marketing',
     excerpt: 'Learn how to attract new patients while maintaining strict HIPAA compliance. Discover strategies that helped Smile Dental Group acquire 150+ new patients monthly.',
@@ -435,7 +436,7 @@ Dr. Chen's practice now serves as a model for other healthcare providers in her 
     featured: true
   },
   {
-    id: '4',
+    id: 4,
     title: 'Sports Facility Marketing: Building Thriving Athletic Communities',
     slug: 'sports-facility-marketing-community-building',
     excerpt: 'Discover how Central Coast Sports Complex doubled their tournament participation and added 300 new members using targeted community building strategies.',
@@ -624,7 +625,7 @@ Today, Mike no longer worries about the competition down the street. "When peopl
     featured: false
   },
   {
-    id: '5',
+    id: 5,
     title: '2025 Digital Marketing Trends Every Business Owner Should Know',
     slug: '2025-digital-marketing-trends-business-owners',
     excerpt: 'Stay ahead of the competition with these essential digital marketing trends that are shaping how businesses connect with customers in 2025.',
@@ -801,7 +802,7 @@ Amanda's hotel chain didn't implement every trend we discussed. Instead, she foc
     featured: false
   },
   {
-    id: '6',
+    id: 6,
     title: 'Local SEO Mastery: Dominating Your Geographic Market',
     slug: 'local-seo-mastery-geographic-market-domination',
     excerpt: 'Learn the advanced local SEO strategies that help businesses capture customers in their immediate area and dominate local search results.',
@@ -1002,7 +1003,7 @@ Janet's plumbing business now dominates local search results, but more important
     featured: false
   },
   {
-    id: '7',
+    id: 7,
     title: 'Email Marketing Automation: Converting Leads into Loyal Customers',
     slug: 'email-marketing-automation-converting-leads-customers',
     excerpt: 'Discover how to build email marketing funnels that nurture leads and drive conversions. Learn the automation strategies used by successful businesses.',
@@ -1226,7 +1227,7 @@ Lisa's transformation from manually sending individual emails to generating $47,
     featured: false
   },
   {
-    id: '8',
+    id: 8,
     title: 'The Complete Guide to Google Ads for Small Businesses',
     slug: 'complete-guide-google-ads-small-businesses',
     excerpt: 'Master Google Ads with this comprehensive guide designed specifically for small businesses. Learn to create profitable campaigns on any budget.',
@@ -1493,7 +1494,7 @@ Today, Tom's landscaping business is booked solid for months in advance, and **G
     featured: false
   },
   {
-    id: '9',
+    id: 9,
     title: 'SaaS Growth Marketing: From $0 to $1M ARR in 18 Months',
     slug: 'saas-growth-marketing-zero-to-one-million-arr',
     excerpt: 'Discover the exact growth marketing playbook that helped CloudSync AI scale from zero to $1M ARR. Learn proven strategies for SaaS customer acquisition.',
@@ -1723,7 +1724,7 @@ CloudSync AI's journey from $0 to $1M ARR wasn't the result of a single growth h
     featured: true
   },
   {
-    id: '10',
+    id: 10,
     title: 'AI Product Marketing: How to Explain Complex Technology Simply',
     slug: 'ai-product-marketing-explain-complex-technology',
     excerpt: 'Learn how to market AI and machine learning products effectively. Discover strategies for communicating complex value propositions to diverse audiences.',
@@ -2032,7 +2033,7 @@ The companies that win in AI don't just build better algorithms; they build bett
     featured: true
   },
   {
-    id: '11',
+    id: 11,
     title: 'B2B Demand Generation: Building Predictable Pipeline for Tech Companies',
     slug: 'b2b-demand-generation-predictable-pipeline-tech',
     excerpt: 'Master B2B demand generation for tech companies. Learn how to build predictable sales pipeline through content marketing, account-based marketing, and sales alignment.',

@@ -1,14 +1,14 @@
 // Blog List Component - Displays and manages all blog posts and drafts
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { blogService } from '../../../services/blogService';
+import { blogService, BlogPostFilters, BlogPostsResponse } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
 
 interface BlogListProps {
   onEditPost: (post: BlogPost) => void;
   onCreateNew: () => void;
-  refreshTrigger: number; // To force refresh when needed
+  refreshTrigger: number;
 }
 
 export const BlogList: React.FC<BlogListProps> = ({
@@ -20,88 +20,169 @@ export const BlogList: React.FC<BlogListProps> = ({
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [viewMode, setViewMode] = useState<'published' | 'drafts' | 'all'>('published');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title' | 'category'>('newest');
-  const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
+  const [selectedPosts, setSelectedPosts] = useState<number[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(10);
+  
+  // API state
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10
+  });
+  const [stats, setStats] = useState({
+    totalPosts: 0,
+    publishedPosts: 0,
+    draftPosts: 0,
+    featuredPosts: 0,
+    categoryCounts: {} as Record<string, number>,
+    tagCounts: {} as Record<string, number>,
+    monthlyPublications: {} as Record<string, number>
+  });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get data from service - Re-calculate when refreshTrigger changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const publishedPosts = useMemo(() => blogService.getAllPosts(), [refreshTrigger]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const draftPosts = useMemo(() => blogService.getAllDrafts(), [refreshTrigger]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stats = useMemo(() => blogService.getStats(), [refreshTrigger]);
-  const categories = useMemo(() => blogService.getCategories(), []);
+  // Fetch data when component mounts or dependencies change
+  useEffect(() => {
+    fetchPosts();
+    fetchStats();
+    fetchCategories();
+  }, [refreshTrigger, currentPage, searchQuery, selectedCategory, viewMode, sortBy]);
 
-  // Filter and sort posts
-  const filteredAndSortedPosts = useMemo(() => {
-    let allPosts: BlogPost[] = [];
-    
-    switch (viewMode) {
-      case 'published':
-        allPosts = publishedPosts;
-        break;
-      case 'drafts':
-        allPosts = draftPosts;
-        break;
-      case 'all':
-        allPosts = [...publishedPosts, ...draftPosts];
-        break;
-    }
-
-    // Filter by category
-    if (selectedCategory !== 'All') {
-      allPosts = allPosts.filter(post => post.category === selectedCategory);
-    }
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      allPosts = allPosts.filter(post =>
-        post.title.toLowerCase().includes(query) ||
-        post.excerpt.toLowerCase().includes(query) ||
-        post.tags.some(tag => tag.toLowerCase().includes(query))
-      );
-    }
-
-    // Sort posts
-    const sorted = [...allPosts].sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.publishedDate || '9999-12-31').getTime() - 
-                 new Date(a.publishedDate || '9999-12-31').getTime();
-        case 'oldest':
-          return new Date(a.publishedDate || '0000-01-01').getTime() - 
-                 new Date(b.publishedDate || '0000-01-01').getTime();
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'category':
-          return a.category.localeCompare(b.category);
-        default:
-          return 0;
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const filters: BlogPostFilters = {
+        page: currentPage,
+        limit: postsPerPage,
+        sortBy: sortBy === 'newest' ? 'publishedAt' : sortBy === 'oldest' ? 'publishedAt' : sortBy,
+        sortOrder: sortBy === 'newest' ? 'desc' : 'asc'
+      };
+      
+      if (searchQuery.trim()) {
+        filters.search = searchQuery.trim();
       }
-    });
+      
+      if (selectedCategory !== 'All') {
+        filters.category = selectedCategory;
+      }
+      
+      if (viewMode === 'published') {
+        filters.published = true;
+      } else if (viewMode === 'drafts') {
+        filters.published = false;
+      }
+      // For 'all', don't set published filter
+      
+      const response: BlogPostsResponse = await blogService.getAllPosts(filters);
+      setPosts(response.posts);
+      setPagination(response.pagination);
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch posts');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return sorted;
-  }, [publishedPosts, draftPosts, viewMode, selectedCategory, searchQuery, sortBy]);
+  const fetchStats = async () => {
+    try {
+      const statsData = await blogService.getStats();
+      setStats(statsData);
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  };
 
-  const handleDeletePost = (id: string) => {
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await blogService.getCategories();
+      setCategories(categoriesData);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
+
+  // Handle search with debouncing
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1); // Reset to first page on search
+    
+    // Debounce search
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      // Trigger fetch with new search query
+    }, 500);
+    
+    setSearchTimeout(timeout);
+  };
+
+  const handleViewModeChange = (mode: 'published' | 'drafts' | 'all') => {
+    setViewMode(mode);
+    setCurrentPage(1);
+    setSelectedPosts([]);
+  };
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortBy(sort as 'newest' | 'oldest' | 'title' | 'category');
+    setCurrentPage(1);
+  };
+
+  const handleDeletePost = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
-      blogService.deletePost(id);
-      // Force refresh by updating parent component
-      window.location.reload(); // Simple approach, could be improved with state management
+      try {
+        setLoading(true);
+        await blogService.deletePost(id);
+        await fetchPosts();
+        await fetchStats();
+        setSelectedPosts(prev => prev.filter(postId => postId !== id));
+        
+        // Show success message
+        alert('Post deleted successfully!');
+      } catch (err) {
+        console.error('Error deleting post:', err);
+        alert(err instanceof Error ? err.message : 'Failed to delete post');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const handlePublishDraft = (id: string) => {
-    const publishedPost = blogService.publishDraft(id);
-    if (publishedPost) {
-      alert('Draft published successfully!');
-      window.location.reload(); // Force refresh
-    } else {
-      alert('Failed to publish draft.');
+  const handlePublishDraft = async (id: number) => {
+    try {
+      setLoading(true);
+      const result = await blogService.togglePublished(id);
+      if (result) {
+        await fetchPosts();
+        await fetchStats();
+        alert('Post published successfully!');
+      } else {
+        alert('Failed to publish post.');
+      }
+    } catch (err) {
+      console.error('Error publishing post:', err);
+      alert(err instanceof Error ? err.message : 'Failed to publish post');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleBulkAction = (action: 'delete' | 'publish') => {
+  const handleBulkAction = async (action: 'delete' | 'publish') => {
     if (selectedPosts.length === 0) {
       alert('Please select posts to perform this action.');
       return;
@@ -112,19 +193,36 @@ export const BlogList: React.FC<BlogListProps> = ({
       : `Are you sure you want to publish ${selectedPosts.length} draft(s)?`;
 
     if (window.confirm(confirmMessage)) {
-      selectedPosts.forEach(id => {
-        if (action === 'delete') {
-          blogService.deletePost(id);
-        } else if (action === 'publish') {
-          blogService.publishDraft(id);
-        }
-      });
-      setSelectedPosts([]);
-      window.location.reload(); // Force refresh
+      try {
+        setLoading(true);
+        
+        // Execute actions in parallel
+        const promises = selectedPosts.map(id => {
+          if (action === 'delete') {
+            return blogService.deletePost(id);
+          } else if (action === 'publish') {
+            return blogService.togglePublished(id);
+          }
+          return Promise.resolve();
+        });
+        
+        await Promise.all(promises);
+        
+        await fetchPosts();
+        await fetchStats();
+        setSelectedPosts([]);
+        
+        alert(`${action === 'delete' ? 'Deleted' : 'Published'} ${selectedPosts.length} post(s) successfully!`);
+      } catch (err) {
+        console.error(`Error performing bulk ${action}:`, err);
+        alert(err instanceof Error ? err.message : `Failed to ${action} posts`);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
     if (!dateString) return 'Draft';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -134,7 +232,7 @@ export const BlogList: React.FC<BlogListProps> = ({
   };
 
   const getStatusBadge = (post: BlogPost) => {
-    if (!post.publishedDate) {
+    if (!post.published || !post.publishedDate) {
       return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>;
     }
     
@@ -146,6 +244,65 @@ export const BlogList: React.FC<BlogListProps> = ({
     }
     
     return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>;
+  };
+
+  const renderPagination = () => {
+    if (pagination.totalPages <= 1) return null;
+    
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+    
+    // Adjust start if we're near the end
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return (
+      <div className="flex items-center justify-between mt-6">
+        <div className="text-sm text-gray-600">
+          Showing {((currentPage - 1) * postsPerPage) + 1} to {Math.min(currentPage * postsPerPage, pagination.totalItems)} of {pagination.totalItems} posts
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1 || loading}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          
+          {pages.map(page => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              disabled={loading}
+              className={`px-3 py-1 border rounded-md text-sm font-medium disabled:cursor-not-allowed ${
+                page === currentPage
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+          
+          <button
+            onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+            disabled={currentPage === pagination.totalPages || loading}
+            className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -242,8 +399,9 @@ export const BlogList: React.FC<BlogListProps> = ({
                 type="text"
                 placeholder="Search posts..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                onChange={(e) => handleSearchChange(e.target.value)}
+                disabled={loading}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
               />
             </div>
 
@@ -256,8 +414,9 @@ export const BlogList: React.FC<BlogListProps> = ({
               ].map((mode) => (
                 <button
                   key={mode.id}
-                  onClick={() => setViewMode(mode.id as 'published' | 'drafts' | 'all')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  onClick={() => handleViewModeChange(mode.id as 'published' | 'drafts' | 'all')}
+                  disabled={loading}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 ${
                     viewMode === mode.id
                       ? 'bg-white text-gray-900 shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
@@ -273,8 +432,9 @@ export const BlogList: React.FC<BlogListProps> = ({
             {/* Category Filter */}
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              disabled={loading}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="All">All Categories</option>
               {categories.map((category) => (
@@ -287,8 +447,9 @@ export const BlogList: React.FC<BlogListProps> = ({
             {/* Sort */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'title' | 'category')}
-              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              onChange={(e) => handleSortChange(e.target.value)}
+              disabled={loading}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -309,20 +470,23 @@ export const BlogList: React.FC<BlogListProps> = ({
                 {viewMode === 'drafts' && (
                   <button
                     onClick={() => handleBulkAction('publish')}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                    disabled={loading}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
                   >
                     Publish Selected
                   </button>
                 )}
                 <button
                   onClick={() => handleBulkAction('delete')}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                  disabled={loading}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
                 >
                   Delete Selected
                 </button>
                 <button
                   onClick={() => setSelectedPosts([])}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors"
+                  disabled={loading}
+                  className="bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-50"
                 >
                   Clear Selection
                 </button>
@@ -331,10 +495,39 @@ export const BlogList: React.FC<BlogListProps> = ({
           </div>
         )}
 
+        {/* Loading indicator */}
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Loading posts...</span>
+          </div>
+        )}
+        
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex">
+              <svg className="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833-.23 2.5 1.732 2.5z" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Error loading posts</h3>
+                <p className="text-sm text-red-700 mt-1">{error}</p>
+                <button
+                  onClick={fetchPosts}
+                  className="mt-2 text-sm text-red-800 underline hover:text-red-900"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Posts List */}
-        {filteredAndSortedPosts.length > 0 ? (
+        {!loading && !error && posts.length > 0 ? (
           <div className="space-y-4">
-            {filteredAndSortedPosts.map((post) => (
+            {posts.map((post) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -353,6 +546,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                         setSelectedPosts(selectedPosts.filter(id => id !== post.id));
                       }
                     }}
+                    disabled={loading}
                     className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
 
@@ -380,7 +574,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                           <span className="bg-gray-100 px-2 py-1 rounded text-xs">
                             {post.category}
                           </span>
-                          <span>{formatDate(post.publishedDate)}</span>
+                          <span>{formatDate(post.publishedDate || null)}</span>
                           <span>{post.readTime} min read</span>
                           {post.featured && (
                             <span className="text-yellow-600 flex items-center">
@@ -403,15 +597,17 @@ export const BlogList: React.FC<BlogListProps> = ({
                   <div className="flex flex-col gap-2">
                     <button
                       onClick={() => onEditPost(post)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                      disabled={loading}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
                     >
                       Edit
                     </button>
                     
-                    {!post.publishedDate && (
+                    {(!post.published || !post.publishedDate) && (
                       <button
                         onClick={() => handlePublishDraft(post.id)}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                        disabled={loading}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
                       >
                         Publish
                       </button>
@@ -419,7 +615,8 @@ export const BlogList: React.FC<BlogListProps> = ({
                     
                     <button
                       onClick={() => handleDeletePost(post.id)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors"
+                      disabled={loading}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
                     >
                       Delete
                     </button>
@@ -427,8 +624,11 @@ export const BlogList: React.FC<BlogListProps> = ({
                 </div>
               </motion.div>
             ))}
+            
+            {/* Pagination */}
+            {renderPagination()}
           </div>
-        ) : (
+        ) : !loading && !error ? (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">📝</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No posts found</h3>
@@ -447,7 +647,7 @@ export const BlogList: React.FC<BlogListProps> = ({
               </button>
             )}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

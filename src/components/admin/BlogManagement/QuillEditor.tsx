@@ -1,19 +1,84 @@
 // Quill Rich Text Editor Component - Alternative to TinyMCE
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { blogService } from '../../../services/blogService';
 
 interface QuillEditorProps {
   value: string;
   onChange: (content: string) => void;
   placeholder?: string;
+  onImageUpload?: (file: File) => Promise<string>;
 }
 
 export const QuillEditor: React.FC<QuillEditorProps> = ({
   value,
   onChange,
-  placeholder = 'Start writing your content here...'
+  placeholder = 'Start writing your content here...',
+  onImageUpload
 }) => {
+  const quillRef = useRef<ReactQuill>(null);
+
+  // Custom image handler for uploading to GCS
+  const imageHandler = () => {
+    const input = document.createElement('input');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/*');
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      try {
+        // Basic file validation
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+          throw new Error('File size too large. Maximum size is 10MB.');
+        }
+        
+        if (!file.type.startsWith('image/')) {
+          throw new Error('Only image files are allowed.');
+        }
+
+        // Show loading state
+        const quill = quillRef.current?.getEditor();
+        if (!quill) return;
+
+        const range = quill.getSelection();
+        if (!range) return;
+
+        // Insert temporary placeholder
+        quill.insertText(range.index, 'Uploading image...', 'user');
+
+        // Upload using the provided upload function or fallback to service
+        const imageUrl = onImageUpload 
+          ? await onImageUpload(file)
+          : await blogService.uploadQuillImage(file);
+        
+        // Remove placeholder text
+        quill.deleteText(range.index, 'Uploading image...'.length);
+        
+        // Insert the uploaded image
+        quill.insertEmbed(range.index, 'image', imageUrl, 'user');
+        quill.setSelection(range.index + 1, 0);
+
+      } catch (error) {
+        console.error('Image upload error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
+        alert(errorMessage);
+        
+        // Remove placeholder text on error
+        const quill = quillRef.current?.getEditor();
+        if (quill) {
+          const range = quill.getSelection();
+          if (range) {
+            quill.deleteText(range.index, 'Uploading image...'.length);
+          }
+        }
+      }
+    };
+  };
+
   // Quill modules configuration
   const modules = useMemo(() => ({
     toolbar: {
@@ -33,7 +98,10 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         ['link', 'image', 'video'],
         
         ['clean'] // remove formatting button
-      ]
+      ],
+      handlers: {
+        image: imageHandler
+      }
     },
     clipboard: {
       matchVisual: false // Preserve formatting when pasting
@@ -148,6 +216,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
       `}</style>
       
       <ReactQuill
+        ref={quillRef}
         theme="snow"
         value={value}
         onChange={onChange}

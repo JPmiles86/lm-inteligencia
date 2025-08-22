@@ -393,15 +393,61 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Featured Image URL *
           </label>
-          <input
-            type="url"
-            value={formData.featuredImage}
-            onChange={(e) => handleInputChange('featuredImage', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-              errors.featuredImage ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="https://example.com/image.jpg"
-          />
+          <div className="space-y-2">
+            <input
+              type="url"
+              value={formData.featuredImage}
+              onChange={(e) => handleInputChange('featuredImage', e.target.value)}
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
+                errors.featuredImage ? 'border-red-300' : 'border-gray-300'
+              }`}
+              placeholder="https://example.com/image.jpg"
+            />
+            <div className="text-center">
+              <span className="text-sm text-gray-500">or</span>
+            </div>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    try {
+                      const imageUrl = await handleImageUpload(file);
+                      handleInputChange('featuredImage', imageUrl);
+                    } catch (error) {
+                      alert('Failed to upload image');
+                    }
+                  }
+                }}
+                className="hidden"
+                id="featured-image-upload"
+                disabled={uploadingImage}
+              />
+              <label
+                htmlFor="featured-image-upload"
+                className={`cursor-pointer flex flex-col items-center justify-center text-sm text-gray-600 hover:text-gray-800 ${
+                  uploadingImage ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {uploadingImage ? (
+                  <>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mb-2"></div>
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span>Click to upload featured image</span>
+                    <span className="text-xs text-gray-400 mt-1">PNG, JPG, WebP up to 10MB</span>
+                  </>
+                )}
+              </label>
+            </div>
+          </div>
           {errors.featuredImage && (
             <p className="mt-1 text-sm text-red-600">{errors.featuredImage}</p>
           )}

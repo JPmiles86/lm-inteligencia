@@ -1,17 +1,18 @@
-// Blog Service - Handles blog data operations and storage
+// Blog Service - Handles blog data operations using database API
 
-import { BlogPost, blogPosts as initialBlogPosts, blogCategories } from '../data/blogData';
+import { BlogPost } from '../data/blogData';
 import { Block } from '../components/admin/BlogManagement/types';
 import { blocksToHtml } from '../components/admin/BlogManagement/utils/blockHelpers';
-import { isMarkdown, markdownToHtml } from '../utils/markdownToHtml';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000/api';
 
 export interface BlogFormData {
   title: string;
   slug: string;
   excerpt: string;
   content: string;
-  blocks?: Block[]; // New field for block-based content
-  editorType?: 'rich' | 'block'; // Track which editor was used
+  blocks?: Block[];
+  editorType?: 'rich' | 'block';
   category: string;
   tags: string[];
   featuredImage: string;
@@ -28,7 +29,7 @@ export interface BlogFormData {
 // Extended interface for rich text editor
 export interface RichTextBlogFormData extends BlogFormData {
   editorType: 'rich' | 'block';
-  images: string[]; // Array of base64 images for rich text posts
+  images: string[];
   status: 'draft' | 'published' | 'scheduled';
   scheduledDate?: Date;
   metaTitle: string;
@@ -46,564 +47,490 @@ export interface BlogStats {
   monthlyPublications: Record<string, number>;
 }
 
-class BlogService {
-  private storageKey = 'inteligencia_blog_posts';
-  private draftsKey = 'inteligencia_blog_drafts';
-  private scheduledKey = 'inteligencia_blog_scheduled';
-  private imagesKey = 'inteligencia_blog_images';
+export interface BlogPostFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+  published?: boolean;
+  featured?: boolean;
+  search?: string;
+  tags?: string[];
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
 
-  // Get all published blog posts
-  getAllPosts(): BlogPost[] {
-    try {
-      const stored = localStorage.getItem(this.storageKey);
-      if (stored) {
-        const posts = JSON.parse(stored);
-        // Convert any markdown content to HTML for consistency
-        return posts.map((post: BlogPost) => ({
-          ...post,
-          content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
-        }));
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+}
+
+export interface BlogPostsResponse {
+  posts: BlogPost[];
+  pagination: PaginationInfo;
+}
+
+class BlogDatabaseService {
+  private authToken: string | null = null;
+
+  constructor() {
+    // Get auth token from localStorage or session storage
+    this.authToken = localStorage.getItem('admin_token') || sessionStorage.getItem('admin_token');
+  }
+
+  private getAuthHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (this.authToken) {
+      headers['Authorization'] = `Bearer ${this.authToken}`;
+    }
+    
+    return headers;
+  }
+
+  private async handleApiResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      if (response.status === 401) {
+        // Handle authentication error
+        this.authToken = null;
+        localStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_token');
+        throw new Error('Authentication required');
       }
-      // Initialize with default posts if none exist
-      const processedInitialPosts = initialBlogPosts.map(post => ({
-        ...post,
-        content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
-      }));
-      this.savePosts(processedInitialPosts);
-      return processedInitialPosts;
+      
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error occurred' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return data.data || data;
+  }
+
+  private async apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const headers = {
+      ...this.getAuthHeaders(),
+      ...options.headers,
+    };
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
+
+    return this.handleApiResponse<T>(response);
+  }
+
+  // Get all blog posts with filtering and pagination
+  async getAllPosts(filters: BlogPostFilters = {}): Promise<BlogPostsResponse> {
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (filters.page) queryParams.append('page', filters.page.toString());
+      if (filters.limit) queryParams.append('limit', filters.limit.toString());
+      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.published !== undefined) queryParams.append('published', filters.published.toString());
+      if (filters.featured !== undefined) queryParams.append('featured', filters.featured.toString());
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.tags && filters.tags.length > 0) {
+        filters.tags.forEach(tag => queryParams.append('tags', tag));
+      }
+      if (filters.sortBy) queryParams.append('sortBy', filters.sortBy);
+      if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
+
+      const endpoint = `/admin/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      return await this.apiCall<BlogPostsResponse>(endpoint);
     } catch (error) {
-      console.error('Error loading blog posts:', error);
-      return initialBlogPosts.map(post => ({
-        ...post,
-        content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
-      }));
+      console.error('Error fetching blog posts:', error);
+      throw error;
+    }
+  }
+
+  // Get all published posts (for public use)
+  async getAllPublishedPosts(filters: BlogPostFilters = {}): Promise<BlogPostsResponse> {
+    try {
+      const publishedFilters = { ...filters, published: true };
+      const queryParams = new URLSearchParams();
+      
+      if (publishedFilters.page) queryParams.append('page', publishedFilters.page.toString());
+      if (publishedFilters.limit) queryParams.append('limit', publishedFilters.limit.toString());
+      if (publishedFilters.category) queryParams.append('category', publishedFilters.category);
+      if (publishedFilters.featured !== undefined) queryParams.append('featured', publishedFilters.featured.toString());
+      if (publishedFilters.search) queryParams.append('search', publishedFilters.search);
+      if (publishedFilters.tags && publishedFilters.tags.length > 0) {
+        publishedFilters.tags.forEach(tag => queryParams.append('tags', tag));
+      }
+      if (publishedFilters.sortBy) queryParams.append('sortBy', publishedFilters.sortBy);
+      if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
+
+      const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      return await this.apiCall<BlogPostsResponse>(endpoint);
+    } catch (error) {
+      console.error('Error fetching published posts:', error);
+      throw error;
     }
   }
 
   // Get all draft posts
-  getAllDrafts(): BlogPost[] {
+  async getAllDrafts(filters: BlogPostFilters = {}): Promise<BlogPostsResponse> {
     try {
-      const stored = localStorage.getItem(this.draftsKey);
-      if (stored) {
-        const drafts = JSON.parse(stored);
-        // Convert any markdown content to HTML for consistency
-        return drafts.map((post: BlogPost) => ({
-          ...post,
-          content: isMarkdown(post.content) ? markdownToHtml(post.content) : post.content
-        }));
-      }
-      return [];
+      const draftFilters = { ...filters, published: false };
+      return await this.getAllPosts(draftFilters);
     } catch (error) {
-      console.error('Error loading draft posts:', error);
-      return [];
+      console.error('Error fetching draft posts:', error);
+      throw error;
     }
   }
 
-  // Get a single post by ID (from published or drafts)
-  getPostById(id: string): BlogPost | null {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = this.getAllDrafts();
-    
-    return publishedPosts.find(post => post.id === id) || 
-           draftPosts.find(post => post.id === id) || 
-           null;
+  // Get a single post by ID
+  async getPostById(id: number): Promise<BlogPost | null> {
+    try {
+      const post = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}`);
+      return post;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error fetching post by ID:', error);
+      throw error;
+    }
   }
 
   // Get a single post by slug
-  getPostBySlug(slug: string): BlogPost | null {
-    const publishedPosts = this.getAllPosts();
-    return publishedPosts.find(post => post.slug === slug) || null;
-  }
-
-  // Save posts to storage
-  private savePosts(posts: BlogPost[]): void {
+  async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(posts));
+      const post = await this.apiCall<BlogPost>(`/admin/blog/posts/slug/${slug}`);
+      return post;
     } catch (error) {
-      console.error('Error saving blog posts:', error);
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error fetching post by slug:', error);
+      throw error;
     }
   }
 
-  // Save drafts to storage
-  private saveDrafts(drafts: BlogPost[]): void {
+  // Get a published post by slug (for public use)
+  async getPublishedPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      localStorage.setItem(this.draftsKey, JSON.stringify(drafts));
+      const post = await this.apiCall<BlogPost>(`/blog/posts/${slug}`);
+      return post;
     } catch (error) {
-      console.error('Error saving draft posts:', error);
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error fetching published post by slug:', error);
+      throw error;
     }
+  }
+
+  // Convert form data to API format
+  private formatPostForAPI(formData: BlogFormData): any {
+    // Process content based on editor type
+    let processedContent = formData.content;
+    if (formData.editorType === 'block' && formData.blocks) {
+      processedContent = blocksToHtml(formData.blocks);
+    }
+
+    return {
+      title: formData.title,
+      slug: formData.slug || this.generateSlug(formData.title),
+      excerpt: formData.excerpt,
+      content: processedContent,
+      featuredImage: formData.featuredImage,
+      category: formData.category,
+      tags: formData.tags,
+      featured: formData.featured,
+      published: Boolean(formData.publishedDate),
+      publishedAt: formData.publishedDate ? new Date(formData.publishedDate).toISOString() : null,
+      authorName: formData.author.name,
+      authorTitle: formData.author.title,
+      authorImage: formData.author.image,
+      readTime: formData.readTime || this.calculateReadTime(processedContent),
+      editorType: formData.editorType || 'rich',
+      blocks: formData.blocks || []
+    };
   }
 
   // Create a new blog post
-  createPost(formData: BlogFormData, isDraft: boolean = false): BlogPost {
-    // Process content based on editor type
-    let processedContent = formData.content;
-    if (formData.editorType === 'block' && formData.blocks) {
-      // Convert blocks to HTML for storage and display
-      processedContent = blocksToHtml(formData.blocks);
+  async createPost(formData: BlogFormData, isDraft: boolean = false): Promise<BlogPost> {
+    try {
+      const postData = this.formatPostForAPI(formData);
+      
+      // Set published status based on isDraft flag
+      postData.published = !isDraft;
+      if (isDraft) {
+        postData.publishedAt = null;
+      }
+
+      const newPost = await this.apiCall<BlogPost>('/admin/blog/posts', {
+        method: 'POST',
+        body: JSON.stringify(postData),
+      });
+
+      return newPost;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
     }
-
-    const newPost: BlogPost = {
-      id: this.generateId(),
-      ...formData,
-      content: processedContent,
-      slug: this.generateSlug(formData.title),
-      publishedDate: isDraft ? '' : (formData.publishedDate || new Date().toISOString().split('T')[0] || ''),
-      readTime: this.calculateReadTime(processedContent),
-      blocks: formData.blocks || [],
-      editorType: formData.editorType || 'rich'
-    };
-
-    if (isDraft) {
-      const drafts = this.getAllDrafts();
-      drafts.push(newPost);
-      this.saveDrafts(drafts);
-    } else {
-      const posts = this.getAllPosts();
-      posts.push(newPost);
-      this.savePosts(posts);
-    }
-
-    return newPost;
   }
 
   // Update an existing blog post
-  updatePost(id: string, formData: BlogFormData, isDraft: boolean = false): BlogPost | null {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = this.getAllDrafts();
-    
-    // Find the post in either published or drafts
-    let postIndex = publishedPosts.findIndex(post => post.id === id);
-    const isInPublished = postIndex !== -1;
-    
-    if (!isInPublished) {
-      postIndex = draftPosts.findIndex(post => post.id === id);
-      if (postIndex === -1) {
-        return null; // Post not found
+  async updatePost(id: number, formData: BlogFormData, isDraft: boolean = false): Promise<BlogPost | null> {
+    try {
+      const postData = this.formatPostForAPI(formData);
+      
+      // Set published status based on isDraft flag
+      postData.published = !isDraft;
+      if (isDraft) {
+        postData.publishedAt = null;
       }
+
+      const updatedPost = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(postData),
+      });
+
+      return updatedPost;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error updating post:', error);
+      throw error;
     }
-
-    // Process content based on editor type
-    let processedContent = formData.content;
-    if (formData.editorType === 'block' && formData.blocks) {
-      // Convert blocks to HTML for storage and display
-      processedContent = blocksToHtml(formData.blocks);
-    }
-
-    const updatedPost: BlogPost = {
-      id,
-      ...formData,
-      content: processedContent,
-      slug: this.generateSlug(formData.title),
-      publishedDate: isDraft ? '' : (formData.publishedDate || new Date().toISOString().split('T')[0] || ''),
-      readTime: this.calculateReadTime(processedContent),
-      blocks: formData.blocks || [],
-      editorType: formData.editorType || 'rich'
-    };
-
-    // Handle moving between published and draft states
-    if (isDraft && isInPublished) {
-      // Move from published to draft
-      publishedPosts.splice(postIndex, 1);
-      draftPosts.push(updatedPost);
-      this.savePosts(publishedPosts);
-      this.saveDrafts(draftPosts);
-    } else if (!isDraft && !isInPublished) {
-      // Move from draft to published
-      draftPosts.splice(postIndex, 1);
-      publishedPosts.push(updatedPost);
-      this.savePosts(publishedPosts);
-      this.saveDrafts(draftPosts);
-    } else if (isDraft) {
-      // Update in drafts
-      draftPosts[postIndex] = updatedPost;
-      this.saveDrafts(draftPosts);
-    } else {
-      // Update in published
-      publishedPosts[postIndex] = updatedPost;
-      this.savePosts(publishedPosts);
-    }
-
-    return updatedPost;
   }
 
   // Delete a blog post
-  deletePost(id: string): boolean {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = this.getAllDrafts();
-    
-    const publishedIndex = publishedPosts.findIndex(post => post.id === id);
-    const draftIndex = draftPosts.findIndex(post => post.id === id);
-    
-    if (publishedIndex !== -1) {
-      publishedPosts.splice(publishedIndex, 1);
-      this.savePosts(publishedPosts);
+  async deletePost(id: number): Promise<boolean> {
+    try {
+      await this.apiCall(`/admin/blog/posts/${id}`, {
+        method: 'DELETE',
+      });
       return true;
-    } else if (draftIndex !== -1) {
-      draftPosts.splice(draftIndex, 1);
-      this.saveDrafts(draftPosts);
-      return true;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return false;
+      }
+      console.error('Error deleting post:', error);
+      throw error;
     }
-    
-    return false;
   }
 
-  // Publish a draft post
-  publishDraft(id: string): BlogPost | null {
-    const drafts = this.getAllDrafts();
-    const draftIndex = drafts.findIndex(post => post.id === id);
-    
-    if (draftIndex === -1) {
-      return null;
+  // Toggle published status
+  async togglePublished(id: number): Promise<BlogPost | null> {
+    try {
+      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin/blog/posts/${id}/publish`, {
+        method: 'PATCH',
+      });
+      return response.post;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error toggling publish status:', error);
+      throw error;
     }
-    
-    const draft = drafts[draftIndex];
-    if (!draft) {
-      return null;
+  }
+
+  // Toggle featured status
+  async toggleFeatured(id: number): Promise<BlogPost | null> {
+    try {
+      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin/blog/posts/${id}/feature`, {
+        method: 'PATCH',
+      });
+      return response.post;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      console.error('Error toggling feature status:', error);
+      throw error;
     }
-    
-    const publishedPost: BlogPost = {
-      ...draft,
-      publishedDate: new Date().toISOString().split('T')[0] || ''
-    };
-    
-    // Remove from drafts and add to published
-    drafts.splice(draftIndex, 1);
-    const publishedPosts = this.getAllPosts();
-    publishedPosts.push(publishedPost);
-    
-    this.saveDrafts(drafts);
-    this.savePosts(publishedPosts);
-    
-    return publishedPost;
+  }
+
+  // Publish a draft (legacy method for compatibility)
+  async publishDraft(id: number): Promise<BlogPost | null> {
+    return await this.togglePublished(id);
   }
 
   // Get blog statistics
-  getStats(): BlogStats {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = this.getAllDrafts();
-    const allPosts = [...publishedPosts, ...draftPosts];
-
-    const categoryCounts: Record<string, number> = {};
-    const tagCounts: Record<string, number> = {};
-    const monthlyPublications: Record<string, number> = {};
-
-    publishedPosts.forEach(post => {
-      // Category counts
-      categoryCounts[post.category] = (categoryCounts[post.category] || 0) + 1;
-      
-      // Tag counts
-      post.tags.forEach(tag => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-      });
-      
-      // Monthly publications
-      if (post.publishedDate) {
-        const month = post.publishedDate.substring(0, 7); // YYYY-MM
-        monthlyPublications[month] = (monthlyPublications[month] || 0) + 1;
-      }
-    });
-
-    return {
-      totalPosts: allPosts.length,
-      publishedPosts: publishedPosts.length,
-      draftPosts: draftPosts.length,
-      featuredPosts: publishedPosts.filter(post => post.featured).length,
-      categoryCounts,
-      tagCounts,
-      monthlyPublications
-    };
+  async getStats(): Promise<BlogStats> {
+    try {
+      const stats = await this.apiCall<BlogStats>('/admin/blog/stats');
+      return stats;
+    } catch (error) {
+      console.error('Error fetching blog stats:', error);
+      throw error;
+    }
   }
 
   // Get available categories
-  getCategories(): string[] {
-    return blogCategories.slice(1); // Remove "All" category
+  async getCategories(): Promise<string[]> {
+    try {
+      const categories = await this.apiCall<string[]>('/admin/blog/categories');
+      return categories;
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      throw error;
+    }
+  }
+
+  // Get available tags
+  async getTags(): Promise<string[]> {
+    try {
+      const tags = await this.apiCall<string[]>('/admin/blog/tags');
+      return tags;
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      throw error;
+    }
   }
 
   // Get popular tags
-  getPopularTags(limit: number = 20): string[] {
-    const stats = this.getStats();
-    return Object.entries(stats.tagCounts)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, limit)
-      .map(([tag]) => tag);
+  async getPopularTags(limit: number = 20): Promise<string[]> {
+    try {
+      const tags = await this.getTags();
+      return tags.slice(0, limit);
+    } catch (error) {
+      console.error('Error fetching popular tags:', error);
+      throw error;
+    }
   }
 
   // Search posts
-  searchPosts(query: string, category?: string, includeDrafts: boolean = false): BlogPost[] {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = includeDrafts ? this.getAllDrafts() : [];
-    const allPosts = [...publishedPosts, ...draftPosts];
-    
-    if (!query.trim() && !category) {
-      return allPosts;
-    }
-
-    let filtered = allPosts;
-
-    // Filter by category
-    if (category && category !== 'All') {
-      filtered = filtered.filter(post => post.category === category);
-    }
-
-    // Filter by search query
-    if (query.trim()) {
-      const searchTerm = query.toLowerCase();
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(searchTerm) ||
-        post.excerpt.toLowerCase().includes(searchTerm) ||
-        post.content.toLowerCase().includes(searchTerm) ||
-        post.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
-        post.author.name.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    return filtered;
-  }
-
-  // Get all scheduled blog posts
-  getAllScheduledPosts(): BlogPost[] {
+  async searchPosts(
+    query: string, 
+    category?: string, 
+    includeDrafts: boolean = false,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<BlogPostsResponse> {
     try {
-      const stored = localStorage.getItem(this.scheduledKey);
-      return stored ? JSON.parse(stored) : [];
+      const filters: BlogPostFilters = {
+        search: query,
+        page,
+        limit
+      };
+      
+      if (category && category !== 'All') {
+        filters.category = category;
+      }
+      
+      if (!includeDrafts) {
+        filters.published = true;
+      }
+
+      return await this.getAllPosts(filters);
     } catch (error) {
-      console.error('Error loading scheduled posts:', error);
-      return [];
+      console.error('Error searching posts:', error);
+      throw error;
     }
   }
 
-  // Save scheduled posts to storage
-  private saveScheduledPosts(posts: BlogPost[]): void {
+  // Image upload to GCS
+  async uploadImage(file: File): Promise<string> {
     try {
-      localStorage.setItem(this.scheduledKey, JSON.stringify(posts));
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: 'POST',
+        headers: {
+          ...this.getAuthHeaders(),
+          // Don't set Content-Type for FormData, let browser set it
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.data.publicUrl;
     } catch (error) {
-      console.error('Error saving scheduled posts:', error);
+      console.error('Error uploading image:', error);
+      throw error;
+    }
+  }
+
+  // Upload image for Quill editor
+  async uploadQuillImage(file: File): Promise<string> {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`${API_BASE_URL}/upload/quill-image`, {
+        method: 'POST',
+        headers: {
+          ...this.getAuthHeaders(),
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.url;
+    } catch (error) {
+      console.error('Error uploading Quill image:', error);
+      throw error;
     }
   }
 
   // Create a new rich text blog post with extended data
-  createRichTextPost(formData: RichTextBlogFormData): BlogPost {
-    const newPost: BlogPost & { 
-      editorType?: string; 
-      images?: string[]; 
-      metaTitle?: string; 
-      metaDescription?: string; 
-    } = {
-      id: this.generateId(),
-      title: formData.title,
-      slug: this.generateSlug(formData.title),
-      excerpt: formData.excerpt,
-      content: formData.content,
-      category: formData.category,
-      tags: formData.tags,
-      featuredImage: formData.featuredImage,
-      featured: formData.featured,
-      publishedDate: formData.status === 'published' ? (formData.publishedDate || '') : '',
-      author: formData.author,
-      readTime: this.calculateReadTime(formData.content),
-      editorType: formData.editorType,
-      images: formData.images,
-      metaTitle: formData.metaTitle,
-      metaDescription: formData.metaDescription
-    };
-
-    if (formData.status === 'scheduled' && formData.scheduledDate) {
-      // Save as scheduled post
-      const scheduledPosts = this.getAllScheduledPosts();
-      const scheduledPost = {
-        ...newPost,
-        scheduledDate: formData.scheduledDate.toISOString()
-      };
-      scheduledPosts.push(scheduledPost);
-      this.saveScheduledPosts(scheduledPosts);
-    } else if (formData.status === 'draft') {
-      // Save as draft
-      const drafts = this.getAllDrafts();
-      drafts.push(newPost);
-      this.saveDrafts(drafts);
-    } else {
-      // Publish immediately
-      const posts = this.getAllPosts();
-      posts.push(newPost);
-      this.savePosts(posts);
-    }
-
-    return newPost;
+  async createRichTextPost(formData: RichTextBlogFormData): Promise<BlogPost> {
+    const isDraft = formData.status === 'draft';
+    return await this.createPost(formData, isDraft);
   }
 
   // Update an existing rich text blog post
-  updateRichTextPost(id: string, formData: RichTextBlogFormData): BlogPost | null {
-    const publishedPosts = this.getAllPosts();
-    const draftPosts = this.getAllDrafts();
-    const scheduledPosts = this.getAllScheduledPosts();
-    
-    // Find the post in any of the collections
-    let postIndex = publishedPosts.findIndex(post => post.id === id);
-    let collection: 'published' | 'draft' | 'scheduled' = 'published';
-    
-    if (postIndex === -1) {
-      postIndex = draftPosts.findIndex(post => post.id === id);
-      collection = 'draft';
-    }
-    
-    if (postIndex === -1) {
-      postIndex = scheduledPosts.findIndex(post => post.id === id);
-      collection = 'scheduled';
-    }
-    
-    if (postIndex === -1) {
-      return null; // Post not found
-    }
-
-    const updatedPost: BlogPost & { 
-      editorType?: string; 
-      images?: string[]; 
-      metaTitle?: string; 
-      metaDescription?: string; 
-      scheduledDate?: string;
-    } = {
-      id,
-      title: formData.title,
-      slug: this.generateSlug(formData.title),
-      excerpt: formData.excerpt,
-      content: formData.content,
-      category: formData.category,
-      tags: formData.tags,
-      featuredImage: formData.featuredImage,
-      featured: formData.featured,
-      publishedDate: formData.status === 'published' ? (formData.publishedDate || '') : '',
-      author: formData.author,
-      readTime: this.calculateReadTime(formData.content),
-      editorType: formData.editorType,
-      images: formData.images,
-      metaTitle: formData.metaTitle,
-      metaDescription: formData.metaDescription
-    };
-
-    // Remove from current collection
-    if (collection === 'published') {
-      publishedPosts.splice(postIndex, 1);
-    } else if (collection === 'draft') {
-      draftPosts.splice(postIndex, 1);
-    } else {
-      scheduledPosts.splice(postIndex, 1);
-    }
-
-    // Add to appropriate collection based on new status
-    if (formData.status === 'scheduled' && formData.scheduledDate) {
-      updatedPost.scheduledDate = formData.scheduledDate.toISOString();
-      scheduledPosts.push(updatedPost);
-    } else if (formData.status === 'draft') {
-      draftPosts.push(updatedPost);
-    } else {
-      publishedPosts.push(updatedPost);
-    }
-
-    // Save all collections
-    this.savePosts(publishedPosts);
-    this.saveDrafts(draftPosts);
-    this.saveScheduledPosts(scheduledPosts);
-
-    return updatedPost;
+  async updateRichTextPost(id: number, formData: RichTextBlogFormData): Promise<BlogPost | null> {
+    const isDraft = formData.status === 'draft';
+    return await this.updatePost(id, formData, isDraft);
   }
 
-  // Check and publish scheduled posts
-  checkScheduledPosts(): BlogPost[] {
-    const scheduledPosts = this.getAllScheduledPosts();
-    const now = new Date();
-    const publishedPosts = this.getAllPosts();
-    const toPublish: BlogPost[] = [];
-
-    const remainingScheduled = scheduledPosts.filter(post => {
-      const scheduledDate = new Date((post as any).scheduledDate);
-      if (scheduledDate <= now) {
-        // Time to publish
-        const publishedPost = {
-          ...post,
-          publishedDate: now.toISOString().split('T')[0] || ''
-        };
-        publishedPosts.push(publishedPost);
-        toPublish.push(publishedPost);
-        return false; // Remove from scheduled
+  // Duplicate a blog post
+  async duplicatePost(id: number): Promise<BlogPost | null> {
+    try {
+      const duplicatedPost = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}/duplicate`, {
+        method: 'POST',
+      });
+      return duplicatedPost;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
       }
-      return true; // Keep in scheduled
-    });
-
-    if (toPublish.length > 0) {
-      this.savePosts(publishedPosts);
-      this.saveScheduledPosts(remainingScheduled);
-    }
-
-    return toPublish;
-  }
-
-  // Get blog images from storage
-  getBlogImages(): Record<string, string> {
-    try {
-      const stored = localStorage.getItem(this.imagesKey);
-      return stored ? JSON.parse(stored) : {};
-    } catch (error) {
-      console.error('Error loading blog images:', error);
-      return {};
+      console.error('Error duplicating post:', error);
+      throw error;
     }
   }
 
-  // Save blog image to storage
-  saveBlogImage(id: string, base64: string): void {
-    try {
-      const images = this.getBlogImages();
-      images[id] = base64;
-      localStorage.setItem(this.imagesKey, JSON.stringify(images));
-    } catch (error) {
-      console.error('Error saving blog image:', error);
-    }
+  // Set authentication token
+  setAuthToken(token: string): void {
+    this.authToken = token;
+    localStorage.setItem('admin_token', token);
   }
 
-  // Delete blog image from storage
-  deleteBlogImage(id: string): void {
-    try {
-      const images = this.getBlogImages();
-      delete images[id];
-      localStorage.setItem(this.imagesKey, JSON.stringify(images));
-    } catch (error) {
-      console.error('Error deleting blog image:', error);
-    }
+  // Clear authentication token
+  clearAuthToken(): void {
+    this.authToken = null;
+    localStorage.removeItem('admin_token');
+    sessionStorage.removeItem('admin_token');
   }
 
-  // Export all blog data including rich text features
-  exportData(): { posts: BlogPost[]; drafts: BlogPost[]; scheduled: BlogPost[]; images: Record<string, string> } {
-    return {
-      posts: this.getAllPosts(),
-      drafts: this.getAllDrafts(),
-      scheduled: this.getAllScheduledPosts(),
-      images: this.getBlogImages()
-    };
-  }
-
-  // Import blog data including rich text features
-  importData(data: { 
-    posts?: BlogPost[]; 
-    drafts?: BlogPost[]; 
-    scheduled?: BlogPost[]; 
-    images?: Record<string, string> 
-  }): void {
-    if (data.posts) {
-      this.savePosts(data.posts);
-    }
-    if (data.drafts) {
-      this.saveDrafts(data.drafts);
-    }
-    if (data.scheduled) {
-      this.saveScheduledPosts(data.scheduled);
-    }
-    if (data.images) {
-      localStorage.setItem(this.imagesKey, JSON.stringify(data.images));
-    }
+  // Check if authenticated
+  isAuthenticated(): boolean {
+    return !!this.authToken;
   }
 
   // Utility functions
-  private generateId(): string {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
 
   private generateSlug(title: string): string {
     return title
@@ -619,4 +546,4 @@ class BlogService {
   }
 }
 
-export const blogService = new BlogService();
+export const blogService = new BlogDatabaseService();

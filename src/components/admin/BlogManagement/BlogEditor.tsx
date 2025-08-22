@@ -5,6 +5,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
 import { RichTextEditor } from './RichTextEditor';
+import { ImageUploader } from '../ImageUploader';
 
 interface BlogEditorProps {
   post?: BlogPost | null;
@@ -401,17 +402,60 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Featured Image URL *
+            Featured Image *
           </label>
-          <input
-            type="url"
-            value={formData.featuredImage}
-            onChange={(e) => handleInputChange('featuredImage', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
-              errors.featuredImage ? 'border-red-300' : 'border-gray-300'
-            }`}
-            placeholder="https://example.com/image.jpg"
-          />
+          
+          {/* Current featured image preview */}
+          {formData.featuredImage && (
+            <div className="mb-4">
+              <img
+                src={formData.featuredImage}
+                alt="Featured image preview"
+                className="w-full max-w-md h-48 object-cover rounded-lg border border-gray-300"
+              />
+              <button
+                type="button"
+                onClick={() => handleInputChange('featuredImage', '')}
+                className="mt-2 text-sm text-red-600 hover:text-red-800"
+              >
+                Remove featured image
+              </button>
+            </div>
+          )}
+          
+          {/* Image uploader */}
+          <div className={errors.featuredImage ? 'border border-red-300 rounded-lg p-4' : ''}>
+            <ImageUploader
+              onUploadComplete={(images) => {
+                if (images.length > 0) {
+                  handleInputChange('featuredImage', images[0].publicUrl);
+                }
+              }}
+              onUploadError={(error) => {
+                console.error('Featured image upload error:', error);
+                alert('Failed to upload featured image: ' + error);
+              }}
+              maxFiles={1}
+              allowMultiple={false}
+              showPreview={false}
+              className="mb-4"
+            />
+          </div>
+          
+          {/* Manual URL input as fallback */}
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Or enter image URL manually:
+            </label>
+            <input
+              type="url"
+              value={formData.featuredImage}
+              onChange={(e) => handleInputChange('featuredImage', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+          
           {errors.featuredImage && (
             <p className="mt-1 text-sm text-red-600">{errors.featuredImage}</p>
           )}
