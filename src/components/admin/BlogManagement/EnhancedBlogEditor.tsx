@@ -243,7 +243,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       </div>
       
       <div className="mb-6">
-        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
           {formData.category}
         </span>
       </div>
@@ -313,7 +313,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             type="text"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.title ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="Enter post title..."
@@ -331,7 +331,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             type="text"
             value={formData.slug}
             onChange={(e) => handleInputChange('slug', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.slug ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="post-slug"
@@ -352,7 +352,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           onChange={(e) => handleInputChange('excerpt', e.target.value)}
           rows={3}
           maxLength={200}
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
+          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none ${
             errors.excerpt ? 'border-red-300' : 'border-gray-300'
           }`}
           placeholder="Brief description of the post..."
@@ -371,7 +371,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           <select
             value={formData.category}
             onChange={(e) => handleInputChange('category', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           >
             {categories.map((category) => (
               <option key={category} value={category}>
@@ -389,7 +389,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             type="url"
             value={formData.featuredImage}
             onChange={(e) => handleInputChange('featuredImage', e.target.value)}
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${
               errors.featuredImage ? 'border-red-300' : 'border-gray-300'
             }`}
             placeholder="https://example.com/image.jpg"
@@ -417,13 +417,13 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                   handleAddTag();
                 }
               }}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               placeholder="Add a tag..."
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
             >
               Add
             </button>
@@ -434,13 +434,13 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
               {formData.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                  className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
                 >
                   {tag}
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(tag)}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-purple-600 hover:text-purple-800"
                   >
                     ×
                   </button>
@@ -465,7 +465,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             type="date"
             value={formData.publishedDate}
             onChange={(e) => handleInputChange('publishedDate', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
           />
         </div>
 
@@ -475,7 +475,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
               type="checkbox"
               checked={formData.featured}
               onChange={(e) => handleInputChange('featured', e.target.checked)}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
             />
             <span className="text-sm font-medium text-gray-700">Featured Post</span>
           </label>
@@ -496,7 +496,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             onClick={() => handleEditorTypeChange('block')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               editorType === 'block'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -506,7 +506,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             onClick={() => handleEditorTypeChange('rich')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               editorType === 'rich'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -541,7 +541,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         ) : (
           <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
             <Editor
-              apiKey="no-api-key" // In production, use your TinyMCE API key
+              apiKey={process.env.REACT_APP_TINYMCE_API_KEY || "no-api-key"} // Uses environment variable or falls back to no-api-key
               value={formData.content}
               onEditorChange={(content) => handleInputChange('content', content)}
               onInit={(evt, editor) => editorRef.current = editor}
@@ -605,7 +605,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 isPreviewMode
                   ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                  : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
               }`}
             >
               {isPreviewMode ? 'Edit' : 'Preview'}
@@ -650,7 +650,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                   <button
                     onClick={() => handleSave(false)}
                     disabled={saving}
-                    className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-colors disabled:opacity-50"
                   >
                     {saving ? 'Publishing...' : (isEditing ? 'Update Post' : 'Publish Post')}
                   </button>

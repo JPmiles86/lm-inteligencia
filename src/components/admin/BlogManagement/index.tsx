@@ -43,31 +43,25 @@ export const BlogManagement: React.FC = () => {
   };
 
   const renderBreadcrumbs = () => {
-    const breadcrumbs = [
-      { label: 'Blog Management', active: currentView === 'list' },
-    ];
-
-    if (currentView === 'editor') {
-      breadcrumbs.push({
-        label: editingPost ? 'Edit Post' : 'New Post',
-        active: true
-      });
+    // Only show breadcrumbs on editor view, not on list view
+    if (currentView !== 'editor') {
+      return null;
     }
 
     return (
       <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        {breadcrumbs.map((crumb, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && (
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            )}
-            <span className={crumb.active ? 'text-blue-600 font-medium' : 'hover:text-gray-900'}>
-              {crumb.label}
-            </span>
-          </React.Fragment>
-        ))}
+        <button
+          onClick={() => setCurrentView('list')}
+          className="hover:text-purple-600 transition-colors"
+        >
+          Blog Management
+        </button>
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+        <span className="text-purple-600 font-medium">
+          {editingPost ? 'Edit Post' : 'New Post'}
+        </span>
       </nav>
     );
   };
@@ -84,7 +78,6 @@ export const BlogManagement: React.FC = () => {
             transition={{ duration: 0.3 }}
             className="h-full overflow-auto"
           >
-            {renderBreadcrumbs()}
             <BlogList
               onEditPost={handleEditPost}
               onCreateNew={handleCreateNew}
@@ -133,7 +126,7 @@ export const BlogManagement: React.FC = () => {
             {/* Main FAB */}
             <button
               onClick={handleCreateNew}
-              className="bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 flex items-center justify-center group"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white w-14 h-14 rounded-full shadow-lg hover:from-purple-700 hover:to-pink-700 transition-all hover:scale-110 flex items-center justify-center group"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

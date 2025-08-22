@@ -70,7 +70,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             animate={{ x: 0 }}
             exit={{ x: -280 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-y-0 left-0 z-50 w-70 bg-white shadow-xl border-r border-gray-200 flex flex-col"
+            className="fixed inset-y-0 left-0 z-50 w-[280px] bg-white shadow-xl border-r border-gray-200 flex flex-col"
           >
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -98,8 +98,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   onClick={() => onSectionChange(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                     currentSection === item.id
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border border-purple-200'
+                      : 'text-gray-700 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-pink-50/50 hover:text-gray-900'
                   }`}
                 >
                   <span className="text-2xl">{item.icon}</span>
@@ -155,7 +155,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-70' : ''}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'lg:ml-[280px]' : ''}`}>
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
           <div className="flex items-center justify-between px-6 py-4">
@@ -203,7 +203,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
                     <span className="text-white font-medium text-sm">LM</span>
                   </div>
                   <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
