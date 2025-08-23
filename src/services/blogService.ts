@@ -4,7 +4,8 @@ import { BlogPost } from '../data/blogData';
 import { Block } from '../components/admin/BlogManagement/types';
 import { blocksToHtml } from '../components/admin/BlogManagement/utils/blockHelpers';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Use relative URL for Vercel deployment
+const API_BASE_URL = import.meta.env.NODE_ENV === 'production' ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
 
 export interface BlogFormData {
   title: string;

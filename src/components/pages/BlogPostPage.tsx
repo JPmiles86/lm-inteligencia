@@ -65,7 +65,8 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
 
       try {
         setLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
+        // Use relative URL for Vercel deployment
+        const apiBaseUrl = import.meta.env.NODE_ENV === 'production' ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
         
         const response = await fetch(`${apiBaseUrl}/blog/posts/slug/${slug}`);
         

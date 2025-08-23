@@ -37,10 +37,10 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
-        // Try production API first, fallback to local dev
-        const apiBaseUrl = window.location.hostname === 'localhost' 
-          ? 'http://localhost:4000' 
-          : '';
+        // Use relative URL for production, absolute for local dev
+        const apiBaseUrl = import.meta.env.NODE_ENV === 'production' 
+          ? '' 
+          : (import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || '');
         
         // First try to get featured posts
         const featuredResponse = await fetch(`${apiBaseUrl}/api/blog/posts?featured=true&limit=3`);
