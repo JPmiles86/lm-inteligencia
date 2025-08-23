@@ -30,6 +30,7 @@
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
     "express": "^5.1.0",
+    "formidable": "^3.5.4",
     "framer-motion": "^12.4.4",
     "lucide-react": "^0.513.0",
     "multer": "^2.0.2",
