@@ -65,12 +65,9 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
 
       try {
         setLoading(true);
-        // Try production API first, fallback to local dev
-        const apiBaseUrl = window.location.hostname === 'localhost' 
-          ? 'http://localhost:4000' 
-          : '';
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
         
-        const response = await fetch(`${apiBaseUrl}/api/blog/posts/slug/${slug}`);
+        const response = await fetch(`${apiBaseUrl}/blog/posts/slug/${slug}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch blog post: ${response.status}`);
@@ -81,7 +78,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
           setPost(data.data);
           
           // Fetch related posts by category
-          const relatedResponse = await fetch(`${apiBaseUrl}/api/blog/posts?category=${encodeURIComponent(data.data.category)}&limit=3`);
+          const relatedResponse = await fetch(`${apiBaseUrl}/blog/posts?category=${encodeURIComponent(data.data.category)}&limit=3`);
           if (relatedResponse.ok) {
             const relatedData = await relatedResponse.json();
             // Filter out the current post and limit to 3
