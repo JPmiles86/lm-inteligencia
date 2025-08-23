@@ -45,9 +45,31 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState<string[]>([
+    'Hospitality Marketing',
+    'Tech & AI Marketing',
+    'Content Strategy',
+    'Social Media',
+    'Email Marketing',
+    'SEO & SEM'
+  ]);
 
-  const categories = blogService.getCategories();
   const isEditing = !!post;
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await blogService.getCategories();
+        if (categoriesData && categoriesData.length > 0) {
+          setCategories(categoriesData);
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Load post data when editing
   useEffect(() => {
@@ -72,12 +94,16 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         blocks: initialBlocks,
         editorType: post.editorType || 'rich',
         category: post.category,
-        tags: post.tags,
+        tags: Array.isArray(post.tags) ? post.tags : [],
         featuredImage: post.featuredImage,
         featured: post.featured,
         publishedDate: post.publishedDate || new Date().toISOString().split('T')[0] as string,
-        author: post.author,
-        readTime: post.readTime
+        author: post.author || {
+          name: 'Laurie Meiring',
+          title: 'Founder & Digital Marketing Strategist',
+          image: '/images/team/laurie-meiring.jpg'
+        },
+        readTime: post.readTime || 5
       });
       
       setEditorType(post.editorType || 'rich');
@@ -121,7 +147,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       // If switching from block to rich, convert blocks to HTML
       if (editorType === 'block' && newType === 'rich' && formData.blocks) {
         // Convert blocks to simple HTML for rich text editor
-        preservedContent = formData.blocks.map(block => {
+        preservedContent = (formData.blocks || []).map(block => {
           if (block.type === 'paragraph') return `<p>${block.data.text || ''}</p>`;
           if (block.type === 'heading') return `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>`;
           if (block.type === 'image') return `<img src="${block.data.url || ''}" alt="${block.data.alt || ''}" />`;
@@ -284,8 +310,8 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         {editorType === 'rich' ? (
           <div dangerouslySetInnerHTML={{ __html: formData.content }} />
         ) : (
-          formData.blocks ? 
-            <div dangerouslySetInnerHTML={{ __html: formData.blocks.map(block => 
+          formData.blocks && formData.blocks.length > 0 ? 
+            <div dangerouslySetInnerHTML={{ __html: (formData.blocks || []).map(block => 
               // Simple preview rendering
               block.type === 'paragraph' ? `<p>${block.data.text || ''}</p>` :
               block.type === 'heading' ? `<h${block.data.level || 2}>${block.data.text || ''}</h${block.data.level || 2}>` :
@@ -297,7 +323,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       </div>
       
       <div className="flex flex-wrap gap-2 mt-8">
-        {formData.tags.map((tag) => (
+        {(formData.tags || []).map((tag) => (
           <span
             key={tag}
             className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
@@ -485,7 +511,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           
           {formData.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {formData.tags.map((tag) => (
+              {(formData.tags || []).map((tag) => (
                 <span
                   key={tag}
                   className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
