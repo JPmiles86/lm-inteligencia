@@ -143,7 +143,26 @@ class BlogDatabaseService {
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
 
       const endpoint = `/admin/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      return await this.apiCall<BlogPostsResponse>(endpoint);
+      const response = await this.apiCall<any>(endpoint);
+      
+      // The API returns { success: true, data: posts[], pagination: {...} }
+      // But handleApiResponse returns data.data || data, so response here is the posts array
+      // We need to get the full response
+      const url = `${API_BASE_URL}${endpoint}`;
+      const fullResponse = await fetch(url, {
+        headers: this.getAuthHeaders(),
+      });
+      const fullData = await fullResponse.json();
+      
+      return {
+        posts: fullData.data || [],
+        pagination: fullData.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 0,
+          itemsPerPage: 10
+        }
+      };
     } catch (error) {
       console.error('Error fetching blog posts:', error);
       throw error;
@@ -168,7 +187,18 @@ class BlogDatabaseService {
       if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
 
       const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      return await this.apiCall<BlogPostsResponse>(endpoint);
+      const response = await this.apiCall<any>(endpoint);
+      
+      // Handle the response structure from the API
+      return {
+        posts: response.data || response.posts || [],
+        pagination: response.pagination || {
+          currentPage: 1,
+          totalPages: 1,
+          totalItems: 0,
+          itemsPerPage: 10
+        }
+      };
     } catch (error) {
       console.error('Error fetching published posts:', error);
       throw error;

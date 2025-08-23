@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ config, onIndustrySwitch, curren
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 lg:h-16">
+          <div className="flex items-center justify-between h-12 lg:h-14">
             {/* Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -61,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({ config, onIndustrySwitch, curren
               <img 
                 src="/LM_inteligencia/Inteligencia-logo-new.png" 
                 alt="Inteligencia Digital Marketing" 
-                className="h-10"
+                className="h-8 lg:h-9"
                 style={{ objectFit: 'contain' }}
               />
               <div className="hidden sm:block text-sm text-gray-600">
