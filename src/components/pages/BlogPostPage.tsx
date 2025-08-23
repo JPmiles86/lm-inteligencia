@@ -5,9 +5,32 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryName } from '../../types/Industry';
-import { blogPosts, type BlogPost } from '../../data/blogData';
 import { getIndustryPath } from '../../utils/subdomainDetection';
 import { isMarkdown, markdownToHtml } from '../../utils/markdownToHtml';
+
+// Database blog post type
+interface DatabaseBlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage: string | null;
+  category: string;
+  tags: string[];
+  featured: boolean;
+  published: boolean;
+  publishedDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    name: string;
+    title: string;
+    image: string | null;
+  };
+  readTime: number;
+  editorType: 'rich' | 'block';
+}
 
 interface BlogPostPageProps {
   slug?: string;
@@ -17,9 +40,11 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
   const { config } = useIndustryContext();
   const { slug: paramSlug } = useParams<{ slug: string }>();
   const slug = propSlug || paramSlug; // Use prop if provided, otherwise use params
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const [post, setPost] = useState<DatabaseBlogPost | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<DatabaseBlogPost[]>([]);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   console.log('[BlogPostPage] Component rendered:', {
     propSlug,
@@ -32,41 +57,109 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
   const industryPath = getIndustryPath();
 
   useEffect(() => {
-    console.log('[BlogPostPage] useEffect - searching for post:', {
-      slug,
-      totalPosts: blogPosts.length
-    });
-    
-    if (slug) {
-      const foundPost = blogPosts.find(p => p.slug === slug);
-      console.log('[BlogPostPage] Post search result:', {
-        found: !!foundPost,
-        postTitle: foundPost?.title,
-        postId: foundPost?.id
-      });
-      setPost(foundPost || null);
-      
-      if (foundPost) {
-        // Find related posts by category or tags
-        const related = blogPosts
-          .filter(p => 
-            p.id !== foundPost.id && 
-            (p.category === foundPost.category || 
-             p.tags.some(tag => foundPost.tags.includes(tag)))
-          )
-          .slice(0, 3);
-        setRelatedPosts(related);
+    const fetchPost = async () => {
+      if (!slug) {
+        setLoading(false);
+        return;
       }
-    }
+
+      try {
+        setLoading(true);
+        // Try production API first, fallback to local dev
+        const apiBaseUrl = window.location.hostname === 'localhost' 
+          ? 'http://localhost:4000' 
+          : '';
+        
+        const response = await fetch(`${apiBaseUrl}/api/blog/posts/slug/${slug}`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch blog post: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        if (data.success && data.data) {
+          setPost(data.data);
+          
+          // Fetch related posts by category
+          const relatedResponse = await fetch(`${apiBaseUrl}/api/blog/posts?category=${encodeURIComponent(data.data.category)}&limit=3`);
+          if (relatedResponse.ok) {
+            const relatedData = await relatedResponse.json();
+            // Filter out the current post and limit to 3
+            const filteredRelated = (relatedData.data || [])
+              .filter((p: DatabaseBlogPost) => p.id !== data.data.id)
+              .slice(0, 3);
+            setRelatedPosts(filteredRelated);
+          }
+        } else {
+          setPost(null);
+        }
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching blog post:', err);
+        setError('Failed to load blog post');
+        setPost(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
   }, [slug]);
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'No date';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-pulse">Loading blog post...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-red-600">
+            <div>{error}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Post not found
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-white py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Blog Post Not Found</h1>
+            <p className="text-gray-600 mb-8">The blog post you're looking for doesn't exist.</p>
+            <Link 
+              to={`${industryPath}/blog`}
+              className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+            >
+              ← Back to Blog
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleShare = (platform: string) => {
     if (!post) return;
