@@ -178,7 +178,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
           background: white;
           border-color: #e5e7eb;
           position: sticky;
-          top: 64px; /* Height of admin header */
+          top: 164px; /* Testing position - adjust as needed */
           z-index: 30;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           border-bottom: 2px solid #e5e7eb;
@@ -186,7 +186,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         
         .ql-toolbar.ql-snow {
           position: sticky !important;
-          top: 64px !important;
+          top: 164px !important;
           z-index: 30 !important;
           background: white !important;
         }
