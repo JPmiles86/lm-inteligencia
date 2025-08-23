@@ -285,7 +285,7 @@ export const BlogList: React.FC<BlogListProps> = ({
               disabled={loading}
               className={`px-3 py-1 border rounded-md text-sm font-medium disabled:cursor-not-allowed ${
                 page === currentPage
-                  ? 'bg-blue-600 text-white border-blue-600'
+                  ? 'bg-primary text-white border-primary'
                   : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
               }`}
             >
@@ -312,7 +312,7 @@ export const BlogList: React.FC<BlogListProps> = ({
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
@@ -376,7 +376,7 @@ export const BlogList: React.FC<BlogListProps> = ({
           
           <button
             onClick={onCreateNew}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-colors flex items-center space-x-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -479,7 +479,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                 <button
                   onClick={() => handleBulkAction('delete')}
                   disabled={loading}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                  className="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50"
                 >
                   Delete Selected
                 </button>
@@ -498,7 +498,7 @@ export const BlogList: React.FC<BlogListProps> = ({
         {/* Loading indicator */}
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <span className="ml-2 text-gray-600">Loading posts...</span>
           </div>
         )}
@@ -547,7 +547,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                       }
                     }}
                     disabled={loading}
-                    className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="mt-1 h-4 w-4 text-primary focus:ring-blue-500 border-gray-300 rounded"
                   />
 
                   {/* Featured Image */}
@@ -598,7 +598,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                     <button
                       onClick={() => onEditPost(post)}
                       disabled={loading}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                      className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50"
                     >
                       Edit
                     </button>
@@ -616,7 +616,7 @@ export const BlogList: React.FC<BlogListProps> = ({
                     <button
                       onClick={() => handleDeletePost(post.id)}
                       disabled={loading}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                      className="bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50"
                     >
                       Delete
                     </button>
@@ -641,7 +641,7 @@ export const BlogList: React.FC<BlogListProps> = ({
             {!searchQuery && selectedCategory === 'All' && (
               <button
                 onClick={onCreateNew}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-colors"
               >
                 Create First Post
               </button>

@@ -246,21 +246,8 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
   return (
     <div className="min-h-screen">
       
-      {/* Breadcrumb */}
-      <nav className="bg-gray-50 py-3 border-b border-gray-200 mt-12 lg:mt-14">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Link to={industryPath} className="hover:text-primary transition-colors">Home</Link>
-            <span>/</span>
-            <Link to={`${industryPath}/blog`} className="hover:text-primary transition-colors">Blog</Link>
-            <span>/</span>
-            <span className="text-gray-900">{post.category}</span>
-          </div>
-        </div>
-      </nav>
-
       {/* Article Header */}
-      <header className="py-16 bg-white">
+      <header className="py-16 bg-white mt-14 lg:mt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
