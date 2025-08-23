@@ -525,7 +525,7 @@ export const BlogList: React.FC<BlogListProps> = ({
         )}
         
         {/* Posts List */}
-        {!loading && !error && posts.length > 0 ? (
+        {!loading && !error && posts && posts.length > 0 ? (
           <div className="space-y-4">
             {posts.map((post) => (
               <motion.div

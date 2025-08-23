@@ -48,11 +48,22 @@ export default async function handler(req, res) {
       const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get posts
-      const posts = await db.select()
+      const rawPosts = await db.select()
         .from(blogPosts)
         .where(whereClause)
         .orderBy(desc(blogPosts.publishedDate))
         .limit(limitNum);
+
+      // Transform posts to match expected frontend format
+      const posts = rawPosts.map(post => ({
+        ...post,
+        author: {
+          name: post.authorName || 'Laurie Meiring',
+          title: post.authorTitle || 'Founder & Marketing Strategist', 
+          image: post.authorImage || '/images/team/Laurie Meiring/laurie ai face 1x1.jpg'
+        },
+        tags: Array.isArray(post.tags) ? post.tags : []
+      }));
 
       res.status(200).json({
         success: true,

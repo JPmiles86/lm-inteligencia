@@ -66,12 +66,23 @@ export default async function handler(req, res) {
       const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       // Get posts with pagination
-      const posts = await db.select()
+      const rawPosts = await db.select()
         .from(blogPosts)
         .where(whereClause)
         .orderBy(sortOrder === 'desc' ? desc(blogPosts.publishedDate) : asc(blogPosts.publishedDate))
         .limit(limitNum)
         .offset((pageNum - 1) * limitNum);
+
+      // Transform posts to match expected frontend format
+      const posts = rawPosts.map(post => ({
+        ...post,
+        author: {
+          name: post.authorName || 'Laurie Meiring',
+          title: post.authorTitle || 'Founder & Marketing Strategist',
+          image: post.authorImage || '/images/team/Laurie Meiring/laurie ai face 1x1.jpg'
+        },
+        tags: Array.isArray(post.tags) ? post.tags : []
+      }));
 
       // Get total count
       const totalResult = await db.select({ count: count() })
