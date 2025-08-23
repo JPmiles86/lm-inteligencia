@@ -439,12 +439,12 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
     <DndProvider backend={HTML5Backend}>
       <div className={`block-editor ${className}`}>
       {/* Editor Toolbar */}
-      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-4">
+      <div className="sticky top-16 z-30 bg-white border-b border-gray-200 p-4 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={openInserter}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-all"
             >
               <span className="text-lg">+</span>
               Add Block
@@ -452,7 +452,7 @@ export const BlockEditor: React.FC<BlockEditorProps> = ({
             
             <button
               onClick={openTemplates}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:opacity-90 transition-all"
             >
               <span className="text-lg">📋</span>
               Templates

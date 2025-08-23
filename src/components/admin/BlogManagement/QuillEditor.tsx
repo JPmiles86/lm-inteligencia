@@ -132,11 +132,19 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
           line-height: 1.6;
         }
         
+        .quill-editor-wrapper {
+          position: relative;
+        }
+        
         .quill-editor-wrapper .ql-toolbar {
           border-top-left-radius: 0.5rem;
           border-top-right-radius: 0.5rem;
           background: #f9fafb;
           border-color: #e5e7eb;
+          position: sticky;
+          top: 60px; /* Account for admin header */
+          z-index: 40;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .quill-editor-wrapper .ql-container {
