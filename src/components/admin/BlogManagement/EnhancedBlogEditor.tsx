@@ -45,6 +45,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [categories, setCategories] = useState<string[]>([
     'Hospitality Marketing',
     'Tech & AI Marketing',
@@ -127,6 +128,19 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     // Clear errors when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const handleImageUpload = async (file: File): Promise<string> => {
+    setUploadingImage(true);
+    try {
+      const imageUrl = await blogService.uploadImage(file);
+      return imageUrl;
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      throw error;
+    } finally {
+      setUploadingImage(false);
     }
   };
 

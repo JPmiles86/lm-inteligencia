@@ -1,6 +1,7 @@
 // Blog Management - Main component that orchestrates blog management functionality
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogList } from './BlogList';
 import { EnhancedBlogEditor } from './EnhancedBlogEditor';
@@ -10,19 +11,37 @@ import { BlogPost } from '../../../data/blogData';
 type BlogManagementView = 'list' | 'editor' | 'media';
 
 export const BlogManagement: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [currentView, setCurrentView] = useState<BlogManagementView>('list');
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [showMediaUploader, setShowMediaUploader] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  // Parse URL to determine view
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('/admin/blog/new')) {
+      setCurrentView('editor');
+      setEditingPost(null);
+    } else if (path.includes('/admin/blog/edit/')) {
+      setCurrentView('editor');
+      // Post will be loaded by the editor component
+    } else {
+      setCurrentView('list');
+    }
+  }, [location.pathname]);
+
   const handleCreateNew = () => {
     setEditingPost(null);
     setCurrentView('editor');
+    navigate('/admin/blog/new');
   };
 
   const handleEditPost = (post: BlogPost) => {
     setEditingPost(post);
     setCurrentView('editor');
+    navigate(`/admin/blog/edit/${post.id}`);
   };
 
   const handleSavePost = () => {
@@ -30,11 +49,13 @@ export const BlogManagement: React.FC = () => {
     setRefreshTrigger(prev => prev + 1);
     setCurrentView('list');
     setEditingPost(null);
+    navigate('/admin/blog');
   };
 
   const handleCancelEdit = () => {
     setCurrentView('list');
     setEditingPost(null);
+    navigate('/admin/blog');
   };
 
   const handleSelectImage = () => {
