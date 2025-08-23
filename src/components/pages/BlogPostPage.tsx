@@ -96,8 +96,36 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
         setError(null);
       } catch (err) {
         console.error('Error fetching blog post:', err);
-        setError('Failed to load blog post');
-        setPost(null);
+        console.log('Falling back to hardcoded blog data');
+        
+        // Fallback to hardcoded blog data
+        try {
+          const { blogPosts: fallbackPosts } = await import('../../data/blogData');
+          const foundPost = fallbackPosts.find(p => p.slug === slug);
+          
+          if (foundPost && foundPost.published !== false && foundPost.publishedDate !== null) {
+            setPost(foundPost);
+            
+            // Find related posts by category
+            const relatedPosts = fallbackPosts
+              .filter(p => 
+                p.category === foundPost.category && 
+                p.id !== foundPost.id &&
+                p.published !== false && 
+                p.publishedDate !== null
+              )
+              .slice(0, 3);
+            setRelatedPosts(relatedPosts);
+            setError(null);
+          } else {
+            setPost(null);
+            setError('Blog post not found');
+          }
+        } catch (fallbackErr) {
+          console.error('Error loading fallback blog data:', fallbackErr);
+          setPost(null);
+          setError('Failed to load blog post');
+        }
       } finally {
         setLoading(false);
       }

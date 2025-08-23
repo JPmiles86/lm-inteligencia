@@ -62,7 +62,7 @@ export const BlogListingPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState(getDefaultCategory());
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'readTime'>('newest');
 
-  // Fetch blog posts from database
+  // Fetch blog posts from database with fallback to hardcoded data
   useEffect(() => {
     const fetchBlogPosts = async () => {
       try {
@@ -83,8 +83,15 @@ export const BlogListingPage: React.FC = () => {
         setError(null);
       } catch (err) {
         console.error('Error fetching blog posts:', err);
-        setError('Failed to load blog posts');
-        setBlogPosts([]);
+        console.log('Falling back to hardcoded blog data');
+        
+        // Fallback to hardcoded blog data
+        const { blogPosts: fallbackPosts } = await import('../../data/blogData');
+        const publishedPosts = fallbackPosts.filter(post => 
+          post.published !== false && post.publishedDate !== null
+        );
+        setBlogPosts(publishedPosts);
+        setError(null);
       } finally {
         setLoading(false);
       }
