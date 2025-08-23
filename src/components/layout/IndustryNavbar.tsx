@@ -116,7 +116,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 lg:h-24 py-2">
+          <div className="flex items-center justify-between h-14 lg:h-16 py-1">
             {/* Logo and Brand Name */}
             <div className="flex items-center">
               <Link
@@ -130,7 +130,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-10 lg:h-12"
+                    className="h-8 lg:h-9"
                     style={{ objectFit: 'contain' }}
                   />
                   <span className="text-2xl font-medium text-primary" style={{ fontFamily: 'inherit' }}>
@@ -310,7 +310,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
       </motion.nav>
 
       {/* Spacer for fixed navbar on non-seamless pages */}
-      {!isSeamlessPage && <div className="h-20 lg:h-24" />}
+      {!isSeamlessPage && <div className="h-14 lg:h-16" />}
     </>
   );
 };
@@ -407,7 +407,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 lg:h-24 py-2">
+          <div className="flex items-center justify-between h-14 lg:h-16 py-1">
             {/* Logo and Brand Name */}
             <div className="flex items-center">
               <Link
@@ -421,7 +421,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                   <img 
                     src="/LM_inteligencia/Inteligencia-logo-new.png" 
                     alt="Inteligencia Digital Marketing" 
-                    className="h-10 lg:h-12"
+                    className="h-8 lg:h-9"
                     style={{ objectFit: 'contain' }}
                   />
                   <span className="text-2xl font-medium text-primary" style={{ fontFamily: 'inherit' }}>
@@ -601,7 +601,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
       </motion.nav>
 
       {/* Spacer for fixed navbar on non-seamless pages */}
-      {!isSeamlessPage && <div className="h-20 lg:h-24" />}
+      {!isSeamlessPage && <div className="h-14 lg:h-16" />}
     </>
   );
 };

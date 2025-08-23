@@ -107,6 +107,11 @@ class BlogDatabaseService {
     }
     
     const data = await response.json();
+    // For blog post endpoints that return pagination, return the full structure
+    if (data.pagination && data.data) {
+      return data as T;
+    }
+    // For other endpoints, return the data directly
     return data.data || data;
   }
 
@@ -145,18 +150,10 @@ class BlogDatabaseService {
       const endpoint = `/admin/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<any>(endpoint);
       
-      // The API returns { success: true, data: posts[], pagination: {...} }
-      // But handleApiResponse returns data.data || data, so response here is the posts array
-      // We need to get the full response
-      const url = `${API_BASE_URL}${endpoint}`;
-      const fullResponse = await fetch(url, {
-        headers: this.getAuthHeaders(),
-      });
-      const fullData = await fullResponse.json();
-      
+      // The handleApiResponse now properly returns the full structure for paginated responses
       return {
-        posts: fullData.data || [],
-        pagination: fullData.pagination || {
+        posts: response.data || [],
+        pagination: response.pagination || {
           currentPage: 1,
           totalPages: 1,
           totalItems: 0,
@@ -189,9 +186,9 @@ class BlogDatabaseService {
       const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<any>(endpoint);
       
-      // Handle the response structure from the API
+      // The handleApiResponse now properly returns the full structure for paginated responses
       return {
-        posts: response.data || response.posts || [],
+        posts: response.data || [],
         pagination: response.pagination || {
           currentPage: 1,
           totalPages: 1,
