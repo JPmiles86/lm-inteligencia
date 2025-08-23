@@ -1,6 +1,7 @@
 // Enhanced Blog Editor Component - Supports both Rich Text and Block editors
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
 import { BlockEditor } from './BlockEditor';
@@ -16,10 +17,13 @@ interface EnhancedBlogEditorProps {
 }
 
 export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
-  post,
+  post: propPost,
   onSave,
   onCancel
 }) => {
+  const { id } = useParams<{ id: string }>();
+  const [post, setPost] = useState<BlogPost | null>(propPost || null);
+  const [loadingPost, setLoadingPost] = useState(false);
   const [editorType, setEditorType] = useState<'rich' | 'block'>('block');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
@@ -56,6 +60,26 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   ]);
 
   const isEditing = !!post;
+
+  // Fetch post from ID if needed
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (id && !propPost) {
+        setLoadingPost(true);
+        try {
+          const fetchedPost = await blogService.getPostById(parseInt(id));
+          if (fetchedPost) {
+            setPost(fetchedPost);
+          }
+        } catch (error) {
+          console.error('Error fetching post:', error);
+        } finally {
+          setLoadingPost(false);
+        }
+      }
+    };
+    fetchPost();
+  }, [id, propPost]);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -264,9 +288,14 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       let savedPost: BlogPost;
 
       if (isEditing && post) {
-        savedPost = blogService.updatePost(post.id, formData, isDraft) as BlogPost;
+        savedPost = await blogService.updatePost(post.id, formData, isDraft) as BlogPost;
+        // Reload the post data after saving to ensure we have the latest
+        const updatedPost = await blogService.getPostById(post.id);
+        if (updatedPost) {
+          setPost(updatedPost);
+        }
       } else {
-        savedPost = blogService.createPost(formData, isDraft);
+        savedPost = await blogService.createPost(formData, isDraft);
       }
 
       onSave(savedPost);
@@ -654,6 +683,19 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       </div>
     </div>
   );
+
+  if (loadingPost) {
+    return (
+      <div className="p-6">
+        <div className="max-w-6xl mx-auto flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading post...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">

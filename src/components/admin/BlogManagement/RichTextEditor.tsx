@@ -100,8 +100,30 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const [charCount, setCharCount] = useState(0);
   const [storageUsage] = useState(estimateStorageUsage());
 
-  const categories = blogService.getCategories();
+  const [categories, setCategories] = useState<string[]>([
+    'Hospitality Marketing',
+    'Tech & AI Marketing', 
+    'Content Strategy',
+    'Social Media',
+    'Email Marketing',
+    'SEO & SEM'
+  ]);
   const isEditing = !!post;
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await blogService.getCategories();
+        if (categoriesData && categoriesData.length > 0) {
+          setCategories(categoriesData);
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Load post data when editing
   useEffect(() => {
@@ -118,7 +140,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         status: post.publishedDate ? 'published' : 'draft',
         publishDate: post.publishedDate ? new Date(post.publishedDate) : new Date(),
         category: post.category,
-        tags: post.tags,
+        tags: Array.isArray(post.tags) ? post.tags : [],
         metaTitle: post.title,
         metaDescription: post.excerpt,
         featured: post.featured,
@@ -360,7 +382,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       />
       
       <div className="flex flex-wrap gap-2 mt-8">
-        {formData.tags.map((tag) => (
+        {(formData.tags || []).map((tag) => (
           <span
             key={tag}
             className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
@@ -642,7 +664,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 
                 {formData.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag) => (
+                    {(formData.tags || []).map((tag) => (
                       <span
                         key={tag}
                         className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm flex items-center gap-1"
