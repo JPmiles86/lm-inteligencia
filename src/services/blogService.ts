@@ -462,16 +462,23 @@ class BlogDatabaseService {
   // Image upload to GCS
   async uploadImage(file: File): Promise<string> {
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      
+      const base64Data = await base64Promise;
 
       const response = await fetch(`${API_BASE_URL}/upload/image`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           ...this.getAuthHeaders(),
-          // Don't set Content-Type for FormData, let browser set it
         },
-        body: formData,
+        body: JSON.stringify({ image: base64Data }),
       });
 
       if (!response.ok) {
@@ -479,7 +486,7 @@ class BlogDatabaseService {
       }
 
       const result = await response.json();
-      return result.data.publicUrl;
+      return result.url || result.data?.publicUrl || base64Data;
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
@@ -489,15 +496,23 @@ class BlogDatabaseService {
   // Upload image for Quill editor
   async uploadQuillImage(file: File): Promise<string> {
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      // Convert file to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      
+      const base64Data = await base64Promise;
 
       const response = await fetch(`${API_BASE_URL}/upload/quill-image`, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           ...this.getAuthHeaders(),
         },
-        body: formData,
+        body: JSON.stringify({ image: base64Data }),
       });
 
       if (!response.ok) {

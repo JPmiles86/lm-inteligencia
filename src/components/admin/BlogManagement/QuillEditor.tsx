@@ -134,6 +134,8 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         
         .quill-editor-wrapper {
           position: relative;
+          display: flex;
+          flex-direction: column;
         }
         
         .quill-editor-wrapper .ql-toolbar {
@@ -142,9 +144,16 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
           background: #f9fafb;
           border-color: #e5e7eb;
           position: sticky;
-          top: 60px; /* Account for admin header */
-          z-index: 40;
+          top: 0;
+          z-index: 50;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ql-toolbar.ql-snow {
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 50 !important;
+          background: white !important;
         }
         
         .quill-editor-wrapper .ql-container {
