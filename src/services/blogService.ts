@@ -145,8 +145,91 @@ class BlogDatabaseService {
       return await this.apiCall<BlogPostsResponse>(endpoint);
     } catch (error) {
       console.error('Error fetching blog posts:', error);
-      throw error;
+      console.log('Falling back to hardcoded blog data for admin');
+      return this.getFallbackBlogPosts(filters);
     }
+  }
+
+  // Fallback method using hardcoded blog data
+  private async getFallbackBlogPosts(filters: BlogPostFilters = {}): Promise<BlogPostsResponse> {
+    const { blogPosts } = await import('../data/blogData');
+    
+    let filteredPosts = [...blogPosts];
+    
+    // Apply filters
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      filteredPosts = filteredPosts.filter(post => 
+        post.title.toLowerCase().includes(searchTerm) ||
+        post.excerpt.toLowerCase().includes(searchTerm) ||
+        post.content.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    if (filters.category && filters.category !== 'All') {
+      filteredPosts = filteredPosts.filter(post => post.category === filters.category);
+    }
+    
+    if (filters.tags && filters.tags.length > 0) {
+      filteredPosts = filteredPosts.filter(post => 
+        filters.tags!.some(tag => post.tags.some(postTag => postTag.toLowerCase().includes(tag.toLowerCase())))
+      );
+    }
+    
+    if (filters.published !== undefined) {
+      filteredPosts = filteredPosts.filter(post => 
+        filters.published ? (post.published !== false && post.publishedDate !== null) : 
+                           (post.published === false || post.publishedDate === null)
+      );
+    }
+    
+    if (filters.featured !== undefined) {
+      filteredPosts = filteredPosts.filter(post => post.featured === filters.featured);
+    }
+    
+    // Sort posts
+    const sortBy = filters.sortBy || 'publishedAt';
+    const sortOrder = filters.sortOrder || 'desc';
+    
+    filteredPosts.sort((a, b) => {
+      let aValue: any, bValue: any;
+      
+      switch (sortBy) {
+        case 'title':
+          aValue = a.title;
+          bValue = b.title;
+          break;
+        case 'publishedAt':
+        default:
+          aValue = new Date(a.publishedDate || '1970-01-01');
+          bValue = new Date(b.publishedDate || '1970-01-01');
+          break;
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+    
+    // Pagination
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedPosts = filteredPosts.slice(startIndex, endIndex);
+    
+    return {
+      posts: paginatedPosts,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(filteredPosts.length / limit),
+        totalCount: filteredPosts.length,
+        hasNext: endIndex < filteredPosts.length,
+        hasPrevious: page > 1
+      }
+    };
   }
 
   // Get all published posts (for public use)
@@ -364,8 +447,25 @@ class BlogDatabaseService {
       return stats;
     } catch (error) {
       console.error('Error fetching blog stats:', error);
-      throw error;
+      console.log('Falling back to hardcoded blog data for stats');
+      return this.getFallbackStats();
     }
+  }
+
+  // Fallback method for blog stats
+  private async getFallbackStats(): Promise<BlogStats> {
+    const { blogPosts } = await import('../data/blogData');
+    
+    const publishedPosts = blogPosts.filter(post => post.published !== false && post.publishedDate !== null);
+    const draftPosts = blogPosts.filter(post => post.published === false || post.publishedDate === null);
+    
+    return {
+      totalPosts: blogPosts.length,
+      publishedPosts: publishedPosts.length,
+      draftPosts: draftPosts.length,
+      totalViews: 0, // Not available in hardcoded data
+      categories: [...new Set(blogPosts.map(post => post.category))].length
+    };
   }
 
   // Get available categories
@@ -375,8 +475,15 @@ class BlogDatabaseService {
       return categories;
     } catch (error) {
       console.error('Error fetching categories:', error);
-      throw error;
+      console.log('Falling back to hardcoded blog data for categories');
+      return this.getFallbackCategories();
     }
+  }
+
+  // Fallback method for categories
+  private async getFallbackCategories(): Promise<string[]> {
+    const { blogCategories } = await import('../data/blogData');
+    return blogCategories.filter(cat => cat !== 'All');
   }
 
   // Get available tags
