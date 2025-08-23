@@ -67,9 +67,7 @@ export const BlogListingPage: React.FC = () => {
     const fetchBlogPosts = async () => {
       try {
         setLoading(true);
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
-        
-        const response = await fetch(`${apiBaseUrl}/blog/posts?published=true`);
+        const response = await fetch('/api/blog/posts?published=true');
         
         if (!response.ok) {
           throw new Error(`Failed to fetch blog posts: ${response.status}`);
