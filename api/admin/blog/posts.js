@@ -108,7 +108,77 @@ export default async function handler(req, res) {
       console.error('Error fetching blog posts:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch blog posts' });
     }
-  } else {
+  } 
+  // POST - Create new post
+  else if (req.method === 'POST') {
+    try {
+      const {
+        title,
+        slug,
+        excerpt,
+        content,
+        featuredImage,
+        category,
+        tags,
+        featured,
+        published,
+        publishedAt,
+        authorName,
+        authorTitle,
+        authorImage,
+        readTime,
+        editorType,
+        blocks
+      } = req.body;
+
+      // Create the new post
+      const newPosts = await db.insert(blogPosts)
+        .values({
+          title,
+          slug,
+          excerpt,
+          content,
+          featuredImage,
+          category,
+          tags: tags || [],
+          featured: featured || false,
+          published: published !== undefined ? published : true,
+          publishedDate: publishedAt || new Date().toISOString(),
+          authorName,
+          authorTitle,
+          authorImage,
+          readTime: readTime || 5,
+          editorType: editorType || 'rich',
+          blocks: blocks || [],
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      const newPost = newPosts[0];
+      
+      // Transform post to match expected frontend format
+      const transformedPost = {
+        ...newPost,
+        author: {
+          name: newPost.authorName || 'Laurie Meiring',
+          title: newPost.authorTitle || 'Founder & Marketing Strategist',
+          image: newPost.authorImage || '/images/team/Laurie Meiring/laurie ai face 1x1.jpg'
+        },
+        tags: Array.isArray(newPost.tags) ? newPost.tags : []
+      };
+
+      res.status(201).json({
+        success: true,
+        data: transformedPost
+      });
+
+    } catch (error) {
+      console.error('Error creating post:', error);
+      res.status(500).json({ success: false, error: 'Failed to create post' });
+    }
+  }
+  else {
     res.status(405).json({ error: 'Method not allowed' });
   }
 }
