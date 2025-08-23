@@ -249,7 +249,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
     <div className="min-h-screen">
       
       {/* Breadcrumb */}
-      <nav className="bg-gray-50 py-4 border-b border-gray-200">
+      <nav className="bg-gray-50 py-4 border-b border-gray-200 mt-14 lg:mt-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Link to={industryPath} className="hover:text-primary transition-colors">Home</Link>
@@ -374,7 +374,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <div className="text-lg leading-relaxed">
+          <div className="text-lg leading-relaxed blog-content">
             {formatContent(post.content)}
           </div>
         </motion.div>
@@ -519,7 +519,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/contact"
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+                className="bg-secondary hover:bg-secondary/90 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
               >
                 Get Free Consultation
               </Link>
@@ -573,7 +573,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
                 <div className="pt-4">
                   <Link
                     to={`${industryPath}/contact`}
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity inline-block"
+                    className="bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity inline-block"
                   >
                     Get Started
                   </Link>
