@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { blogPosts } from '../../../../src/db/schema';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { blogPosts } from '../../../src/db/schema.js';
 import { eq, count } from 'drizzle-orm';
 
 // Create database connection
@@ -12,7 +11,17 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'GET') {
     try {
       const totalResult = await db.select({ count: count() }).from(blogPosts);

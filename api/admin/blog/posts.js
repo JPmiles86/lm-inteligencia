@@ -1,7 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { blogPosts } from '../../../../src/db/schema';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { blogPosts } from '../../../src/db/schema.js';
 import { eq, and, desc, asc, like, or, count } from 'drizzle-orm';
 
 // Create database connection
@@ -12,7 +11,17 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'GET') {
     try {
       const {
@@ -25,8 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sortOrder = 'desc'
       } = req.query;
 
-      const pageNum = parseInt(page as string);
-      const limitNum = parseInt(limit as string);
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
 
       // Build where conditions
       const conditions = [];
@@ -40,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       
       if (category && category !== 'All') {
-        conditions.push(eq(blogPosts.category, category as string));
+        conditions.push(eq(blogPosts.category, category));
       }
       
       if (search) {

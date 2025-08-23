@@ -1,8 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { blogPosts } from '../../../src/db/schema';
-import { eq, and, desc, like, or } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { blogPosts } from '../../src/db/schema.js';
+import { eq, and, desc } from 'drizzle-orm';
 
 // Create database connection
 const pool = new Pool({
@@ -12,7 +11,17 @@ const pool = new Pool({
 
 const db = drizzle(pool);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === 'GET') {
     try {
       const {
@@ -21,18 +30,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         limit = '10'
       } = req.query;
 
-      const limitNum = parseInt(limit as string);
+      const limitNum = parseInt(limit);
 
       // Build where conditions
       const conditions = [];
       
       // Only show published posts for public API
       if (published === 'true') {
-        conditions.push(and(eq(blogPosts.published, true)));
+        conditions.push(eq(blogPosts.published, true));
       }
       
       if (category && category !== 'All') {
-        conditions.push(eq(blogPosts.category, category as string));
+        conditions.push(eq(blogPosts.category, category));
       }
 
       // Build where clause
