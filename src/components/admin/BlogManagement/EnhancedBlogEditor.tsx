@@ -252,54 +252,158 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   };
 
   const renderPreview = () => (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-4">
+      {/* Hero Image - Full Width */}
       {formData.featuredImage && (
-        <div className="mb-8">
+        <div className="-mx-4 mb-12">
           <img
             src={formData.featuredImage}
             alt={formData.title}
-            className="w-full h-96 object-cover rounded-lg shadow-lg"
+            className="w-full h-[400px] object-cover"
           />
         </div>
       )}
       
-      <div className="mb-6">
-        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-          {formData.category}
-        </span>
-      </div>
-      
-      <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+      {/* Main Title - Matching actual blog styling */}
+      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-tight tracking-tight">
         {formData.title}
       </h1>
       
-      <div className="flex items-center gap-4 mb-8 text-sm text-gray-600">
-        <div className="flex items-center gap-2">
-          <img
-            src={formData.author.image}
-            alt={formData.author.name}
-            className="w-10 h-10 rounded-full"
-          />
+      {/* Excerpt - Larger and more prominent */}
+      <p className="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed font-light">
+        "{formData.excerpt}"
+      </p>
+      
+      {/* Author and Meta Info */}
+      <div className="flex items-center gap-4 mb-12 text-base text-gray-600">
+        <div className="flex items-center gap-3">
+          {formData.author.image && (
+            <img
+              src={formData.author.image}
+              alt={formData.author.name}
+              className="w-12 h-12 rounded-full"
+            />
+          )}
           <div>
-            <div className="font-medium text-gray-900">{formData.author.name}</div>
-            <div className="text-xs">{formData.author.title}</div>
+            <div className="font-semibold text-gray-900">{formData.author.name}</div>
+            <div className="text-sm text-gray-500">{formData.author.title}</div>
           </div>
         </div>
-        <span>•</span>
-        <span>{formData.publishedDate}</span>
-        <span>•</span>
+        <span className="text-gray-400">•</span>
+        <span>{new Date(formData.publishedDate).toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}</span>
+        <span className="text-gray-400">•</span>
         <span>{formData.readTime} min read</span>
       </div>
       
-      <p className="text-xl text-gray-600 mb-10 leading-relaxed font-light">
-        {formData.excerpt}
-      </p>
-      
-      {/* Enhanced prose styling for preview */}
-      <div 
-        className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-li:text-gray-700 prose-strong:text-gray-900 prose-a:text-purple-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:shadow-md prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-code:text-purple-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:mt-8 prose-h2:mt-6 prose-h3:mt-4"
-        dangerouslySetInnerHTML={{ __html: formData.content }} 
-      />
+      {/* Content with proper spacing matching actual blog */}
+      <div className="blog-content">
+        <style>{`
+          .blog-content h1,
+          .blog-content h2,
+          .blog-content h3,
+          .blog-content h4,
+          .blog-content h5,
+          .blog-content h6 {
+            font-weight: 700;
+            color: #111827;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+          }
+          
+          .blog-content h1 { font-size: 2.5rem; }
+          .blog-content h2 { font-size: 2rem; font-weight: 600; }
+          .blog-content h3 { font-size: 1.75rem; font-weight: 600; }
+          .blog-content h4 { font-size: 1.5rem; }
+          
+          .blog-content p {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #374151;
+            margin-bottom: 1.75rem;
+            font-weight: 400;
+          }
+          
+          .blog-content ul,
+          .blog-content ol {
+            margin: 1.5rem 0;
+            padding-left: 2rem;
+          }
+          
+          .blog-content li {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #374151;
+            margin-bottom: 0.75rem;
+          }
+          
+          .blog-content strong,
+          .blog-content b {
+            font-weight: 600;
+            color: #111827;
+          }
+          
+          .blog-content blockquote {
+            border-left: 4px solid #9333ea;
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: #6b7280;
+            font-size: 1.25rem;
+          }
+          
+          .blog-content a {
+            color: #9333ea;
+            text-decoration: underline;
+            font-weight: 500;
+          }
+          
+          .blog-content a:hover {
+            color: #7c3aed;
+          }
+          
+          .blog-content img {
+            width: 100%;
+            height: auto;
+            margin: 2rem 0;
+            border-radius: 0.5rem;
+          }
+          
+          .blog-content pre {
+            background: #1f2937;
+            color: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 2rem 0;
+          }
+          
+          .blog-content code {
+            background: #f3f4f6;
+            color: #9333ea;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+          }
+          
+          .blog-content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+          }
+          
+          .blog-content hr {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 3rem 0;
+          }
+        `}</style>
+        <div dangerouslySetInnerHTML={{ __html: formData.content }} />
+      </div>
       
       <div className="flex flex-wrap gap-2 mt-8">
         {(formData.tags || []).map((tag) => (
