@@ -7,6 +7,7 @@ import { CSVImporter } from './CSVImporter';
 import { ContentEditor } from './ContentEditor';
 import { BlogManagement } from './BlogManagement';
 import { AdminPanel } from './AdminPanel';
+import { Settings } from './Settings';
 import type { IndustryType } from '../../types/Industry';
 import type { CSVImportResult } from '../../types/Content';
 import { ContentService } from '../../services/contentService';
@@ -416,7 +417,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
           </div>
         );
       case 'settings':
-        return <AdminPanel />;
+        return <Settings />;
       default:
         return renderDashboard();
     }
