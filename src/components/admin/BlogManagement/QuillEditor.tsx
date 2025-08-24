@@ -55,48 +55,41 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
 
   // Sticky toolbar implementation
   React.useEffect(() => {
-    let originalToolbarOffset: { left: number; width: number } | null = null;
+    let animationFrameId: number | null = null;
     
     const handleStickyToolbar = () => {
-      const toolbar = document.querySelector('.ql-toolbar') as HTMLElement;
-      const editor = document.querySelector('.ql-editor') as HTMLElement;
-      const adminHeader = document.querySelector('header') as HTMLElement;
-      const wrapper = document.querySelector('.quill-editor-wrapper') as HTMLElement;
-      const sidebar = document.querySelector('aside') as HTMLElement;
-      
-      if (!toolbar || !editor || !wrapper) return;
-      
-      // Get admin header height
-      const headerHeight = adminHeader ? adminHeader.offsetHeight : 93;
-      
-      // Calculate content area position accounting for sidebar
-      const sidebarWidth = sidebar && window.getComputedStyle(sidebar).display !== 'none' ? 280 : 0;
-      
-      // Store original position based on content container, not viewport
-      if (!originalToolbarOffset && toolbar.style.position !== 'fixed') {
-        // Get the wrapper's actual position relative to viewport
-        const wrapperRect = wrapper.getBoundingClientRect();
-        
-        // For sticky positioning, we need the wrapper's left position relative to viewport
-        // This already accounts for the sidebar margin and container padding
-        originalToolbarOffset = {
-          left: wrapperRect.left,
-          width: wrapperRect.width
-        };
+      // Cancel any pending animation frame
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
       }
       
-      const editorRect = editor.getBoundingClientRect();
-      const scrollY = window.scrollY || window.pageYOffset;
+      animationFrameId = requestAnimationFrame(() => {
+        const toolbar = document.querySelector('.ql-toolbar') as HTMLElement;
+        const editor = document.querySelector('.ql-editor') as HTMLElement;
+        const adminHeader = document.querySelector('header') as HTMLElement;
+        const wrapper = document.querySelector('.quill-editor-wrapper') as HTMLElement;
+        const sidebar = document.querySelector('aside') as HTMLElement;
+        
+        if (!toolbar || !editor || !wrapper) return;
+        
+        // Get admin header height
+        const headerHeight = adminHeader ? adminHeader.offsetHeight : 93;
+        
+        // Always recalculate position based on current wrapper position
+        // This ensures we track sidebar state changes
+        const wrapperRect = wrapper.getBoundingClientRect();
       
-      // Check if we need to make it sticky - account for admin header
-      const toolbarRect = toolbar.getBoundingClientRect();
-      
-      if (scrollY > 0 && toolbarRect.top <= headerHeight && editorRect.bottom > (headerHeight + 100)) {
-        if (originalToolbarOffset) {
+        const editorRect = editor.getBoundingClientRect();
+        const scrollY = window.scrollY || window.pageYOffset;
+        
+        // Check if we need to make it sticky - account for admin header
+        const toolbarRect = toolbar.getBoundingClientRect();
+        
+        if (scrollY > 0 && toolbarRect.top <= headerHeight && editorRect.bottom > (headerHeight + 100)) {
           toolbar.style.position = 'fixed';
           toolbar.style.top = `${headerHeight}px`;
-          toolbar.style.left = `${originalToolbarOffset.left}px`;
-          toolbar.style.width = `${originalToolbarOffset.width}px`;
+          toolbar.style.left = `${wrapperRect.left}px`;
+          toolbar.style.width = `${wrapperRect.width}px`;
           toolbar.style.zIndex = '30';
           toolbar.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
           
@@ -108,26 +101,21 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
             div.style.height = `${toolbar.offsetHeight}px`;
             toolbar.parentElement?.insertBefore(div, toolbar);
           }
+        } else {
+          toolbar.style.position = '';
+          toolbar.style.top = '';
+          toolbar.style.left = '';
+          toolbar.style.width = '';
+          toolbar.style.boxShadow = '';
+          toolbar.style.zIndex = '';
+          
+          // Remove placeholder
+          const placeholder = document.getElementById('toolbar-placeholder');
+          if (placeholder) {
+            placeholder.remove();
+          }
         }
-      } else {
-        toolbar.style.position = '';
-        toolbar.style.top = '';
-        toolbar.style.left = '';
-        toolbar.style.width = '';
-        toolbar.style.boxShadow = '';
-        toolbar.style.zIndex = '';
-        
-        // Reset stored position when returning to normal to recalculate on next scroll
-        if (toolbar.style.position !== 'fixed') {
-          originalToolbarOffset = null;
-        }
-        
-        // Remove placeholder
-        const placeholder = document.getElementById('toolbar-placeholder');
-        if (placeholder) {
-          placeholder.remove();
-        }
-      }
+      });
     };
     
     // Multiple checks to ensure layout is complete and positioning is correct
@@ -137,18 +125,46 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
     
     // Add scroll and resize listeners
     window.addEventListener('scroll', handleStickyToolbar, { passive: true });
-    window.addEventListener('resize', () => {
-      // Reset position on resize to recalculate
-      originalToolbarOffset = null;
-      handleStickyToolbar();
-    });
+    window.addEventListener('resize', handleStickyToolbar);
+    
+    // Watch for sidebar changes using MutationObserver
+    const sidebar = document.querySelector('aside');
+    let observer: MutationObserver | null = null;
+    
+    if (sidebar) {
+      observer = new MutationObserver(() => {
+        // Recalculate toolbar position when sidebar changes
+        handleStickyToolbar();
+      });
+      
+      observer.observe(sidebar, {
+        attributes: true,
+        attributeFilter: ['class', 'style'],
+        subtree: false
+      });
+    }
+    
+    // Also listen for animation/transition events on the main content area
+    const mainContent = document.querySelector('[class*="ml-\\[280px\\]"], [class*="transition-all"]');
+    if (mainContent) {
+      mainContent.addEventListener('transitionend', handleStickyToolbar);
+    }
     
     return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
       clearTimeout(timeoutId3);
       window.removeEventListener('scroll', handleStickyToolbar);
       window.removeEventListener('resize', handleStickyToolbar);
+      if (observer) {
+        observer.disconnect();
+      }
+      if (mainContent) {
+        mainContent.removeEventListener('transitionend', handleStickyToolbar);
+      }
       // Clean up placeholder on unmount
       const placeholder = document.getElementById('toolbar-placeholder');
       if (placeholder) {

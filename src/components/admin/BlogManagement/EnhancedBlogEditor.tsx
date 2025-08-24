@@ -53,20 +53,47 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     'SEO & SEM'
   ]);
 
-  const isEditing = !!post;
+  const isEditing = !!post || !!id;
 
   // Fetch post from ID if needed
   useEffect(() => {
     const fetchPost = async () => {
       if (id && !propPost) {
+        console.log('[EnhancedBlogEditor] Fetching post with ID:', id);
         setLoadingPost(true);
         try {
           const fetchedPost = await blogService.getPostById(parseInt(id));
+          console.log('[EnhancedBlogEditor] Fetched post:', fetchedPost);
           if (fetchedPost) {
             setPost(fetchedPost);
+            // Directly set form data here as well to ensure it's populated
+            let processedContent = fetchedPost.content;
+            if (isMarkdown(fetchedPost.content)) {
+              processedContent = markdownToHtml(fetchedPost.content);
+            }
+            
+            setFormData({
+              title: fetchedPost.title,
+              slug: fetchedPost.slug,
+              excerpt: fetchedPost.excerpt,
+              content: processedContent,
+              category: fetchedPost.category,
+              tags: Array.isArray(fetchedPost.tags) ? fetchedPost.tags : [],
+              featuredImage: fetchedPost.featuredImage,
+              featured: fetchedPost.featured,
+              publishedDate: fetchedPost.publishedDate || new Date().toISOString().split('T')[0] as string,
+              author: fetchedPost.author || {
+                name: 'Laurie Meiring',
+                title: 'Founder & Digital Marketing Strategist',
+                image: '/images/team/laurie-meiring.jpg'
+              },
+              readTime: fetchedPost.readTime || 5
+            });
+          } else {
+            console.error('[EnhancedBlogEditor] No post found with ID:', id);
           }
         } catch (error) {
-          console.error('Error fetching post:', error);
+          console.error('[EnhancedBlogEditor] Error fetching post:', error);
         } finally {
           setLoadingPost(false);
         }
