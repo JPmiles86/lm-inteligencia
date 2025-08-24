@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, AlertCircle, CheckCircle, Wifi, WifiOff } from 'lucide-react';
 import imageUploadService, { UploadedImage, UploadProgress } from '../../services/imageUploadService';
+import { imageConfig } from '../../config/api-config';
 
 
 interface ImageUploaderProps {
