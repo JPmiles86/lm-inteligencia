@@ -168,8 +168,12 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         
         .quill-editor-wrapper {
           position: relative;
-          display: flex;
-          flex-direction: column;
+        }
+        
+        /* Fix for sticky toolbar - needs container with proper height */
+        .quill-editor-container {
+          position: relative;
+          height: 100%;
         }
         
         .quill-editor-wrapper .ql-toolbar {
@@ -177,17 +181,19 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
           border-top-right-radius: 0.5rem;
           background: white;
           border-color: #e5e7eb;
+          position: -webkit-sticky;
           position: sticky;
-          top: 164px; /* Testing position - adjust as needed */
-          z-index: 30;
+          top: 100px;
+          z-index: 40;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
           border-bottom: 2px solid #e5e7eb;
         }
         
         .ql-toolbar.ql-snow {
+          position: -webkit-sticky !important;
           position: sticky !important;
-          top: 164px !important;
-          z-index: 30 !important;
+          top: 100px !important;
+          z-index: 40 !important;
           background: white !important;
         }
         
