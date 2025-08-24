@@ -1,4 +1,4 @@
-// Blog Editor Component - Multi-editor support for creating and editing blog posts
+// Blog Editor Component - Rich text editor for creating and editing blog posts
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
@@ -19,7 +19,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   onCancel
 }) => {
   const editorRef = useRef<any>(null);
-  const [editorType, setEditorType] = useState<'rich' | 'block'>('rich');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -42,8 +41,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
-  const [showSwitchConfirmation, setShowSwitchConfirmation] = useState(false);
-  const [pendingEditorType, setPendingEditorType] = useState<'rich' | 'block'>('rich');
 
   const categories = blogService.getCategories();
   const isEditing = !!post;
@@ -104,38 +101,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     }));
   };
 
-  const handleEditorSwitch = (newEditorType: 'rich' | 'block') => {
-    if (newEditorType === editorType) return;
-    
-    // If there's content, show confirmation dialog
-    if (formData.content.trim()) {
-      setPendingEditorType(newEditorType);
-      setShowSwitchConfirmation(true);
-    } else {
-      // No content to lose, switch immediately
-      setEditorType(newEditorType);
-    }
-  };
-
-  const confirmEditorSwitch = () => {
-    // Auto-save current content before switching
-    if (formData.title && formData.content) {
-      const autoSaveData = {
-        ...formData,
-        editorType: editorType,
-        autoSavedAt: new Date().toISOString()
-      };
-      localStorage.setItem(`blog_editor_backup_${editorType}`, JSON.stringify(autoSaveData));
-    }
-    
-    // Switch to new editor type
-    setEditorType(pendingEditorType);
-    setShowSwitchConfirmation(false);
-  };
-
-  const cancelEditorSwitch = () => {
-    setShowSwitchConfirmation(false);
-  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -320,65 +285,42 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Content *
         </label>
-        {editorType === 'rich' ? (
-          <div>
-            <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
-              <Editor
-                apiKey="no-api-key" // In production, use your TinyMCE API key
-                onInit={(evt, editor) => editorRef.current = editor}
-                value={formData.content}
-                onEditorChange={(content) => handleInputChange('content', content)}
-                init={{
-                  height: 400,
-                  menubar: true,
-                  plugins: [
-                    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                    'insertdatetime', 'media', 'table', 'wordcount', 'emoticons', 'template',
-                    'codesample', 'quickbars'
-                  ],
-                  toolbar: [
-                    'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
-                    'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist',
-                    'forecolor backcolor | link image media table | emoticons charmap | code preview fullscreen'
-                  ].join(' | '),
-                  quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                  quickbars_insert_toolbar: 'quickimage quicktable',
-                  contextmenu: 'link image table',
-                  skin: 'oxide',
-                  content_css: 'default',
-                  branding: false,
-                  promotion: false,
-                  placeholder: 'Start writing your blog post content here...',
-                }}
-              />
-            </div>
-            {errors.content && (
-              <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-            )}
-            <p className="mt-2 text-sm text-gray-600">
-              Rich text WYSIWYG editor with full formatting toolbar. Use the toolbar buttons to format your content like Microsoft Word.
-            </p>
-          </div>
-        ) : (
-          <div>
-            <textarea
+        <div>
+          <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
+            <Editor
+              apiKey="no-api-key" // In production, use your TinyMCE API key
+              onInit={(evt, editor) => editorRef.current = editor}
               value={formData.content}
-              onChange={(e) => handleInputChange('content', e.target.value)}
-              rows={20}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none font-mono text-sm ${
-                errors.content ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder="Write your blog post content here... You can use Markdown formatting."
+              onEditorChange={(content) => handleInputChange('content', content)}
+              init={{
+                height: 400,
+                menubar: true,
+                plugins: [
+                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons', 'template',
+                  'codesample', 'quickbars'
+                ],
+                toolbar: [
+                  'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
+                  'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist',
+                  'forecolor backcolor | link image media table | emoticons charmap | code preview fullscreen'
+                ].join(' | '),
+                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+                quickbars_insert_toolbar: 'quickimage quicktable',
+                contextmenu: 'link image table',
+                skin: 'oxide',
+                content_css: 'default',
+                branding: false,
+                promotion: false,
+                placeholder: 'Start writing your blog post content here...',
+              }}
             />
-            {errors.content && (
-              <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-            )}
-            <p className="mt-2 text-sm text-gray-600">
-              Block editor mode. Use the plus button to add blocks or type "/" for quick commands.
-            </p>
           </div>
-        )}
+          {errors.content && (
+            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
+          )}
+        </div>
       </div>
 
       {/* Category and Featured Image */}
@@ -561,30 +503,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Editor Type Selection */}
-            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => handleEditorSwitch('rich')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  editorType === 'rich'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Rich Text
-              </button>
-              <button
-                onClick={() => handleEditorSwitch('block')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  editorType === 'block'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Block Editor
-              </button>
-            </div>
-
             <button
               onClick={() => setIsPreviewMode(!isPreviewMode)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -608,15 +526,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         {/* Content */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200">
           <div className="p-8">
-            {isPreviewMode ? renderPreview() : (
-              editorType === 'rich' ? (
-                <RichTextEditor
-                  post={post}
-                  onSave={onSave}
-                  onCancel={onCancel}
-                />
-              ) : renderEditor()
-            )}
+            {isPreviewMode ? renderPreview() : renderEditor()}
           </div>
 
           {/* Footer Actions */}
@@ -650,44 +560,6 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         </div>
       </div>
 
-      {/* Editor Switch Confirmation Modal */}
-      {showSwitchConfirmation && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Switch Editor Type?</h3>
-                <p className="text-sm text-gray-600">You have unsaved content</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-700 mb-6">
-              Switching to the {pendingEditorType === 'rich' ? 'Rich Text' : 'Block'} editor will preserve your current content. 
-              Your work will be automatically backed up before switching.
-            </p>
-            
-            <div className="flex gap-3">
-              <button
-                onClick={cancelEditorSwitch}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmEditorSwitch}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
-              >
-                Switch Editor
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

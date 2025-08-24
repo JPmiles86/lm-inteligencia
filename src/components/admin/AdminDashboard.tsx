@@ -67,6 +67,77 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
     };
   };
 
+  // Component to show recent blog posts
+  const RecentBlogPosts: React.FC<{ onEditPost: (post: any) => void }> = ({ onEditPost }) => {
+    const [recentPosts, setRecentPosts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    React.useEffect(() => {
+      const fetchRecentPosts = async () => {
+        try {
+          const response = await blogService.getAllPosts({ limit: 3, orderBy: 'publishedDate', orderDirection: 'desc' });
+          setRecentPosts(response.posts || []);
+        } catch (error) {
+          console.error('Error fetching recent posts:', error);
+          setRecentPosts([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchRecentPosts();
+    }, []);
+
+    if (loading) {
+      return (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (recentPosts.length === 0) {
+      return (
+        <div className="text-center py-8 text-gray-500">
+          <div className="text-4xl mb-2">📄</div>
+          <p>No blog posts yet</p>
+          <p className="text-sm">Create your first blog post to get started</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {recentPosts.map((post) => (
+          <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 hover:bg-purple-50 transition-colors cursor-pointer" onClick={() => onEditPost(post)}>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900 line-clamp-1">{post.title}</h3>
+                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{post.excerpt}</p>
+                <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                  <span className={`px-2 py-1 rounded-full ${
+                    post.published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {post.published ? 'Published' : 'Draft'}
+                  </span>
+                  <span>{new Date(post.publishedDate).toLocaleDateString()}</span>
+                </div>
+              </div>
+              {post.featuredImage && (
+                <img src={post.featuredImage} alt={post.title} className="w-16 h-16 object-cover rounded-lg ml-4" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const renderDashboard = (): JSX.Element => {
     const analytics = getAnalyticsData();
     
@@ -140,19 +211,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Latest Blog Posts */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Latest Blog Posts</h2>
+              <button
+                onClick={() => setCurrentSection('blog')}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-colors"
+              >
+                Create New Blog
+              </button>
+            </div>
+            <RecentBlogPosts onEditPost={(post) => {
+              setCurrentSection('blog');
+              // The BlogManagement component will handle the edit functionality
+            }} />
+          </div>
+
           {/* Quick Actions */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button
-                onClick={() => setCurrentSection('blog')}
-                className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
-              >
-                <div className="text-2xl mb-2">📝</div>
-                <div className="font-medium text-gray-900">New Blog Post</div>
-                <div className="text-sm text-gray-600">Create and publish content</div>
-              </button>
-              
               <button
                 onClick={() => setCurrentSection('settings')}
                 className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
@@ -179,34 +258,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
                 <div className="font-medium text-gray-900">View Live Site</div>
                 <div className="text-sm text-gray-600">See your changes</div>
               </button>
+              
+              <button
+                onClick={() => setCurrentSection('blog')}
+                className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition-colors text-left"
+              >
+                <div className="text-2xl mb-2">📝</div>
+                <div className="font-medium text-gray-900">Manage Blogs</div>
+                <div className="text-sm text-gray-600">View and edit all blog posts</div>
+              </button>
             </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Recent Activity</h2>
-            {analytics.activityLogs.length > 0 ? (
-              <div className="space-y-4">
-                {analytics.activityLogs.map((log, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">
-                        {log.action === 'csv_import' ? 'CSV Import Completed' : log.action}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(log.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">📊</div>
-                <p>No recent activity</p>
-              </div>
-            )}
           </div>
         </div>
 

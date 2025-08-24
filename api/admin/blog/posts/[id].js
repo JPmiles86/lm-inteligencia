@@ -90,9 +90,7 @@ export default async function handler(req, res) {
         authorName,
         authorTitle,
         authorImage,
-        readTime,
-        editorType,
-        blocks
+        readTime
       } = req.body;
 
       // Update the post
@@ -112,8 +110,6 @@ export default async function handler(req, res) {
           authorTitle,
           authorImage,
           readTime: readTime || 5,
-          editorType: editorType || 'rich',
-          blocks: blocks || [],
           updatedAt: new Date()
         })
         .where(eq(blogPosts.id, postId))

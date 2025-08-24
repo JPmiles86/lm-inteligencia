@@ -19,8 +19,7 @@ export const blogPosts = pgTable('blog_posts', {
   authorName: varchar('author_name', { length: 100 }).notNull(),
   authorTitle: varchar('author_title', { length: 150 }),
   authorImage: varchar('author_image', { length: 500 }),
-  readTime: integer('read_time').default(5),
-  editorType: varchar('editor_type', { length: 20 }).default('rich') // 'rich' or 'block'
+  readTime: integer('read_time').default(5)
 });
 
 export type BlogPost = typeof blogPosts.$inferSelect;

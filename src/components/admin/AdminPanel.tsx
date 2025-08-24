@@ -168,8 +168,8 @@ export const AdminPanel: React.FC = () => {
                   <div className="flex items-center gap-3 mb-4">
                     <PenTool className="w-8 h-8 text-purple-600" />
                     <div>
-                      <h3 className="font-bold text-lg">Rich Text Editor</h3>
-                      <p className="text-sm text-gray-600">Traditional WYSIWYG editing</p>
+                      <h3 className="font-bold text-lg">Blog Editor</h3>
+                      <p className="text-sm text-gray-600">Create and edit blog posts</p>
                     </div>
                   </div>
                   <ul className="text-sm text-gray-600 mb-4 space-y-1">
@@ -180,37 +180,12 @@ export const AdminPanel: React.FC = () => {
                   </ul>
                   <button
                     onClick={() => {
-                      window.history.pushState({}, '', '/admin/blog/new?editor=rich');
+                      window.history.pushState({}, '', '/admin/blog/new');
                       window.location.reload(); // Force reload to update AdminRoutes
                     }}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
                   >
-                    Open Rich Text Editor
-                  </button>
-                </div>
-                
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Layout className="w-8 h-8 text-purple-600" />
-                    <div>
-                      <h3 className="font-bold text-lg">Block Editor</h3>
-                      <p className="text-sm text-gray-600">Modern Gutenberg-style</p>
-                    </div>
-                  </div>
-                  <ul className="text-sm text-gray-600 mb-4 space-y-1">
-                    <li>✓ Drag & drop blocks</li>
-                    <li>✓ 13+ block types</li>
-                    <li>✓ Slash commands</li>
-                    <li>✓ Block templates</li>
-                  </ul>
-                  <button
-                    onClick={() => {
-                      window.history.pushState({}, '', '/admin/blog/new?editor=block');
-                      window.location.reload(); // Force reload to update AdminRoutes
-                    }}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
-                  >
-                    Open Block Editor
+                    Create New Blog Post
                   </button>
                 </div>
               </div>

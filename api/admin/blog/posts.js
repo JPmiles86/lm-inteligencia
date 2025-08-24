@@ -134,9 +134,7 @@ export default async function handler(req, res) {
         authorName,
         authorTitle,
         authorImage,
-        readTime,
-        editorType,
-        blocks
+        readTime
       } = req.body;
 
       // Create the new post
@@ -156,8 +154,6 @@ export default async function handler(req, res) {
           authorTitle,
           authorImage,
           readTime: readTime || 5,
-          editorType: editorType || 'rich',
-          blocks: blocks || [],
           createdAt: new Date(),
           updatedAt: new Date()
         })

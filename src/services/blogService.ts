@@ -1,8 +1,6 @@
 // Blog Service - Handles blog data operations using database API
 
 import { BlogPost } from '../data/blogData';
-import { Block } from '../components/admin/BlogManagement/types';
-import { blocksToHtml } from '../components/admin/BlogManagement/utils/blockHelpers';
 
 // Use relative URL for Vercel deployment
 const API_BASE_URL = import.meta.env.NODE_ENV === 'production' ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
@@ -12,8 +10,6 @@ export interface BlogFormData {
   slug: string;
   excerpt: string;
   content: string;
-  blocks?: Block[];
-  editorType?: 'rich' | 'block';
   category: string;
   tags: string[];
   featuredImage: string;
@@ -29,7 +25,6 @@ export interface BlogFormData {
 
 // Extended interface for rich text editor
 export interface RichTextBlogFormData extends BlogFormData {
-  editorType: 'rich' | 'block';
   images: string[];
   status: 'draft' | 'published' | 'scheduled';
   scheduledDate?: Date;
@@ -257,17 +252,12 @@ class BlogDatabaseService {
 
   // Convert form data to API format
   private formatPostForAPI(formData: BlogFormData): any {
-    // Process content based on editor type
-    let processedContent = formData.content;
-    if (formData.editorType === 'block' && formData.blocks) {
-      processedContent = blocksToHtml(formData.blocks);
-    }
 
     return {
       title: formData.title,
       slug: formData.slug || this.generateSlug(formData.title),
       excerpt: formData.excerpt,
-      content: processedContent,
+      content: formData.content,
       featuredImage: formData.featuredImage,
       category: formData.category,
       tags: formData.tags,
