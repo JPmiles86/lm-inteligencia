@@ -72,8 +72,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             transition={{ duration: 0.3 }}
             className="fixed inset-y-0 left-0 z-50 w-[280px] bg-white shadow-xl border-r border-gray-200 flex flex-col"
           >
-            {/* Sidebar Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            {/* Sidebar Header - Match admin header height */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200" style={{ minHeight: '72px' }}>
               <div className="flex items-center space-x-3">
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Inteligencia</h1>

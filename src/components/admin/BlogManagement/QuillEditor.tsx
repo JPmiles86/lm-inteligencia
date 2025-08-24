@@ -58,20 +58,24 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
     const handleStickyToolbar = () => {
       const toolbar = document.querySelector('.ql-toolbar') as HTMLElement;
       const editor = document.querySelector('.ql-editor') as HTMLElement;
+      const adminHeader = document.querySelector('header') as HTMLElement;
       
       if (!toolbar || !editor) return;
+      
+      // Get admin header height (typically 72-80px with py-4)
+      const headerHeight = adminHeader ? adminHeader.offsetHeight : 72;
       
       // Get the original position of the toolbar
       const toolbarRect = toolbar.getBoundingClientRect();
       const editorRect = editor.getBoundingClientRect();
       
-      // Check if we need to make it sticky
-      if (window.scrollY > 0 && editorRect.top < 0 && editorRect.bottom > 100) {
+      // Check if we need to make it sticky - account for admin header
+      if (window.scrollY > 0 && editorRect.top < headerHeight && editorRect.bottom > (headerHeight + 100)) {
         toolbar.style.position = 'fixed';
-        toolbar.style.top = '0';
+        toolbar.style.top = `${headerHeight}px`; // Position below admin header
         toolbar.style.left = `${toolbarRect.left}px`;
         toolbar.style.width = `${toolbarRect.width}px`;
-        toolbar.style.zIndex = '1000';
+        toolbar.style.zIndex = '30'; // Below admin header z-40
         toolbar.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
         
         // Add padding to prevent content jump
