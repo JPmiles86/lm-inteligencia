@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
 // Unified Component
@@ -20,55 +20,50 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
 
 /**
- * AdminRoutes - Handles all admin section routing with proper navigation
+ * AdminRoutes - Handles all admin section routing with proper React Router navigation
  */
 const AdminRoutes: React.FC = () => {
-  const [currentSection, setCurrentSection] = useState<'dashboard' | 'blog' | 'customization' | 'analytics' | 'settings'>('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
   
-  // Parse URL to determine current section
-  useEffect(() => {
-    const path = window.location.pathname;
+  // Determine current section based on URL using React Router location
+  const currentSection = useMemo(() => {
+    const path = location.pathname;
+    console.log('[AdminRoutes] URL CHANGE - Determining section:', {
+      path: path,
+      timestamp: new Date().toISOString()
+    });
+    
     if (path.includes('/admin/blog')) {
-      setCurrentSection('blog');
+      console.log('[AdminRoutes] Section determined: blog');
+      return 'blog';
     } else if (path.includes('/admin/customization')) {
-      setCurrentSection('customization');
+      console.log('[AdminRoutes] Section determined: customization');
+      return 'customization';
     } else if (path.includes('/admin/analytics')) {
-      setCurrentSection('analytics');
+      console.log('[AdminRoutes] Section determined: analytics');
+      return 'analytics';
     } else if (path.includes('/admin/settings')) {
-      setCurrentSection('settings');
+      console.log('[AdminRoutes] Section determined: settings');
+      return 'settings';
     } else {
-      setCurrentSection('dashboard');
+      console.log('[AdminRoutes] Section determined: dashboard');
+      return 'dashboard';
     }
-  }, []);
+  }, [location.pathname]);
 
-  const handleSectionChange = (section: typeof currentSection) => {
-    setCurrentSection(section);
-    // Update URL without page reload
-    const basePath = `/admin/${section === 'dashboard' ? '' : section}`;
-    window.history.pushState({}, '', basePath);
-  };
-
-  const renderContent = () => {
-    const path = window.location.pathname;
+  // Handle section change using React Router navigate
+  const handleSectionChange = (section: 'dashboard' | 'blog' | 'customization' | 'analytics' | 'settings') => {
+    console.log('[AdminRoutes] SECTION CHANGE:', {
+      from: currentSection,
+      to: section,
+      currentPath: location.pathname,
+      timestamp: new Date().toISOString()
+    });
     
-    // All blog routes are handled by BlogManagement component
-    if (path.includes('/admin/blog')) {
-      return <BlogManagement />;
-    }
-    
-    switch (currentSection) {
-      case 'blog':
-        return <BlogManagement />;
-      case 'customization':
-        return <div className="p-6">Site Customization - Coming Soon</div>;
-      case 'analytics':
-        return <div className="p-6">Analytics - Coming Soon</div>;
-      case 'settings':
-        return <div className="p-6">Settings - Coming Soon</div>;
-      case 'dashboard':
-      default:
-        return <AdminPanel />;
-    }
+    const basePath = `/admin${section === 'dashboard' ? '' : `/${section}`}`;
+    console.log('[AdminRoutes] Navigating to:', basePath);
+    navigate(basePath); // ✅ Use React Router navigate instead of pushState
   };
 
   return (
@@ -77,7 +72,15 @@ const AdminRoutes: React.FC = () => {
       onSectionChange={handleSectionChange}
       tenantId="hospitality"
     >
-      {renderContent()}
+      <Routes>
+        <Route path="/blog" element={<BlogManagement />} />
+        <Route path="/blog/new" element={<BlogManagement />} />
+        <Route path="/blog/edit/:id" element={<BlogManagement />} />
+        <Route path="/customization" element={<div className="p-6">Site Customization - Coming Soon</div>} />
+        <Route path="/analytics" element={<div className="p-6">Analytics - Coming Soon</div>} />
+        <Route path="/settings" element={<div className="p-6">Settings - Coming Soon</div>} />
+        <Route path="/*" element={<AdminPanel />} />
+      </Routes>
     </AdminLayout>
   );
 };

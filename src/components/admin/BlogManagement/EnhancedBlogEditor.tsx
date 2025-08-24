@@ -8,19 +8,27 @@ import { QuillEditor } from './QuillEditor';
 import { markdownToHtml, isMarkdown } from '../../../utils/markdownToHtml';
 
 interface EnhancedBlogEditorProps {
-  post?: BlogPost | null;
+  postId?: number; // Use ID instead of full post object
   onSave: (post: BlogPost) => void;
   onCancel: () => void;
 }
 
 export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
-  post: propPost,
+  postId,
   onSave,
   onCancel
 }) => {
-  const { id } = useParams<{ id: string }>();
-  const [post, setPost] = useState<BlogPost | null>(propPost || null);
+  const [post, setPost] = useState<BlogPost | null>(null);
   const [loadingPost, setLoadingPost] = useState(false);
+
+  console.log('[EnhancedBlogEditor] RENDER - Component state:', {
+    postId: postId,
+    postState: post,
+    loadingPost: loadingPost,
+    isEditing: !!postId,
+    url: window.location.pathname,
+    timestamp: new Date().toISOString()
+  });
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -53,54 +61,36 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     'SEO & SEM'
   ]);
 
-  const isEditing = !!post || !!id;
+  const isEditing = !!postId;
 
-  // Fetch post from ID if needed
+  // Fetch post by ID when postId is provided
   useEffect(() => {
     const fetchPost = async () => {
-      if (id && !propPost) {
-        console.log('[EnhancedBlogEditor] Fetching post with ID:', id);
+      if (postId) {
+        console.log('[EnhancedBlogEditor] Fetching post with ID:', postId);
         setLoadingPost(true);
         try {
-          const fetchedPost = await blogService.getPostById(parseInt(id));
+          const fetchedPost = await blogService.getPostById(postId);
           console.log('[EnhancedBlogEditor] Fetched post:', fetchedPost);
           if (fetchedPost) {
             setPost(fetchedPost);
-            // Directly set form data here as well to ensure it's populated
-            let processedContent = fetchedPost.content;
-            if (isMarkdown(fetchedPost.content)) {
-              processedContent = markdownToHtml(fetchedPost.content);
-            }
-            
-            setFormData({
-              title: fetchedPost.title,
-              slug: fetchedPost.slug,
-              excerpt: fetchedPost.excerpt,
-              content: processedContent,
-              category: fetchedPost.category,
-              tags: Array.isArray(fetchedPost.tags) ? fetchedPost.tags : [],
-              featuredImage: fetchedPost.featuredImage,
-              featured: fetchedPost.featured,
-              publishedDate: fetchedPost.publishedDate || new Date().toISOString().split('T')[0] as string,
-              author: fetchedPost.author || {
-                name: 'Laurie Meiring',
-                title: 'Founder & Digital Marketing Strategist',
-                image: '/images/team/laurie-meiring.jpg'
-              },
-              readTime: fetchedPost.readTime || 5
-            });
           } else {
-            console.error('[EnhancedBlogEditor] No post found with ID:', id);
+            console.error('[EnhancedBlogEditor] No post found with ID:', postId);
           }
         } catch (error) {
           console.error('[EnhancedBlogEditor] Error fetching post:', error);
         } finally {
           setLoadingPost(false);
         }
+      } else {
+        // Clear post state for new post creation
+        console.log('[EnhancedBlogEditor] Clearing post state for new post');
+        setPost(null);
+        setLoadingPost(false);
       }
     };
     fetchPost();
-  }, [id, propPost]);
+  }, [postId]); // Re-fetch when postId changes
 
   // Fetch categories on mount
   useEffect(() => {

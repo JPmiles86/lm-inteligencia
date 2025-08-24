@@ -127,27 +127,59 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
     window.addEventListener('scroll', handleStickyToolbar, { passive: true });
     window.addEventListener('resize', handleStickyToolbar);
     
-    // Watch for sidebar changes using MutationObserver
+    // Enhanced sidebar change detection
     const sidebar = document.querySelector('aside');
+    const mainContent = document.querySelector('[class*="ml-\\[280px\\]"], [class*="transition-all"]');
     let observer: MutationObserver | null = null;
+    let parentObserver: MutationObserver | null = null;
+    
+    // Improved sidebar change handler with animation delay
+    const handleSidebarChange = () => {
+      console.log('[QuillEditor] Sidebar change detected');
+      handleStickyToolbar(); // Immediate recalculation
+      // Wait for Framer Motion animation to complete (300ms + buffer)
+      setTimeout(handleStickyToolbar, 350);
+    };
     
     if (sidebar) {
-      observer = new MutationObserver(() => {
-        // Recalculate toolbar position when sidebar changes
-        handleStickyToolbar();
+      // Watch for sidebar visibility/position changes
+      observer = new MutationObserver((mutations) => {
+        console.log('[QuillEditor] MutationObserver triggered:', mutations.length, 'mutations');
+        handleSidebarChange();
       });
       
       observer.observe(sidebar, {
         attributes: true,
         attributeFilter: ['class', 'style'],
+        childList: true,
         subtree: false
       });
+      
+      // Also listen for Framer Motion animation events
+      sidebar.addEventListener('animationstart', handleSidebarChange);
+      sidebar.addEventListener('animationend', handleSidebarChange);
+      sidebar.addEventListener('transitionstart', handleSidebarChange);
+      sidebar.addEventListener('transitionend', handleSidebarChange);
     }
     
-    // Also listen for animation/transition events on the main content area
-    const mainContent = document.querySelector('[class*="ml-\\[280px\\]"], [class*="transition-all"]');
+    // Listen for main content transitions (when sidebar state changes)
     if (mainContent) {
-      mainContent.addEventListener('transitionend', handleStickyToolbar);
+      mainContent.addEventListener('transitionstart', handleSidebarChange);
+      mainContent.addEventListener('transitionend', handleSidebarChange);
+    }
+    
+    // Watch for changes to the parent container class changes
+    const parentContainer = document.querySelector('[class*="flex-1"][class*="transition-all"]');
+    if (parentContainer) {
+      parentObserver = new MutationObserver(() => {
+        console.log('[QuillEditor] Parent container change detected');
+        handleSidebarChange();
+      });
+      
+      parentObserver.observe(parentContainer, {
+        attributes: true,
+        attributeFilter: ['class', 'style']
+      });
     }
     
     return () => {
@@ -159,12 +191,29 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
       clearTimeout(timeoutId3);
       window.removeEventListener('scroll', handleStickyToolbar);
       window.removeEventListener('resize', handleStickyToolbar);
+      
+      // Clean up sidebar event listeners
+      if (sidebar) {
+        sidebar.removeEventListener('animationstart', handleSidebarChange);
+        sidebar.removeEventListener('animationend', handleSidebarChange);
+        sidebar.removeEventListener('transitionstart', handleSidebarChange);
+        sidebar.removeEventListener('transitionend', handleSidebarChange);
+      }
+      
+      // Clean up main content event listeners
+      if (mainContent) {
+        mainContent.removeEventListener('transitionstart', handleSidebarChange);
+        mainContent.removeEventListener('transitionend', handleSidebarChange);
+      }
+      
+      // Disconnect observers
       if (observer) {
         observer.disconnect();
       }
-      if (mainContent) {
-        mainContent.removeEventListener('transitionend', handleStickyToolbar);
+      if (parentObserver) {
+        parentObserver.disconnect();
       }
+      
       // Clean up placeholder on unmount
       const placeholder = document.getElementById('toolbar-placeholder');
       if (placeholder) {

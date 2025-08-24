@@ -1,7 +1,7 @@
 // Blog Management - Main component that orchestrates blog management functionality
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogList } from './BlogList';
 import { EnhancedBlogEditor } from './EnhancedBlogEditor';
@@ -13,48 +13,57 @@ type BlogManagementView = 'list' | 'editor' | 'media';
 export const BlogManagement: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentView, setCurrentView] = useState<BlogManagementView>('list');
-  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const { id } = useParams<{ id: string }>();
   const [showMediaUploader, setShowMediaUploader] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Parse URL to determine view
-  useEffect(() => {
+  // Determine current view based on URL using useMemo for better performance
+  const currentView = useMemo<BlogManagementView>(() => {
     const path = location.pathname;
-    if (path.includes('/admin/blog/new')) {
-      setCurrentView('editor');
-      setEditingPost(null);
-    } else if (path.includes('/admin/blog/edit/')) {
-      setCurrentView('editor');
-      // Post will be loaded by the editor component
+    console.log('[BlogManagement] URL PATH PARSING:', {
+      path: path,
+      id: id,
+      includes_new: path.includes('/new'),
+      includes_edit: path.includes('/edit/'),
+      timestamp: new Date().toISOString()
+    });
+    
+    if (path.includes('/new')) {
+      console.log('[BlogManagement] View determined: EDITOR (new post)');
+      return 'editor';
+    } else if (path.includes('/edit/') && id) {
+      console.log('[BlogManagement] View determined: EDITOR (edit post)', id);
+      return 'editor';
     } else {
-      setCurrentView('list');
+      console.log('[BlogManagement] View determined: LIST');
+      return 'list';
     }
-  }, [location.pathname]);
+  }, [location.pathname, id]);
+
+  // Derived state for editing post ID
+  const editingPostId = useMemo(() => {
+    return currentView === 'editor' && id ? parseInt(id) : undefined;
+  }, [currentView, id]);
 
   const handleCreateNew = () => {
-    setEditingPost(null);
-    setCurrentView('editor');
+    console.log('[BlogManagement] Creating new post');
     navigate('/admin/blog/new');
   };
 
   const handleEditPost = (post: BlogPost) => {
-    setEditingPost(post);
-    setCurrentView('editor');
+    console.log('[BlogManagement] Editing post:', post.id);
     navigate(`/admin/blog/edit/${post.id}`);
   };
 
   const handleSavePost = () => {
+    console.log('[BlogManagement] Post saved, returning to list');
     // Trigger refresh of the blog list
     setRefreshTrigger(prev => prev + 1);
-    setCurrentView('list');
-    setEditingPost(null);
     navigate('/admin/blog');
   };
 
   const handleCancelEdit = () => {
-    setCurrentView('list');
-    setEditingPost(null);
+    console.log('[BlogManagement] Edit cancelled, returning to list');
     navigate('/admin/blog');
   };
 
@@ -94,7 +103,8 @@ export const BlogManagement: React.FC = () => {
             className="h-full overflow-auto"
           >
             <EnhancedBlogEditor
-              post={editingPost}
+              key={editingPostId || 'new'} // Force re-mount when ID changes
+              postId={editingPostId}
               onSave={handleSavePost}
               onCancel={handleCancelEdit}
             />

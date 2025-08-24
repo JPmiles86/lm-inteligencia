@@ -210,10 +210,29 @@ class BlogDatabaseService {
 
   // Get a single post by ID
   async getPostById(id: number): Promise<BlogPost | null> {
+    console.log('[blogService] getPostById called:', {
+      id: id,
+      timestamp: new Date().toISOString()
+    });
+    
     try {
       const post = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}`);
+      console.log('[blogService] getPostById SUCCESS:', {
+        id: id,
+        post: post,
+        postId: post?.id,
+        postTitle: post?.title,
+        timestamp: new Date().toISOString()
+      });
       return post;
     } catch (error) {
+      console.log('[blogService] getPostById ERROR:', {
+        id: id,
+        error: error,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+      
       if (error instanceof Error && error.message.includes('404')) {
         return null;
       }

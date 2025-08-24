@@ -30,6 +30,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
+  // Debug sidebar state changes
+  React.useEffect(() => {
+    console.log('[AdminLayout] SIDEBAR STATE CHANGE:', {
+      sidebarOpen: sidebarOpen,
+      timestamp: new Date().toISOString()
+    });
+  }, [sidebarOpen]);
+
   const navigationItems: NavigationItem[] = [
     {
       id: 'dashboard',
@@ -95,7 +103,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
               {navigationItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => onSectionChange(item.id)}
+                  onClick={() => {
+                    console.log('[AdminLayout] SIDEBAR CLICK:', {
+                      clicked: item.id,
+                      currentSection: currentSection,
+                      currentPath: window.location.pathname,
+                      timestamp: new Date().toISOString()
+                    });
+                    onSectionChange(item.id);
+                  }}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left transition-all duration-200 ${
                     currentSection === item.id
                       ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border border-purple-200'
