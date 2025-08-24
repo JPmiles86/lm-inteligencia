@@ -1,10 +1,10 @@
 // Blog Editor Component - Rich text editor for creating and editing blog posts
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+// TinyMCE removed - this file should be deprecated in favor of EnhancedBlogEditor
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
-import { RichTextEditor } from './RichTextEditor';
+// import { RichTextEditor } from './RichTextEditor'; // REMOVED: TinyMCE-based editor
 import { ImageUploader } from '../ImageUploader';
 
 interface BlogEditorProps {
@@ -316,41 +316,10 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Content *
         </label>
-        <div>
-          <div className={`border rounded-lg overflow-hidden ${errors.content ? 'border-red-300' : 'border-gray-300'}`}>
-            <Editor
-              apiKey="no-api-key" // In production, use your TinyMCE API key
-              onInit={(evt, editor) => editorRef.current = editor}
-              value={formData.content}
-              onEditorChange={(content) => handleInputChange('content', content)}
-              init={{
-                height: 400,
-                menubar: true,
-                plugins: [
-                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                  'insertdatetime', 'media', 'table', 'wordcount', 'emoticons', 'template',
-                  'codesample', 'quickbars'
-                ],
-                toolbar: [
-                  'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough',
-                  'alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist checklist',
-                  'forecolor backcolor | link image media table | emoticons charmap | code preview fullscreen'
-                ].join(' | '),
-                quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
-                quickbars_insert_toolbar: 'quickimage quicktable',
-                contextmenu: 'link image table',
-                skin: 'oxide',
-                content_css: 'default',
-                branding: false,
-                promotion: false,
-                placeholder: 'Start writing your blog post content here...',
-              }}
-            />
-          </div>
-          {errors.content && (
-            <p className="mt-1 text-sm text-red-600">{errors.content}</p>
-          )}
+        {/* DEPRECATED: TinyMCE Editor removed. Use EnhancedBlogEditor instead. */}
+        <div className="p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-yellow-800 font-medium">This editor component has been deprecated.</p>
+          <p className="text-yellow-700 mt-1">Please use EnhancedBlogEditor instead, which uses Quill editor.</p>
         </div>
       </div>
 

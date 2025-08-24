@@ -1,7 +1,7 @@
 // Editor Helper Functions - HTML cleanup, validation, and utility functions
 
 export const sanitizeHtml = (html: string): string => {
-  // Basic HTML sanitization for TinyMCE content
+  // Basic HTML sanitization for rich text editor content
   // This is a simple implementation - in production, consider using a library like DOMPurify
   return html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')

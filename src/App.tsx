@@ -10,7 +10,7 @@ import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { BlogManagement } from './components/admin/BlogManagement';
-import { BlogEditor } from './components/admin/BlogManagement/BlogEditor';
+// import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
@@ -51,20 +51,9 @@ const AdminRoutes: React.FC = () => {
   const renderContent = () => {
     const path = window.location.pathname;
     
-    // Check for specific blog routes
-    if (path.includes('/admin/blog/new') || path.includes('/admin/blog/edit/')) {
-      return (
-        <BlogEditor 
-          onSave={() => {
-            setCurrentSection('blog');
-            window.history.pushState({}, '', '/admin/blog');
-          }} 
-          onCancel={() => {
-            setCurrentSection('blog');  
-            window.history.pushState({}, '', '/admin/blog');
-          }} 
-        />
-      );
+    // All blog routes are handled by BlogManagement component
+    if (path.includes('/admin/blog')) {
+      return <BlogManagement />;
     }
     
     switch (currentSection) {

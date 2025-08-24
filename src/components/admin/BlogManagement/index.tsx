@@ -63,29 +63,6 @@ export const BlogManagement: React.FC = () => {
     setShowMediaUploader(false);
   };
 
-  const renderBreadcrumbs = () => {
-    // Only show breadcrumbs on editor view, not on list view
-    if (currentView !== 'editor') {
-      return null;
-    }
-
-    return (
-      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <button
-          onClick={() => setCurrentView('list')}
-          className="hover:text-purple-600 transition-colors"
-        >
-          Blog Management
-        </button>
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-        <span className="text-purple-600 font-medium">
-          {editingPost ? 'Edit Post' : 'New Post'}
-        </span>
-      </nav>
-    );
-  };
 
   return (
     <div className="h-full overflow-hidden">
@@ -116,7 +93,6 @@ export const BlogManagement: React.FC = () => {
             transition={{ duration: 0.3 }}
             className="h-full overflow-auto"
           >
-            {renderBreadcrumbs()}
             <EnhancedBlogEditor
               post={editingPost}
               onSave={handleSavePost}

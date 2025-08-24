@@ -110,19 +110,6 @@ export const SiteCustomization: React.FC = () => {
     }
   ];
 
-  const renderBreadcrumbs = () => {
-    const currentItem = navigationItems.find(item => item.id === currentView);
-    
-    return (
-      <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-        <span className="hover:text-gray-900">Site Customization</span>
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-        </svg>
-        <span className="text-blue-600 font-medium">{currentItem?.label}</span>
-      </nav>
-    );
-  };
 
   const renderSidebar = () => (
     <div className="w-80 bg-white border-r border-gray-200 p-6">
@@ -254,7 +241,6 @@ export const SiteCustomization: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className="p-6">
-          {renderBreadcrumbs()}
           
           <AnimatePresence mode="wait">
             <motion.div
