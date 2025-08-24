@@ -41,9 +41,24 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [categories, setCategories] = useState<string[]>(['Technology', 'Business', 'Travel', 'Food', 'Lifestyle', 'Other']);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  const categories = blogService.getCategories();
   const isEditing = !!post;
+
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const fetchedCategories = await blogService.getCategories();
+        setCategories(fetchedCategories);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        // Keep default categories if fetch fails
+      }
+    };
+    loadCategories();
+  }, []);
 
   // Load post data when editing
   useEffect(() => {
@@ -64,6 +79,20 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
     }
   }, [post]);
 
+  // Warn user about unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   // Auto-generate slug from title
   useEffect(() => {
     if (formData.title && !isEditing) {
@@ -77,6 +106,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
 
   const handleInputChange = (field: keyof BlogFormData, value: BlogFormData[keyof BlogFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setHasUnsavedChanges(true);
     
     // Clear errors when user starts typing
     if (errors[field]) {
@@ -157,6 +187,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       alert('Failed to save post. Please try again.');
     } finally {
       setSaving(false);
+      setHasUnsavedChanges(false);
     }
   };
 

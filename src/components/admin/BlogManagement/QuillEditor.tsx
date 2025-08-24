@@ -55,26 +55,42 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
 
   // Sticky toolbar implementation
   React.useEffect(() => {
+    let originalToolbarOffset: { left: number; width: number } | null = null;
+    
     const handleStickyToolbar = () => {
       const toolbar = document.querySelector('.ql-toolbar') as HTMLElement;
       const editor = document.querySelector('.ql-editor') as HTMLElement;
       const adminHeader = document.querySelector('header') as HTMLElement;
+      const wrapper = document.querySelector('.quill-editor-wrapper') as HTMLElement;
       
       if (!toolbar || !editor) return;
       
       // Get admin header height (typically 72-80px with py-4)
       const headerHeight = adminHeader ? adminHeader.offsetHeight : 72;
       
-      // Get the original position of the toolbar
-      const toolbarRect = toolbar.getBoundingClientRect();
+      // Store original position only once when toolbar is in normal position
+      if (!originalToolbarOffset && toolbar.style.position !== 'fixed') {
+        const wrapperRect = wrapper?.getBoundingClientRect();
+        if (wrapperRect) {
+          originalToolbarOffset = {
+            left: wrapperRect.left,
+            width: wrapperRect.width
+          };
+        }
+      }
+      
       const editorRect = editor.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
       
       // Check if we need to make it sticky - account for admin header
-      if (window.scrollY > 0 && editorRect.top < headerHeight && editorRect.bottom > (headerHeight + 100)) {
+      if (scrollY > 0 && editorRect.top < headerHeight && editorRect.bottom > (headerHeight + 100)) {
+        // Use stored original position or current wrapper position
+        const position = originalToolbarOffset || wrapper?.getBoundingClientRect() || toolbar.getBoundingClientRect();
+        
         toolbar.style.position = 'fixed';
         toolbar.style.top = `${headerHeight}px`; // Position below admin header
-        toolbar.style.left = `${toolbarRect.left}px`;
-        toolbar.style.width = `${toolbarRect.width}px`;
+        toolbar.style.left = `${position.left}px`;
+        toolbar.style.width = `${position.width}px`;
         toolbar.style.zIndex = '30'; // Below admin header z-40
         toolbar.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
         
@@ -93,6 +109,11 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         toolbar.style.width = '';
         toolbar.style.boxShadow = '';
         
+        // Reset stored position when returning to normal
+        if (toolbar.style.position !== 'fixed') {
+          originalToolbarOffset = null;
+        }
+        
         // Remove placeholder
         const placeholder = document.getElementById('toolbar-placeholder');
         if (placeholder) {
@@ -101,14 +122,15 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
       }
     };
     
-    // Initial check
-    setTimeout(handleStickyToolbar, 100);
+    // Delay initial check to ensure layout is complete
+    const timeoutId = setTimeout(handleStickyToolbar, 300);
     
     // Add scroll listener
     window.addEventListener('scroll', handleStickyToolbar);
     window.addEventListener('resize', handleStickyToolbar);
     
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleStickyToolbar);
       window.removeEventListener('resize', handleStickyToolbar);
       // Clean up placeholder on unmount
