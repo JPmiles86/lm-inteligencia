@@ -53,6 +53,68 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
     return () => document.removeEventListener('click', handleImageClick);
   }, []);
 
+  // Sticky toolbar implementation
+  React.useEffect(() => {
+    const handleStickyToolbar = () => {
+      const toolbar = document.querySelector('.ql-toolbar') as HTMLElement;
+      const editor = document.querySelector('.ql-editor') as HTMLElement;
+      
+      if (!toolbar || !editor) return;
+      
+      // Get the original position of the toolbar
+      const toolbarRect = toolbar.getBoundingClientRect();
+      const editorRect = editor.getBoundingClientRect();
+      
+      // Check if we need to make it sticky
+      if (window.scrollY > 0 && editorRect.top < 0 && editorRect.bottom > 100) {
+        toolbar.style.position = 'fixed';
+        toolbar.style.top = '0';
+        toolbar.style.left = `${toolbarRect.left}px`;
+        toolbar.style.width = `${toolbarRect.width}px`;
+        toolbar.style.zIndex = '1000';
+        toolbar.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+        
+        // Add padding to prevent content jump
+        const placeholder = document.getElementById('toolbar-placeholder');
+        if (!placeholder) {
+          const div = document.createElement('div');
+          div.id = 'toolbar-placeholder';
+          div.style.height = `${toolbar.offsetHeight}px`;
+          toolbar.parentElement?.insertBefore(div, toolbar);
+        }
+      } else {
+        toolbar.style.position = '';
+        toolbar.style.top = '';
+        toolbar.style.left = '';
+        toolbar.style.width = '';
+        toolbar.style.boxShadow = '';
+        
+        // Remove placeholder
+        const placeholder = document.getElementById('toolbar-placeholder');
+        if (placeholder) {
+          placeholder.remove();
+        }
+      }
+    };
+    
+    // Initial check
+    setTimeout(handleStickyToolbar, 100);
+    
+    // Add scroll listener
+    window.addEventListener('scroll', handleStickyToolbar);
+    window.addEventListener('resize', handleStickyToolbar);
+    
+    return () => {
+      window.removeEventListener('scroll', handleStickyToolbar);
+      window.removeEventListener('resize', handleStickyToolbar);
+      // Clean up placeholder on unmount
+      const placeholder = document.getElementById('toolbar-placeholder');
+      if (placeholder) {
+        placeholder.remove();
+      }
+    };
+  }, []);
+
   // Custom image handler for uploading to GCS
   const imageHandler = () => {
     const input = document.createElement('input');
@@ -170,31 +232,24 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
           position: relative;
         }
         
-        /* Fix for sticky toolbar - needs container with proper height */
-        .quill-editor-container {
-          position: relative;
-          height: 100%;
-        }
-        
+        /* Enhanced sticky toolbar styles */
         .quill-editor-wrapper .ql-toolbar {
           border-top-left-radius: 0.5rem;
           border-top-right-radius: 0.5rem;
-          background: white;
+          background: rgb(255 255 255 / var(--tw-bg-opacity, 1));
           border-color: #e5e7eb;
-          position: -webkit-sticky;
-          position: sticky;
-          top: 100px;
-          z-index: 40;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid #ccc;
+          transition: box-shadow 0.2s ease;
+        }
+        
+        /* When toolbar becomes fixed via JS */
+        .quill-editor-wrapper .ql-toolbar[style*="position: fixed"] {
+          border-radius: 0;
           border-bottom: 2px solid #e5e7eb;
         }
         
-        .ql-toolbar.ql-snow {
-          position: -webkit-sticky !important;
-          position: sticky !important;
-          top: 100px !important;
-          z-index: 40 !important;
-          background: white !important;
+        #toolbar-placeholder {
+          display: block;
         }
         
         .quill-editor-wrapper .ql-container {
