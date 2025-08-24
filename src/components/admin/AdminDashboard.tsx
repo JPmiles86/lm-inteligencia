@@ -68,14 +68,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
   };
 
   // Component to show recent blog posts
-  const RecentBlogPosts: React.FC<{ onEditPost: (post: any) => void }> = ({ onEditPost }) => {
+  const RecentBlogPosts: React.FC<{ 
+    onEditPost: (post: any) => void;
+    onDeletePost?: (postId: number) => void;
+  }> = ({ onEditPost, onDeletePost }) => {
     const [recentPosts, setRecentPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     React.useEffect(() => {
       const fetchRecentPosts = async () => {
         try {
-          const response = await blogService.getAllPosts({ limit: 3, orderBy: 'publishedDate', orderDirection: 'desc' });
+          const response = await blogService.getAllPosts({ 
+            limit: 3, 
+            sortBy: 'publishedAt', 
+            sortOrder: 'desc' 
+          });
           setRecentPosts(response.posts || []);
         } catch (error) {
           console.error('Error fetching recent posts:', error);
@@ -88,13 +96,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
       fetchRecentPosts();
     }, []);
 
+    const handleDeletePost = async (postId: number, postTitle: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      
+      if (!confirm(`Are you sure you want to delete "${postTitle}"? This action cannot be undone.`)) {
+        return;
+      }
+
+      setDeletingId(postId);
+      try {
+        await blogService.deletePost(postId);
+        setRecentPosts(prev => prev.filter(post => post.id !== postId));
+        if (onDeletePost) {
+          onDeletePost(postId);
+        }
+      } catch (error) {
+        console.error('Error deleting post:', error);
+        alert('Failed to delete post. Please try again.');
+      } finally {
+        setDeletingId(null);
+      }
+    };
+
+    const formatDate = (dateString: string | null) => {
+      if (!dateString) return 'Not published';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    };
+
     if (loading) {
       return (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div key={i} className="animate-pulse bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                  <div className="flex gap-2 mt-3">
+                    <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                    <div className="h-6 bg-gray-200 rounded w-24"></div>
+                  </div>
+                </div>
+                <div className="w-20 h-20 bg-gray-200 rounded-lg ml-4"></div>
+              </div>
             </div>
           ))}
         </div>
@@ -103,10 +152,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
 
     if (recentPosts.length === 0) {
       return (
-        <div className="text-center py-8 text-gray-500">
-          <div className="text-4xl mb-2">📄</div>
-          <p>No blog posts yet</p>
-          <p className="text-sm">Create your first blog post to get started</p>
+        <div className="text-center py-12 text-gray-500">
+          <div className="text-6xl mb-4">📝</div>
+          <h3 className="text-xl font-medium text-gray-900 mb-2">No blog posts yet</h3>
+          <p className="text-gray-600 mb-6">Create your first blog post to get started</p>
+          <button
+            onClick={() => setCurrentSection('blog')}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-colors"
+          >
+            Create Your First Post
+          </button>
         </div>
       );
     }
@@ -114,22 +169,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
     return (
       <div className="space-y-4">
         {recentPosts.map((post) => (
-          <div key={post.id} className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 hover:bg-purple-50 transition-colors cursor-pointer" onClick={() => onEditPost(post)}>
+          <div key={post.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:border-purple-300 hover:shadow-md transition-all duration-200">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="font-medium text-gray-900 line-clamp-1">{post.title}</h3>
-                <p className="text-sm text-gray-600 mt-1 line-clamp-2">{post.excerpt}</p>
-                <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
-                  <span className={`px-2 py-1 rounded-full ${
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1">
+                  {post.title}
+                </h3>
+                
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  {post.excerpt || 'No excerpt available...'}
+                </p>
+                
+                <div className="flex items-center gap-3 mb-4 text-sm text-gray-500">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     post.published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {post.published ? 'Published' : 'Draft'}
                   </span>
-                  <span>{new Date(post.publishedDate).toLocaleDateString()}</span>
+                  <span className="flex items-center gap-1">
+                    📅 {formatDate(post.publishedDate)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    👤 {post.author?.name || 'Unknown Author'}
+                  </span>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditPost(post);
+                    }}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+                  >
+                    ✏️ Edit
+                  </button>
+                  
+                  <button
+                    onClick={(e) => handleDeletePost(post.id, post.title, e)}
+                    disabled={deletingId === post.id}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deletingId === post.id ? '⏳' : '🗑️'} Delete
+                  </button>
                 </div>
               </div>
+              
               {post.featuredImage && (
-                <img src={post.featuredImage} alt={post.title} className="w-16 h-16 object-cover rounded-lg ml-4" />
+                <div className="ml-6">
+                  <img 
+                    src={post.featuredImage} 
+                    alt={post.title} 
+                    className="w-20 h-20 object-cover rounded-lg shadow-sm" 
+                  />
+                </div>
               )}
             </div>
           </div>
@@ -217,15 +310,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
               <h2 className="text-xl font-bold text-gray-900">Latest Blog Posts</h2>
               <button
                 onClick={() => setCurrentSection('blog')}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 transition-colors"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg"
               >
-                Create New Blog
+                📝 Create New Blog Post
               </button>
             </div>
-            <RecentBlogPosts onEditPost={(post) => {
-              setCurrentSection('blog');
-              // The BlogManagement component will handle the edit functionality
-            }} />
+            <RecentBlogPosts 
+              onEditPost={(post) => {
+                setCurrentSection('blog');
+                // The BlogManagement component will handle the edit functionality
+              }}
+              onDeletePost={(postId) => {
+                // Post deleted, analytics will be refreshed on next render
+                console.log(`Post ${postId} deleted from dashboard`);
+              }}
+            />
           </div>
 
           {/* Quick Actions */}

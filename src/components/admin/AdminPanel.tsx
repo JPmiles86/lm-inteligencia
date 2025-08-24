@@ -1,42 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Users, BookOpen, LogOut, Eye, EyeOff, PenTool, Layout } from 'lucide-react';
+import { LogOut, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface AdminSettings {
-  showStaffSection: boolean;
-  showBlog: boolean;
-}
+import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
 
 export const AdminPanel: React.FC = () => {
   console.log('[AdminPanel] AdminPanel component mounting/rendering');
   const navigate = useNavigate();
-  
-  const [settings, setSettings] = useState<AdminSettings>({
-    showStaffSection: true,
-    showBlog: true
-  });
-  const [saved, setSaved] = useState(false);
 
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('admin_settings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
-  }, []);
-
-  const handleToggle = (key: keyof AdminSettings) => {
-    const newSettings = {
-      ...settings,
-      [key]: !settings[key]
-    };
-    setSettings(newSettings);
-  };
-
-  const handleSave = () => {
-    localStorage.setItem('admin_settings', JSON.stringify(settings));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSettingsSave = (newSettings: AdminSettings) => {
+    localStorage.setItem('admin_settings', JSON.stringify(newSettings));
+    console.log('Settings saved:', newSettings);
   };
 
   const handleLogout = () => {
@@ -65,138 +38,36 @@ export const AdminPanel: React.FC = () => {
           </div>
           
           <div className="space-y-6">
-            <div className="border rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4">Content Visibility Settings</h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-purple-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Staff Section</p>
-                      <p className="text-sm text-gray-600">Team members on About page</p>
-                      <p className="text-xs mt-1">
-                        <span className={`font-semibold ${settings.showStaffSection ? 'text-green-600' : 'text-gray-500'}`}>
-                          Status: {settings.showStaffSection ? '✅ VISIBLE' : '🚫 HIDDEN'}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleToggle('showStaffSection')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                      settings.showStaffSection 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-green-500 hover:bg-green-600 text-white'
-                    }`}
-                  >
-                    {settings.showStaffSection ? (
-                      <>
-                        <EyeOff className="w-4 h-4" />
-                        Hide Staff
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="w-4 h-4" />
-                        Show Staff
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-pink-50 rounded-lg border border-pink-200">
-                  <div className="flex items-center gap-3">
-                    <BookOpen className="w-5 h-5 text-pink-600" />
-                    <div>
-                      <p className="font-medium text-gray-900">Blog Section</p>
-                      <p className="text-sm text-gray-600">Blog pages and navigation</p>
-                      <p className="text-xs mt-1">
-                        <span className={`font-semibold ${settings.showBlog ? 'text-green-600' : 'text-gray-500'}`}>
-                          Status: {settings.showBlog ? '✅ VISIBLE' : '🚫 HIDDEN'}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleToggle('showBlog')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                      settings.showBlog 
-                        ? 'bg-red-500 hover:bg-red-600 text-white' 
-                        : 'bg-green-500 hover:bg-green-600 text-white'
-                    }`}
-                  >
-                    {settings.showBlog ? (
-                      <>
-                        <EyeOff className="w-4 h-4" />
-                        Hide Blog
-                      </>
-                    ) : (
-                      <>
-                        <Eye className="w-4 h-4" />
-                        Show Blog
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                onClick={handleSave}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-                  saved 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
-                }`}
-              >
-                <Save className="w-4 h-4" />
-                {saved ? 'Saved!' : 'Save Settings'}
-              </button>
-            </div>
+            {/* Content Visibility Settings */}
+            <ContentVisibilitySettings 
+              onSave={handleSettingsSave}
+              showSaveButton={true}
+              showTitle={true}
+            />
             
-            {/* Blog Management Section */}
+            {/* Quick Actions for Blog Management */}
             <div className="mt-8 border-t pt-8">
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
                 Blog Management 📝
               </h2>
-              <p className="text-gray-600 mb-6">
-                Create and manage blog posts with our powerful editors
-              </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-200">
-                  <div className="flex items-center gap-3 mb-4">
-                    <PenTool className="w-8 h-8 text-purple-600" />
-                    <div>
-                      <h3 className="font-bold text-lg">Blog Editor</h3>
-                      <p className="text-sm text-gray-600">Create and edit blog posts</p>
-                    </div>
-                  </div>
-                  <ul className="text-sm text-gray-600 mb-4 space-y-1">
-                    <li>✓ Familiar Word-like interface</li>
-                    <li>✓ Formatting toolbar</li>
-                    <li>✓ Drag & drop images</li>
-                    <li>✓ Auto-save every 30s</li>
-                  </ul>
-                  <button
-                    onClick={() => {
-                      window.history.pushState({}, '', '/admin/blog/new');
-                      window.location.reload(); // Force reload to update AdminRoutes
-                    }}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition-all transform hover:scale-105"
-                  >
-                    Create New Blog Post
-                  </button>
-                </div>
-              </div>
-              
-              <div className="mt-6 text-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    window.history.pushState({}, '', '/admin/blog/new');
+                    window.location.reload(); // Force reload to update AdminRoutes
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 px-8 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg"
+                >
+                  📝 Create New Blog Post
+                </button>
+                
                 <button
                   onClick={() => {
                     window.history.pushState({}, '', '/admin/blog');
                     window.location.reload(); // Force reload to update AdminRoutes
                   }}
-                  className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+                  className="inline-flex items-center justify-center gap-2 bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 py-3 px-8 rounded-lg font-medium transition-all"
                 >
                   <BookOpen className="w-5 h-5" />
                   View All Blog Posts
