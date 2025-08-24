@@ -252,14 +252,16 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   };
 
   const renderPreview = () => (
-    <div className="prose prose-lg max-w-none">
-      <div className="mb-8">
-        <img
-          src={formData.featuredImage}
-          alt={formData.title}
-          className="w-full h-64 object-cover rounded-lg"
-        />
-      </div>
+    <div className="max-w-4xl mx-auto">
+      {formData.featuredImage && (
+        <div className="mb-8">
+          <img
+            src={formData.featuredImage}
+            alt={formData.title}
+            className="w-full h-96 object-cover rounded-lg shadow-lg"
+          />
+        </div>
+      )}
       
       <div className="mb-6">
         <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -267,11 +269,11 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         </span>
       </div>
       
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
         {formData.title}
       </h1>
       
-      <div className="flex items-center gap-4 mb-6 text-sm text-gray-600">
+      <div className="flex items-center gap-4 mb-8 text-sm text-gray-600">
         <div className="flex items-center gap-2">
           <img
             src={formData.author.image}
@@ -279,7 +281,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
             className="w-10 h-10 rounded-full"
           />
           <div>
-            <div className="font-medium">{formData.author.name}</div>
+            <div className="font-medium text-gray-900">{formData.author.name}</div>
             <div className="text-xs">{formData.author.title}</div>
           </div>
         </div>
@@ -289,13 +291,15 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         <span>{formData.readTime} min read</span>
       </div>
       
-      <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+      <p className="text-xl text-gray-600 mb-10 leading-relaxed font-light">
         {formData.excerpt}
       </p>
       
-      <div className="prose prose-lg max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: formData.content }} />
-      </div>
+      {/* Enhanced prose styling for preview */}
+      <div 
+        className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6 prose-li:text-gray-700 prose-strong:text-gray-900 prose-a:text-purple-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-img:shadow-md prose-blockquote:border-l-4 prose-blockquote:border-purple-500 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-code:text-purple-600 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-h1:mt-8 prose-h2:mt-6 prose-h3:mt-4"
+        dangerouslySetInnerHTML={{ __html: formData.content }} 
+      />
       
       <div className="flex flex-wrap gap-2 mt-8">
         {(formData.tags || []).map((tag) => (
@@ -579,74 +583,111 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {isEditing ? 'Edit Post' : 'Create New Post'}
-            </h1>
-            <p className="text-gray-600 mt-2">
-              {isEditing ? 'Update your blog post' : 'Write and publish a new blog post'}
-            </p>
+    <div className="relative h-full">
+      {/* Main Content Area with padding for sticky bar */}
+      <div className="p-6 pb-24">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {isEditing ? 'Edit Post' : 'Create New Post'}
+              </h1>
+              <p className="text-gray-600 mt-2">
+                {isEditing ? 'Update your blog post' : 'Write and publish a new blog post'}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsPreviewMode(!isPreviewMode)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                isPreviewMode
-                  ? 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                  : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
-              }`}
-            >
-              {isPreviewMode ? 'Edit' : 'Preview'}
-            </button>
-            
-            <button
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
+          {/* Content */}
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="p-8">
+              {isPreviewMode ? renderPreview() : renderEditor()}
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Content */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200">
-          <div className="p-8">
-            {isPreviewMode ? renderPreview() : renderEditor()}
-          </div>
+      {/* Sticky Action Bar - accounts for sidebar */}
+      <div className="fixed bottom-0 left-0 lg:left-[280px] right-0 bg-white border-t border-gray-200 shadow-lg z-20 transition-all duration-300">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left side - Cancel & Status */}
+            <div className="flex items-center gap-4">
+              <button
+                onClick={onCancel}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+              >
+                ← Cancel
+              </button>
+              
+              <div className="text-sm text-gray-500 hidden sm:block">
+                {saving ? (
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
+                    Saving...
+                  </span>
+                ) : (
+                  isEditing ? `Last saved: ${new Date().toLocaleString()}` : 'Draft auto-saves'
+                )}
+              </div>
+            </div>
 
-          {/* Footer Actions */}
-          {!isPreviewMode && (
-            <div className="border-t border-gray-200 p-6 bg-gray-50 rounded-b-xl">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  {isEditing ? 'Last updated: ' + new Date().toLocaleString() : 'Draft will be auto-saved'}
-                </div>
-                
-                <div className="flex gap-3">
+            {/* Right side - Action buttons */}
+            <div className="flex items-center gap-3">
+              {/* Preview/Edit Toggle */}
+              <button
+                onClick={() => setIsPreviewMode(!isPreviewMode)}
+                className={`px-5 py-2.5 rounded-lg font-medium transition-all ${
+                  isPreviewMode
+                    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  {isPreviewMode ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      Preview
+                    </>
+                  )}
+                </span>
+              </button>
+
+              {/* Save/Publish buttons - only show when editing */}
+              {!isPreviewMode && (
+                <>
+                  <div className="h-8 w-px bg-gray-300"></div>
+                  
                   <button
                     onClick={() => handleSave(true)}
                     disabled={saving}
-                    className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    className="px-5 py-2.5 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Saving...' : 'Save as Draft'}
+                    Save Draft
                   </button>
                   
                   <button
                     onClick={() => handleSave(false)}
                     disabled={saving}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-colors disabled:opacity-50"
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {saving ? 'Publishing...' : (isEditing ? 'Update Post' : 'Publish Post')}
+                    {isEditing ? 'Update Post' : 'Publish Post'}
                   </button>
-                </div>
-              </div>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
