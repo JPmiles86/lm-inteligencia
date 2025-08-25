@@ -1,7 +1,7 @@
-// Quill Rich Text Editor Component - Alternative to TinyMCE
+// Quill Rich Text Editor Component - Using react-quill-new for Quill 2.0 support
 import React, { useMemo, useRef } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { blogService } from '../../../services/blogService';
 
 interface QuillEditorProps {

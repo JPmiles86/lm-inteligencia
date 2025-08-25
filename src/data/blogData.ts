@@ -1,5 +1,26 @@
 // Sample blog data for the Inteligencia website
 
+// SEO Meta fields interface
+export interface SEOFields {
+  metaTitle?: string;         // Custom meta title (max 60 chars)
+  metaDescription?: string;   // Custom meta description (max 160 chars) 
+  keywords?: string[];        // SEO keywords array
+  ogImage?: string;          // Open Graph image URL
+  canonicalUrl?: string;     // Custom canonical URL
+}
+
+// Blog revision interface
+export interface BlogRevision {
+  id: string;
+  timestamp: Date;
+  content: string;
+  title: string;
+  excerpt?: string;
+  seoData?: SEOFields;
+  author?: string;
+  changeType: 'auto' | 'manual' | 'publish';
+}
+
 export interface BlogPost {
   id: number;
   title: string;
@@ -12,12 +33,23 @@ export interface BlogPost {
     image: string;
   };
   publishedDate: string | null;
-  published?: boolean; // New field to track publish status
+  published?: boolean; // Legacy field for backward compatibility
   readTime: number;
   category: string;
   tags: string[];
   featuredImage: string;
   featured: boolean;
+  
+  // New SEO fields
+  seo?: SEOFields;
+  
+  // New revision history
+  revisions?: BlogRevision[];
+  
+  // New scheduling fields
+  status?: 'draft' | 'scheduled' | 'published';
+  scheduledPublishDate?: Date;
+  timezone?: string;
 }
 
 export const blogCategories = [

@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { blogService, BlogFormData } from '../../../services/blogService';
-import { BlogPost } from '../../../data/blogData';
+import { BlogPost, SEOFields, BlogRevision } from '../../../data/blogData';
 import { QuillEditor } from './QuillEditor';
+import { SEOFieldsComponent } from './SEOFields';
+import { RevisionHistory } from './RevisionHistory';
+import { SchedulingFields } from './SchedulingFields';
 import { markdownToHtml, isMarkdown } from '../../../utils/markdownToHtml';
 
 interface EnhancedBlogEditorProps {
@@ -44,7 +47,16 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
       title: 'Founder & Digital Marketing Strategist',
       image: '/images/team/laurie-meiring.jpg'
     },
-    readTime: 5
+    readTime: 5,
+    seo: {
+      metaTitle: '',
+      metaDescription: '',
+      keywords: [],
+      ogImage: '',
+      canonicalUrl: ''
+    },
+    status: 'draft',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
   });
 
   const [isPreviewMode, setIsPreviewMode] = useState(false);
@@ -52,6 +64,17 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showRevisionHistory, setShowRevisionHistory] = useState(false);
+  
+  // Autosave state management
+  const [autoSaving, setAutoSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
+  const [showDraftRecovery, setShowDraftRecovery] = useState(false);
+  const [draftData, setDraftData] = useState<any>(null);
+  const autoSaveTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const lastFormDataRef = React.useRef<string>('');
   const [categories, setCategories] = useState<string[]>([
     'Hospitality Marketing',
     'Tech & AI Marketing',
@@ -131,7 +154,17 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           title: 'Founder & Digital Marketing Strategist',
           image: '/images/team/laurie-meiring.jpg'
         },
-        readTime: post.readTime || 5
+        readTime: post.readTime || 5,
+        seo: post.seo || {
+          metaTitle: '',
+          metaDescription: '',
+          keywords: [],
+          ogImage: '',
+          canonicalUrl: ''
+        },
+        status: post.status || (post.published ? 'published' : 'draft'),
+        scheduledPublishDate: post.scheduledPublishDate,
+        timezone: post.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
       });
     }
   }, [post]);
@@ -147,6 +180,33 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     }
   }, [formData.title, isEditing]);
 
+  // Note: useEffects for autosave will be added after the callback functions are defined
+
+  // Handle beforeunload warning for unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+
+  // Cleanup autosave timer on unmount
+  useEffect(() => {
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleInputChange = (field: keyof BlogFormData, value: BlogFormData[keyof BlogFormData]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
@@ -154,6 +214,199 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+    
+    // Mark as having unsaved changes
+    setHasUnsavedChanges(true);
+    setAutoSaveError(null);
+  };
+
+  const handleSeoDataChange = (seoData: SEOFields) => {
+    setFormData(prev => ({ ...prev, seo: seoData }));
+    setHasUnsavedChanges(true);
+    setAutoSaveError(null);
+  };
+
+  const handleStatusChange = (status: 'draft' | 'scheduled' | 'published') => {
+    setFormData(prev => ({ ...prev, status }));
+    setHasUnsavedChanges(true);
+    setAutoSaveError(null);
+  };
+
+  const handleScheduledDateChange = (scheduledPublishDate: Date | undefined) => {
+    setFormData(prev => ({ ...prev, scheduledPublishDate }));
+    setHasUnsavedChanges(true);
+    setAutoSaveError(null);
+  };
+
+  const handleTimezoneChange = (timezone: string) => {
+    setFormData(prev => ({ ...prev, timezone }));
+    setHasUnsavedChanges(true);
+    setAutoSaveError(null);
+  };
+
+  // Autosave functionality
+  const performAutoSave = React.useCallback(async () => {
+    if (!hasUnsavedChanges || autoSaving || saving) {
+      return;
+    }
+
+    // Don't autosave if form is invalid (except for required fields that might be filled later)
+    const criticalErrors = ['title', 'content'];
+    const hasCriticalErrors = criticalErrors.some(field => 
+      formData[field as keyof BlogFormData] === '' || 
+      formData[field as keyof BlogFormData] === undefined
+    );
+    
+    if (hasCriticalErrors) {
+      console.log('Skipping autosave - missing critical fields');
+      return;
+    }
+
+    setAutoSaving(true);
+    setAutoSaveError(null);
+
+    try {
+      if (isEditing && post) {
+        // Update existing post as draft
+        await blogService.updatePost(post.id, formData, true);
+      } else {
+        // Create new post as draft
+        const newPost = await blogService.createPost(formData, true);
+        // Update the post reference for future updates
+        if (newPost) {
+          setPost(newPost);
+        }
+      }
+      
+      setHasUnsavedChanges(false);
+      setLastSaved(new Date());
+      console.log('Autosave successful at', new Date().toLocaleTimeString());
+      
+    } catch (error) {
+      console.error('Autosave failed:', error);
+      setAutoSaveError(error instanceof Error ? error.message : 'Autosave failed');
+    } finally {
+      setAutoSaving(false);
+    }
+  }, [hasUnsavedChanges, autoSaving, saving, formData, isEditing, post]);
+
+  const resetAutoSaveTimer = React.useCallback(() => {
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+    
+    // Set new timer for 30 seconds
+    autoSaveTimerRef.current = setTimeout(() => {
+      performAutoSave();
+    }, 30000); // 30 seconds
+  }, [performAutoSave]);
+
+  const loadDraftFromStorage = React.useCallback(() => {
+    try {
+      const draftKey = `blog-draft-${postId || 'new'}`;
+      const savedDraft = localStorage.getItem(draftKey);
+      
+      if (savedDraft) {
+        const parsedDraft = JSON.parse(savedDraft);
+        const draftAge = Date.now() - parsedDraft.timestamp;
+        
+        // Only show recovery for drafts less than 24 hours old
+        if (draftAge < 24 * 60 * 60 * 1000) {
+          console.log('Found draft in localStorage');
+          setDraftData(parsedDraft);
+          setShowDraftRecovery(true);
+          return true;
+        } else {
+          // Remove old draft
+          localStorage.removeItem(draftKey);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load draft:', error);
+    }
+    return false;
+  }, [postId]);
+
+  const handleRecoverDraft = () => {
+    if (draftData) {
+      setFormData(draftData.formData);
+      setHasUnsavedChanges(true);
+      setShowDraftRecovery(false);
+      setDraftData(null);
+    }
+  };
+
+  const handleDiscardDraft = () => {
+    clearDraftFromStorage();
+    setShowDraftRecovery(false);
+    setDraftData(null);
+  };
+
+  const saveDraftToStorage = React.useCallback(() => {
+    try {
+      const draftKey = `blog-draft-${postId || 'new'}`;
+      const draftData = {
+        formData,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(draftKey, JSON.stringify(draftData));
+    } catch (error) {
+      console.error('Failed to save draft to localStorage:', error);
+    }
+  }, [formData, postId]);
+
+  const clearDraftFromStorage = React.useCallback(() => {
+    try {
+      const draftKey = `blog-draft-${postId || 'new'}`;
+      localStorage.removeItem(draftKey);
+    } catch (error) {
+      console.error('Failed to clear draft:', error);
+    }
+  }, [postId]);
+
+  // Autosave timer effect
+  useEffect(() => {
+    if (hasUnsavedChanges) {
+      resetAutoSaveTimer();
+    }
+    
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [hasUnsavedChanges, resetAutoSaveTimer]);
+
+  // Monitor form data changes for local storage backup
+  useEffect(() => {
+    const currentFormData = JSON.stringify(formData);
+    if (currentFormData !== lastFormDataRef.current && hasUnsavedChanges) {
+      lastFormDataRef.current = currentFormData;
+      saveDraftToStorage();
+    }
+  }, [formData, hasUnsavedChanges, saveDraftToStorage]);
+
+  // Load draft on component mount
+  useEffect(() => {
+    if (!isEditing) {
+      // Only load draft for new posts
+      const hasDraft = loadDraftFromStorage();
+      if (hasDraft) {
+        console.log('Draft recovery modal should show');
+      }
+    }
+  }, [isEditing, loadDraftFromStorage]);
+
+  const handleRestoreRevision = (revision: BlogRevision) => {
+    setFormData(prev => ({
+      ...prev,
+      title: revision.title,
+      content: revision.content,
+      excerpt: revision.excerpt || prev.excerpt,
+      seo: revision.seoData || prev.seo
+    }));
+    setShowRevisionHistory(false);
   };
 
   const handleImageUpload = async (file: File): Promise<string> => {
@@ -227,6 +480,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     }
 
     setSaving(true);
+    setAutoSaveError(null);
 
     try {
       let savedPost: BlogPost;
@@ -240,7 +494,14 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
         }
       } else {
         savedPost = await blogService.createPost(formData, isDraft);
+        // Update post reference for future autosaves
+        setPost(savedPost);
       }
+
+      // Clear unsaved changes and update save status
+      setHasUnsavedChanges(false);
+      setLastSaved(new Date());
+      clearDraftFromStorage();
 
       onSave(savedPost);
     } catch (error) {
@@ -670,6 +931,25 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           <p className="mt-1 text-sm text-red-600">{errors.content}</p>
         )}
       </div>
+
+      {/* SEO Fields */}
+      <SEOFieldsComponent
+        seoData={formData.seo || {}}
+        onSeoDataChange={handleSeoDataChange}
+        errors={errors}
+      />
+
+      {/* Scheduling Fields */}
+      <SchedulingFields
+        status={formData.status || 'draft'}
+        scheduledPublishDate={formData.scheduledPublishDate}
+        timezone={formData.timezone}
+        publishedDate={formData.publishedDate}
+        onStatusChange={handleStatusChange}
+        onScheduledDateChange={handleScheduledDateChange}
+        onTimezoneChange={handleTimezoneChange}
+        errors={errors}
+      />
     </div>
   );
 
@@ -686,8 +966,67 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
     );
   }
 
+  // Draft Recovery Modal
+  const DraftRecoveryModal = () => {
+    if (!showDraftRecovery || !draftData) return null;
+
+    const draftAge = Date.now() - draftData.timestamp;
+    const hoursAgo = Math.floor(draftAge / (1000 * 60 * 60));
+    const minutesAgo = Math.floor(draftAge / (1000 * 60));
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full m-4">
+          <div className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Recover Draft</h3>
+                <p className="text-sm text-gray-500">
+                  Found unsaved work from {hoursAgo > 0 ? `${hoursAgo} hours ago` : `${minutesAgo} minutes ago`}
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-gray-700 mb-2">
+                We found a draft with unsaved changes. Would you like to recover it?
+              </p>
+              {draftData.formData.title && (
+                <div className="bg-gray-50 p-3 rounded border">
+                  <p className="text-sm font-medium text-gray-900">Title:</p>
+                  <p className="text-sm text-gray-600 truncate">{draftData.formData.title}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleRecoverDraft}
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Recover Draft
+              </button>
+              <button
+                onClick={handleDiscardDraft}
+                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="relative h-full">
+      <DraftRecoveryModal />
       {/* Main Content Area with padding for sticky bar */}
       <div className="p-6 pb-24">
         <div className="max-w-6xl mx-auto">
@@ -701,6 +1040,19 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                 {isEditing ? 'Update your blog post' : 'Write and publish a new blog post'}
               </p>
             </div>
+            
+            {/* Revision History Button (only show when editing) */}
+            {isEditing && post?.revisions && post.revisions.length > 0 && (
+              <button
+                onClick={() => setShowRevisionHistory(true)}
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                View History ({post.revisions.length})
+              </button>
+            )}
           </div>
 
           {/* Content */}
@@ -731,8 +1083,34 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
                     <span className="inline-block w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></span>
                     Saving...
                   </span>
+                ) : autoSaving ? (
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
+                    Auto-saving...
+                  </span>
+                ) : autoSaveError ? (
+                  <span className="text-red-500 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Autosave failed
+                  </span>
+                ) : hasUnsavedChanges ? (
+                  <span className="text-amber-600 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Unsaved changes
+                  </span>
+                ) : lastSaved ? (
+                  <span className="text-green-600 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Saved {lastSaved.toLocaleTimeString()}
+                  </span>
                 ) : (
-                  isEditing ? `Last saved: ${new Date().toLocaleString()}` : 'Draft auto-saves'
+                  'Auto-save enabled'
                 )}
               </div>
             </div>
@@ -794,6 +1172,19 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Revision History Modal */}
+      {showRevisionHistory && post?.revisions && (
+        <RevisionHistory
+          revisions={post.revisions}
+          currentContent={formData.content}
+          currentTitle={formData.title}
+          currentExcerpt={formData.excerpt}
+          currentSeoData={formData.seo}
+          onRestoreRevision={handleRestoreRevision}
+          onClose={() => setShowRevisionHistory(false)}
+        />
+      )}
     </div>
   );
 };

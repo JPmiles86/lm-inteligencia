@@ -18,7 +18,7 @@ export const BlogList: React.FC<BlogListProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [viewMode, setViewMode] = useState<'published' | 'drafts' | 'all'>('published');
+  const [viewMode, setViewMode] = useState<'published' | 'drafts' | 'scheduled' | 'all'>('published');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'title' | 'category'>('newest');
   const [selectedPosts, setSelectedPosts] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,6 +76,9 @@ export const BlogList: React.FC<BlogListProps> = ({
         filters.published = true;
       } else if (viewMode === 'drafts') {
         filters.published = false;
+      } else if (viewMode === 'scheduled') {
+        // Filter for scheduled posts - this would need backend support
+        filters.status = 'scheduled';
       }
       // For 'all', don't set published filter
       
@@ -127,7 +130,7 @@ export const BlogList: React.FC<BlogListProps> = ({
     setSearchTimeout(timeout);
   };
 
-  const handleViewModeChange = (mode: 'published' | 'drafts' | 'all') => {
+  const handleViewModeChange = (mode: 'published' | 'drafts' | 'scheduled' | 'all') => {
     setViewMode(mode);
     setCurrentPage(1);
     setSelectedPosts([]);
@@ -232,6 +235,19 @@ export const BlogList: React.FC<BlogListProps> = ({
   };
 
   const getStatusBadge = (post: BlogPost) => {
+    // Use new status field if available, otherwise fall back to legacy logic
+    if (post.status) {
+      switch (post.status) {
+        case 'draft':
+          return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>;
+        case 'scheduled':
+          return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Scheduled</span>;
+        case 'published':
+          return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>;
+      }
+    }
+    
+    // Legacy logic for backward compatibility
     if (!post.published || !post.publishedDate) {
       return <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Draft</span>;
     }
@@ -308,7 +324,7 @@ export const BlogList: React.FC<BlogListProps> = ({
   return (
     <div className="p-6 space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -347,6 +363,20 @@ export const BlogList: React.FC<BlogListProps> = ({
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Drafts</p>
               <p className="text-2xl font-bold text-gray-900">{stats.draftPosts}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Scheduled</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.scheduledPosts || 0}</p>
             </div>
           </div>
         </div>
@@ -514,11 +544,12 @@ export const BlogList: React.FC<BlogListProps> = ({
               {[
                 { id: 'published', label: 'Published', count: stats.publishedPosts },
                 { id: 'drafts', label: 'Drafts', count: stats.draftPosts },
+                { id: 'scheduled', label: 'Scheduled', count: stats.scheduledPosts || 0 },
                 { id: 'all', label: 'All', count: stats.totalPosts }
               ].map((mode) => (
                 <button
                   key={mode.id}
-                  onClick={() => handleViewModeChange(mode.id as 'published' | 'drafts' | 'all')}
+                  onClick={() => handleViewModeChange(mode.id as 'published' | 'drafts' | 'scheduled' | 'all')}
                   disabled={loading}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 ${
                     viewMode === mode.id

@@ -1,6 +1,27 @@
 // Blog API Validation Schemas using Zod
 import { z } from 'zod';
 
+// SEO fields schema
+export const SEOFieldsSchema = z.object({
+  metaTitle: z.string().max(60, 'Meta title must be 60 characters or less').optional(),
+  metaDescription: z.string().max(160, 'Meta description must be 160 characters or less').optional(),
+  keywords: z.array(z.string()).optional(),
+  ogImage: z.string().url().optional(),
+  canonicalUrl: z.string().url().optional()
+});
+
+// Blog revision schema
+export const BlogRevisionSchema = z.object({
+  id: z.string(),
+  timestamp: z.date(),
+  content: z.string(),
+  title: z.string(),
+  excerpt: z.string().optional(),
+  seoData: SEOFieldsSchema.optional(),
+  author: z.string().optional(),
+  changeType: z.enum(['auto', 'manual', 'publish'])
+});
+
 // Base blog post schema
 export const BlogPostSchema = z.object({
   id: z.number().int().positive(),
@@ -20,7 +41,18 @@ export const BlogPostSchema = z.object({
   authorTitle: z.string().max(150, 'Author title must be less than 150 characters').nullable(),
   authorImage: z.string().url().nullable(),
   readTime: z.number().int().positive().default(5),
-  editorType: z.enum(['rich', 'block']).default('rich')
+  editorType: z.enum(['rich', 'block']).default('rich'),
+  
+  // New SEO fields
+  seo: SEOFieldsSchema.optional(),
+  
+  // New revision history
+  revisions: z.array(BlogRevisionSchema).optional(),
+  
+  // New scheduling fields
+  status: z.enum(['draft', 'scheduled', 'published']).default('draft'),
+  scheduledPublishDate: z.date().optional(),
+  timezone: z.string().optional()
 });
 
 // Schema for creating a new blog post
@@ -39,7 +71,15 @@ export const CreateBlogPostSchema = z.object({
   authorTitle: z.string().max(150, 'Author title must be less than 150 characters').optional(),
   authorImage: z.string().url().optional(),
   readTime: z.number().int().positive().optional(),
-  editorType: z.enum(['rich', 'block']).default('rich')
+  editorType: z.enum(['rich', 'block']).default('rich'),
+  
+  // New SEO fields
+  seo: SEOFieldsSchema.optional(),
+  
+  // New scheduling fields
+  status: z.enum(['draft', 'scheduled', 'published']).default('draft'),
+  scheduledPublishDate: z.date().optional(),
+  timezone: z.string().optional()
 });
 
 // Schema for updating a blog post
@@ -111,6 +151,8 @@ export const CategoriesSchema = z.array(z.string());
 export const TagsSchema = z.array(z.string());
 
 // Type exports for TypeScript
+export type SEOFields = z.infer<typeof SEOFieldsSchema>;
+export type BlogRevision = z.infer<typeof BlogRevisionSchema>;
 export type BlogPost = z.infer<typeof BlogPostSchema>;
 export type CreateBlogPost = z.infer<typeof CreateBlogPostSchema>;
 export type UpdateBlogPost = z.infer<typeof UpdateBlogPostSchema>;

@@ -21,6 +21,16 @@ export interface BlogFormData {
     image: string;
   };
   readTime: number;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+    ogImage?: string;
+    canonicalUrl?: string;
+  };
+  status?: 'draft' | 'scheduled' | 'published';
+  scheduledPublishDate?: Date;
+  timezone?: string;
 }
 
 // Extended interface for rich text editor
@@ -37,6 +47,7 @@ export interface BlogStats {
   totalPosts: number;
   publishedPosts: number;
   draftPosts: number;
+  scheduledPosts: number;
   featuredPosts: number;
   categoryCounts: Record<string, number>;
   tagCounts: Record<string, number>;
@@ -53,6 +64,7 @@ export interface BlogPostFilters {
   tags?: string[];
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  status?: 'draft' | 'scheduled' | 'published';
 }
 
 export interface PaginationInfo {
@@ -271,7 +283,6 @@ class BlogDatabaseService {
 
   // Convert form data to API format
   private formatPostForAPI(formData: BlogFormData): any {
-
     return {
       title: formData.title,
       slug: formData.slug || this.generateSlug(formData.title),
@@ -286,9 +297,33 @@ class BlogDatabaseService {
       authorName: formData.author.name,
       authorTitle: formData.author.title,
       authorImage: formData.author.image,
-      readTime: formData.readTime || this.calculateReadTime(processedContent),
-      editorType: formData.editorType || 'rich',
-      blocks: formData.blocks || []
+      readTime: formData.readTime || this.calculateReadTime(formData.content),
+      editorType: 'rich',
+      
+      // SEO fields
+      seo: formData.seo,
+      
+      // Scheduling fields
+      status: formData.status || 'draft',
+      scheduledPublishDate: formData.scheduledPublishDate ? formData.scheduledPublishDate.toISOString() : null,
+      timezone: formData.timezone,
+      
+      // Revision data (if this is an update)
+      createRevision: true
+    };
+  }
+
+  // Create a revision from current post state
+  private createRevision(post: BlogPost, changeType: 'auto' | 'manual' | 'publish'): any {
+    return {
+      id: `revision_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      content: post.content,
+      title: post.title,
+      excerpt: post.excerpt,
+      seoData: post.seo,
+      changeType,
+      author: post.author?.name || 'Unknown'
     };
   }
 
@@ -468,7 +503,7 @@ class BlogDatabaseService {
     }
   }
 
-  // Image upload to GCS
+  // Image upload to GCS (with fallback to base64)
   async uploadImage(file: File): Promise<string> {
     try {
       // Convert file to base64
@@ -481,6 +516,7 @@ class BlogDatabaseService {
       
       const base64Data = await base64Promise;
 
+      // Try to upload to GCS first via the enhanced endpoint
       const response = await fetch(`${API_BASE_URL}/upload/image`, {
         method: 'POST',
         headers: {
@@ -495,14 +531,22 @@ class BlogDatabaseService {
       }
 
       const result = await response.json();
-      return result.url || result.data?.publicUrl || base64Data;
+      
+      // Log whether we're using GCS or fallback
+      if (result.gcs) {
+        console.log('Image uploaded to GCS successfully:', result.fileName);
+      } else if (result.fallback) {
+        console.log('Using base64 fallback for image upload:', result.message);
+      }
+      
+      return result.url || result.publicUrl || base64Data;
     } catch (error) {
       console.error('Error uploading image:', error);
       throw error;
     }
   }
 
-  // Upload image for Quill editor
+  // Upload image for Quill editor (with GCS support and fallback)
   async uploadQuillImage(file: File): Promise<string> {
     try {
       // Convert file to base64
@@ -515,6 +559,7 @@ class BlogDatabaseService {
       
       const base64Data = await base64Promise;
 
+      // Try to upload to GCS first via the enhanced endpoint
       const response = await fetch(`${API_BASE_URL}/upload/quill-image`, {
         method: 'POST',
         headers: {
@@ -529,7 +574,15 @@ class BlogDatabaseService {
       }
 
       const result = await response.json();
-      return result.url;
+      
+      // Log whether we're using GCS or fallback
+      if (result.gcs) {
+        console.log('Quill image uploaded to GCS successfully:', result.fileName);
+      } else if (result.fallback) {
+        console.log('Using base64 fallback for Quill image upload:', result.message);
+      }
+      
+      return result.url || result.publicUrl || base64Data;
     } catch (error) {
       console.error('Error uploading Quill image:', error);
       throw error;
