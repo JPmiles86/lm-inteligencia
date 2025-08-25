@@ -8,6 +8,7 @@ import { ContentEditor } from './ContentEditor';
 import { BlogManagement } from './BlogManagement';
 import { AdminPanel } from './AdminPanel';
 import { Settings } from './Settings';
+import { ContentVisibilitySettings } from './shared/ContentVisibilitySettings';
 import type { IndustryType } from '../../types/Industry';
 import type { CSVImportResult } from '../../types/Content';
 import { ContentService } from '../../services/contentService';
@@ -245,6 +246,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
           </p>
         </div>
 
+        {/* Latest Blog Posts - Moved to top */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900">Latest Blog Posts</h2>
+            <button
+              onClick={() => setCurrentSection('blog')}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg"
+            >
+              📝 Create New Blog Post
+            </button>
+          </div>
+          <RecentBlogPosts 
+            onEditPost={(post) => {
+              setCurrentSection('blog');
+              // The BlogManagement component will handle the edit functionality
+            }}
+            onDeletePost={(postId) => {
+              // Post deleted, analytics will be refreshed on next render
+              console.log(`Post ${postId} deleted from dashboard`);
+            }}
+          />
+        </div>
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -305,26 +329,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Latest Blog Posts */}
+          {/* Content Visibility Settings */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Latest Blog Posts</h2>
-              <button
-                onClick={() => setCurrentSection('blog')}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg"
-              >
-                📝 Create New Blog Post
-              </button>
-            </div>
-            <RecentBlogPosts 
-              onEditPost={(post) => {
-                setCurrentSection('blog');
-                // The BlogManagement component will handle the edit functionality
-              }}
-              onDeletePost={(postId) => {
-                // Post deleted, analytics will be refreshed on next render
-                console.log(`Post ${postId} deleted from dashboard`);
-              }}
+            <ContentVisibilitySettings 
+              showSaveButton={true}
+              showTitle={true}
             />
           </div>
 
