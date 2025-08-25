@@ -441,4 +441,4 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
       {renderContent()}
     </AdminLayout>
   );
-};
+};// Force rebuild Mon Aug 25 07:58:23 CST 2025
