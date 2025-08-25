@@ -11,8 +11,8 @@ import { AdminAuth } from './components/admin/AdminAuth';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { BlogManagement } from './components/admin/BlogManagement';
 // import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
-import { AdminDashboard } from './components/admin/AdminDashboard';
-import { Settings } from './components/admin/Settings';
+import { AdminDashboard } from './components/admin/SimplifiedAdminDashboard';
+import { Settings } from './components/admin/SimplifiedSettings';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
@@ -38,9 +38,6 @@ const AdminRoutes: React.FC = () => {
     if (path.includes('/admin/blog')) {
       console.log('[AdminRoutes] Section determined: blog');
       return 'blog';
-    } else if (path.includes('/admin/customization')) {
-      console.log('[AdminRoutes] Section determined: customization');
-      return 'customization';
     } else if (path.includes('/admin/analytics')) {
       console.log('[AdminRoutes] Section determined: analytics');
       return 'analytics';
@@ -54,7 +51,7 @@ const AdminRoutes: React.FC = () => {
   }, [location.pathname]);
 
   // Handle section change using React Router navigate
-  const handleSectionChange = (section: 'dashboard' | 'blog' | 'customization' | 'analytics' | 'settings') => {
+  const handleSectionChange = (section: 'dashboard' | 'blog' | 'analytics' | 'settings') => {
     console.log('[AdminRoutes] SECTION CHANGE:', {
       from: currentSection,
       to: section,
@@ -77,8 +74,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="/blog" element={<BlogManagement />} />
         <Route path="/blog/new" element={<BlogManagement />} />
         <Route path="/blog/edit/:id" element={<BlogManagement />} />
-        <Route path="/customization" element={<div className="p-6">Site Customization - Coming Soon</div>} />
-        <Route path="/analytics" element={<div className="p-6">Analytics - Coming Soon</div>} />
+        <Route path="/analytics" element={<div className="p-6 text-center text-gray-500">Analytics - Coming Soon</div>} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/*" element={<AdminDashboard tenantId="hospitality" />} />
       </Routes>

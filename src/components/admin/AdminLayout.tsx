@@ -4,7 +4,7 @@ import React, { useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export type AdminSection = 'dashboard' | 'blog' | 'customization' | 'analytics' | 'settings';
+export type AdminSection = 'dashboard' | 'blog' | 'analytics' | 'settings';
 
 interface AdminLayoutProps {
   children: ReactNode;
