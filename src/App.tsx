@@ -12,6 +12,7 @@ import { AdminLayout } from './components/admin/AdminLayout';
 import { BlogManagement } from './components/admin/BlogManagement';
 // import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { Settings } from './components/admin/Settings';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
@@ -78,8 +79,8 @@ const AdminRoutes: React.FC = () => {
         <Route path="/blog/edit/:id" element={<BlogManagement />} />
         <Route path="/customization" element={<div className="p-6">Site Customization - Coming Soon</div>} />
         <Route path="/analytics" element={<div className="p-6">Analytics - Coming Soon</div>} />
-        <Route path="/settings" element={<div className="p-6">Settings - Coming Soon</div>} />
-        <Route path="/*" element={<AdminPanel />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/*" element={<AdminDashboard tenantId="hospitality" />} />
       </Routes>
     </AdminLayout>
   );
