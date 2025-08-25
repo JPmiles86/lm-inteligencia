@@ -5,6 +5,9 @@ import { BlogPost } from '../data/blogData';
 // Use relative URL for Vercel deployment
 const API_BASE_URL = import.meta.env.NODE_ENV === 'production' ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');
 
+// Use enhanced endpoints for new features
+const USE_ENHANCED_API = true;
+
 export interface BlogFormData {
   title: string;
   slug: string;
@@ -48,6 +51,20 @@ export interface BlogStats {
   publishedPosts: number;
   draftPosts: number;
   scheduledPosts: number;
+}
+
+export interface BlogRevision {
+  id: number;
+  postId: number;
+  revisionNumber: number;
+  title: string;
+  content: string;
+  excerpt?: string;
+  metaData?: any;
+  changeType: 'auto' | 'manual' | 'publish';
+  changeSummary?: string;
+  authorName?: string;
+  createdAt: string;
   featuredPosts: number;
   categoryCounts: Record<string, number>;
   tagCounts: Record<string, number>;
@@ -648,6 +665,128 @@ class BlogDatabaseService {
     const wordsPerMinute = 200;
     const wordCount = content.split(/\s+/).length;
     return Math.ceil(wordCount / wordsPerMinute);
+  }
+
+  // ============= ENHANCED METHODS FOR NEW FEATURES =============
+
+  // Autosave a draft
+  async autosavePost(id: number, content: string): Promise<boolean> {
+    try {
+      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      await this.apiCall(`${endpoint}?id=${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          draftContent: content,
+          autosave: true
+        }),
+      });
+      return true;
+    } catch (error) {
+      console.error('Error autosaving post:', error);
+      return false;
+    }
+  }
+
+  // Create post with enhanced fields (SEO, scheduling, etc.)
+  async createEnhancedPost(formData: BlogFormData): Promise<BlogPost> {
+    try {
+      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const postData = {
+        ...this.formatPostForAPI(formData),
+        seo: formData.seo,
+        status: formData.status || 'draft',
+        scheduledPublishDate: formData.scheduledPublishDate,
+        timezone: formData.timezone || 'America/New_York',
+        saveAsRevision: true
+      };
+
+      const newPost = await this.apiCall<BlogPost>(endpoint, {
+        method: 'POST',
+        body: JSON.stringify(postData),
+      });
+
+      return newPost;
+    } catch (error) {
+      console.error('Error creating enhanced post:', error);
+      throw error;
+    }
+  }
+
+  // Update post with enhanced fields
+  async updateEnhancedPost(id: number, formData: BlogFormData): Promise<BlogPost> {
+    try {
+      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const postData = {
+        ...this.formatPostForAPI(formData),
+        seo: formData.seo,
+        status: formData.status || 'draft',
+        scheduledPublishDate: formData.scheduledPublishDate,
+        timezone: formData.timezone || 'America/New_York',
+        saveAsRevision: true
+      };
+
+      const updatedPost = await this.apiCall<BlogPost>(`${endpoint}?id=${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(postData),
+      });
+
+      return updatedPost;
+    } catch (error) {
+      console.error('Error updating enhanced post:', error);
+      throw error;
+    }
+  }
+
+  // Get revisions for a post
+  async getRevisions(postId: number): Promise<BlogRevision[]> {
+    try {
+      const revisions = await this.apiCall<BlogRevision[]>(`/admin/blog/revisions?postId=${postId}`, {
+        method: 'GET',
+      });
+      return revisions || [];
+    } catch (error) {
+      console.error('Error fetching revisions:', error);
+      return [];
+    }
+  }
+
+  // Restore a revision
+  async restoreRevision(postId: number, revisionId: number): Promise<boolean> {
+    try {
+      await this.apiCall('/admin/blog/revisions', {
+        method: 'POST',
+        body: JSON.stringify({ postId, revisionId }),
+      });
+      return true;
+    } catch (error) {
+      console.error('Error restoring revision:', error);
+      return false;
+    }
+  }
+
+  // Get scheduled posts
+  async getScheduledPosts(): Promise<BlogPost[]> {
+    try {
+      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const response = await this.apiCall<BlogPostsResponse>(`${endpoint}?status=scheduled&limit=50`, {
+        method: 'GET',
+      });
+      return response.data || [];
+    } catch (error) {
+      console.error('Error fetching scheduled posts:', error);
+      return [];
+    }
+  }
+
+  // Recover draft
+  async recoverDraft(postId: number): Promise<string | null> {
+    try {
+      const post = await this.getPost(postId);
+      return post?.draftContent || null;
+    } catch (error) {
+      console.error('Error recovering draft:', error);
+      return null;
+    }
   }
 }
 
