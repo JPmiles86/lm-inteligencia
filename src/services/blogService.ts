@@ -174,9 +174,14 @@ class BlogDatabaseService {
 
       queryParams.append('action', 'posts');
       const endpoint = `/admin${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const response = await this.apiCall<unknown>(endpoint);
+      const response = await this.apiCall<any>(endpoint);
       
-      // The handleApiResponse now properly returns the full structure for paginated responses
+      // Check if response already has the correct structure
+      if (response.posts && response.pagination) {
+        return response;
+      }
+      
+      // Otherwise, handle the API response format
       return {
         posts: response.data || [],
         pagination: response.pagination || {
