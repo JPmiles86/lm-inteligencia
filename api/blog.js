@@ -20,11 +20,11 @@ export default async function handler(req, res) {
     if (slug) {
       // Get single post by slug
       req.query.slug = slug;
-      const slugHandler = await import('./blog/posts/slug/[slug].js');
+      const slugHandler = await import('../lib/api-handlers/blog-posts-folder/slug/[slug].js');
       return slugHandler.default(req, res);
     } else {
       // Get all posts
-      const postsHandler = await import('./blog/posts.js');
+      const postsHandler = await import('../lib/api-handlers/blog-posts.js');
       return postsHandler.default(req, res);
     }
   } catch (error) {

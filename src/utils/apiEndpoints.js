@@ -6,14 +6,14 @@ const API_BASE = process.env.NODE_ENV === 'production'
   : 'http://localhost:3000/api';
 
 export const API_ENDPOINTS = {
-  // Admin Blog endpoints - now consolidated
+  // Admin endpoints - now consolidated
   admin: {
-    posts: `${API_BASE}/admin/blog?action=posts`,
-    post: (id) => `${API_BASE}/admin/blog?action=post&id=${id}`,
-    categories: `${API_BASE}/admin/blog?action=categories`,
-    revisions: `${API_BASE}/admin/blog?action=revisions`,
-    stats: `${API_BASE}/admin/blog?action=stats`,
-    enhanced: `${API_BASE}/admin/blog?action=enhanced`,
+    posts: `${API_BASE}/admin?action=posts`,
+    post: (id) => `${API_BASE}/admin?action=post&id=${id}`,
+    categories: `${API_BASE}/admin?action=categories`,
+    revisions: `${API_BASE}/admin?action=revisions`,
+    stats: `${API_BASE}/admin?action=stats`,
+    enhanced: `${API_BASE}/admin?action=enhanced`,
   },
   
   // AI endpoints - now consolidated

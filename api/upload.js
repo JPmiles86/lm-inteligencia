@@ -35,23 +35,23 @@ export default async function handler(req, res) {
   }
 }
 
-// Import existing handlers
+// Import existing handlers from lib directory
 async function handleImage(req, res) {
-  const imageHandler = await import('./upload/image.js');
+  const imageHandler = await import('../lib/api-handlers/image.js');
   return imageHandler.default(req, res);
 }
 
 async function handleGcsImage(req, res) {
-  const gcsImageHandler = await import('./upload/gcs-image.js');
+  const gcsImageHandler = await import('../lib/api-handlers/gcs-image.js');
   return gcsImageHandler.default(req, res);
 }
 
 async function handleGcsDelete(req, res) {
-  const gcsDeleteHandler = await import('./upload/gcs-delete.js');
+  const gcsDeleteHandler = await import('../lib/api-handlers/gcs-delete.js');
   return gcsDeleteHandler.default(req, res);
 }
 
 async function handleQuillImage(req, res) {
-  const quillImageHandler = await import('./upload/quill-image.js');
+  const quillImageHandler = await import('../lib/api-handlers/quill-image.js');
   return quillImageHandler.default(req, res);
 }

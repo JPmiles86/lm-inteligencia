@@ -41,38 +41,38 @@ export default async function handler(req, res) {
   }
 }
 
-// Import existing handlers
+// Import existing handlers from lib directory
 async function handleGenerate(req, res) {
-  const generateHandler = await import('./ai/generate.js');
+  const generateHandler = await import('../lib/api-handlers/generate.js');
   return generateHandler.default(req, res);
 }
 
 async function handleProviders(req, res) {
-  const providersHandler = await import('./ai/providers.js');
+  const providersHandler = await import('../lib/api-handlers/providers.js');
   return providersHandler.default(req, res);
 }
 
 async function handleContext(req, res) {
-  const contextHandler = await import('./ai/context.js');
+  const contextHandler = await import('../lib/api-handlers/context.js');
   return contextHandler.default(req, res);
 }
 
 async function handleStyleGuides(req, res) {
-  const styleGuidesHandler = await import('./ai/style-guides.js');
+  const styleGuidesHandler = await import('../lib/api-handlers/style-guides.js');
   return styleGuidesHandler.default(req, res);
 }
 
 async function handleTree(req, res) {
-  const treeHandler = await import('./ai/tree.js');
+  const treeHandler = await import('../lib/api-handlers/tree.js');
   return treeHandler.default(req, res);
 }
 
 async function handleAnalytics(req, res) {
-  const analyticsHandler = await import('./ai/analytics.js');
+  const analyticsHandler = await import('../lib/api-handlers/analytics.js');
   return analyticsHandler.default(req, res);
 }
 
 async function handleImages(req, res) {
-  const imagesHandler = await import('./ai/images.js');
+  const imagesHandler = await import('../lib/api-handlers/images.js');
   return imagesHandler.default(req, res);
 }

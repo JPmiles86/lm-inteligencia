@@ -1,5 +1,5 @@
-// Consolidated Admin Blog API
-// Combines posts, categories, revisions, and stats into one endpoint
+// Consolidated Admin API
+// Combines all admin endpoints into one serverless function
 
 export default async function handler(req, res) {
   const { method, query, body } = req;
@@ -34,39 +34,39 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid action' });
     }
   } catch (error) {
-    console.error('Admin blog API error:', error);
+    console.error('Admin API error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
 
-// Import existing handlers
+// Import existing handlers from lib directory
 async function handlePosts(req, res) {
-  const postsHandler = await import('./blog/posts.js');
+  const postsHandler = await import('../lib/api-handlers/admin-blog/posts.js');
   return postsHandler.default(req, res);
 }
 
 async function handleSinglePost(req, res, id) {
   req.query.id = id;
-  const postHandler = await import('./blog/posts/[id].js');
+  const postHandler = await import('../lib/api-handlers/admin-blog/posts/[id].js');
   return postHandler.default(req, res);
 }
 
 async function handleCategories(req, res) {
-  const categoriesHandler = await import('./blog/categories.js');
+  const categoriesHandler = await import('../lib/api-handlers/admin-blog/categories.js');
   return categoriesHandler.default(req, res);
 }
 
 async function handleRevisions(req, res) {
-  const revisionsHandler = await import('./blog/revisions.js');
+  const revisionsHandler = await import('../lib/api-handlers/admin-blog/revisions.js');
   return revisionsHandler.default(req, res);
 }
 
 async function handleStats(req, res) {
-  const statsHandler = await import('./blog/stats.js');
+  const statsHandler = await import('../lib/api-handlers/admin-blog/stats.js');
   return statsHandler.default(req, res);
 }
 
 async function handleEnhancedPosts(req, res) {
-  const enhancedHandler = await import('./blog/posts-enhanced.js');
+  const enhancedHandler = await import('../lib/api-handlers/admin-blog/posts-enhanced.js');
   return enhancedHandler.default(req, res);
 }
