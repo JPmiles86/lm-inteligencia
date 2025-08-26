@@ -132,7 +132,8 @@ class BlogDatabaseService {
     
     const data = await response.json();
     // For blog post endpoints that return pagination, return the full structure
-    if (data.pagination && data.data) {
+    // The API returns { success: true, data: [...], pagination: {...} }
+    if (data.success && data.pagination && data.data) {
       return data as T;
     }
     // For other endpoints, return the data directly
@@ -413,10 +414,10 @@ class BlogDatabaseService {
   // Toggle published status
   async togglePublished(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=publish`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=publish`, {
         method: 'PATCH',
       });
-      return response.post;
+      return response.post || response.data;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
         return null;
@@ -429,10 +430,10 @@ class BlogDatabaseService {
   // Toggle featured status
   async toggleFeatured(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=feature`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=feature`, {
         method: 'PATCH',
       });
-      return response.post;
+      return response.post || response.data;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
         return null;

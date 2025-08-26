@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,PATCH,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (method === 'OPTIONS') {
@@ -151,18 +151,46 @@ export default async function handler(req, res) {
             success: true,
             data: post
           });
-        } else if (method === 'PUT') {
+        } else if (method === 'PUT' || method === 'PATCH') {
           // Update post
           if (operation === 'publish') {
             // Publish/unpublish post
-            const [updatedPost] = await db
-              .update(blogPosts)
-              .set({ 
-                published: body.published !== false,
-                publishedDate: body.published !== false ? new Date().toISOString() : null
-              })
-              .where(eq(blogPosts.id, parseInt(id)))
-              .returning();
+            if (method === 'PATCH') {
+              // For PATCH, toggle the current state
+              const [currentPost] = await db.select().from(blogPosts).where(eq(blogPosts.id, parseInt(id))).limit(1);
+              if (!currentPost) {
+                await pool.end();
+                return res.status(404).json({ error: 'Post not found' });
+              }
+              
+              const newPublishedState = !currentPost.published;
+              const [updatedPost] = await db
+                .update(blogPosts)
+                .set({ 
+                  published: newPublishedState,
+                  publishedDate: newPublishedState ? new Date().toISOString() : null
+                })
+                .where(eq(blogPosts.id, parseInt(id)))
+                .returning();
+                
+              await pool.end();
+              
+              return res.status(200).json({
+                success: true,
+                data: updatedPost,
+                post: updatedPost, // For backward compatibility with old frontend code
+                action: newPublishedState ? 'published' : 'unpublished'
+              });
+            } else {
+              // For PUT, use the provided state
+              const [updatedPost] = await db
+                .update(blogPosts)
+                .set({ 
+                  published: body.published !== false,
+                  publishedDate: body.published !== false ? new Date().toISOString() : null
+                })
+                .where(eq(blogPosts.id, parseInt(id)))
+                .returning();
               
             await pool.end();
             
@@ -171,13 +199,39 @@ export default async function handler(req, res) {
               data: updatedPost,
               action: body.published !== false ? 'published' : 'unpublished'
             });
+            }
           } else if (operation === 'feature') {
             // Feature/unfeature post
-            const [updatedPost] = await db
-              .update(blogPosts)
-              .set({ featured: body.featured !== false })
-              .where(eq(blogPosts.id, parseInt(id)))
-              .returning();
+            if (method === 'PATCH') {
+              // For PATCH, toggle the current state
+              const [currentPost] = await db.select().from(blogPosts).where(eq(blogPosts.id, parseInt(id))).limit(1);
+              if (!currentPost) {
+                await pool.end();
+                return res.status(404).json({ error: 'Post not found' });
+              }
+              
+              const newFeaturedState = !currentPost.featured;
+              const [updatedPost] = await db
+                .update(blogPosts)
+                .set({ featured: newFeaturedState })
+                .where(eq(blogPosts.id, parseInt(id)))
+                .returning();
+                
+              await pool.end();
+              
+              return res.status(200).json({
+                success: true,
+                data: updatedPost,
+                post: updatedPost, // For backward compatibility with old frontend code
+                action: newFeaturedState ? 'featured' : 'unfeatured'
+              });
+            } else {
+              // For PUT, use the provided state
+              const [updatedPost] = await db
+                .update(blogPosts)
+                .set({ featured: body.featured !== false })
+                .where(eq(blogPosts.id, parseInt(id)))
+                .returning();
               
             await pool.end();
             
@@ -186,6 +240,7 @@ export default async function handler(req, res) {
               data: updatedPost,
               action: body.featured !== false ? 'featured' : 'unfeatured'
             });
+            }
           } else {
             // Regular update
             const [updatedPost] = await db
