@@ -1,6 +1,6 @@
 // Blog Management - Main component that orchestrates blog management functionality
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BlogList } from './BlogList';

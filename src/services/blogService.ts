@@ -51,6 +51,10 @@ export interface BlogStats {
   publishedPosts: number;
   draftPosts: number;
   scheduledPosts: number;
+  featuredPosts: number;
+  categoryCounts: Record<string, number>;
+  tagCounts: Record<string, number>;
+  monthlyPublications: Record<string, number>;
 }
 
 export interface BlogRevision {
@@ -60,15 +64,11 @@ export interface BlogRevision {
   title: string;
   content: string;
   excerpt?: string;
-  metaData?: any;
+  metaData?: unknown;
   changeType: 'auto' | 'manual' | 'publish';
   changeSummary?: string;
   authorName?: string;
   createdAt: string;
-  featuredPosts: number;
-  categoryCounts: Record<string, number>;
-  tagCounts: Record<string, number>;
-  monthlyPublications: Record<string, number>;
 }
 
 export interface BlogPostFilters {
@@ -172,7 +172,7 @@ class BlogDatabaseService {
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
 
       const endpoint = `/admin/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const response = await this.apiCall<any>(endpoint);
+      const response = await this.apiCall<unknown>(endpoint);
       
       // The handleApiResponse now properly returns the full structure for paginated responses
       return {
@@ -208,7 +208,7 @@ class BlogDatabaseService {
       if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
 
       const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const response = await this.apiCall<any>(endpoint);
+      const response = await this.apiCall<unknown>(endpoint);
       
       // The handleApiResponse now properly returns the full structure for paginated responses
       return {
@@ -299,7 +299,7 @@ class BlogDatabaseService {
   }
 
   // Convert form data to API format
-  private formatPostForAPI(formData: BlogFormData): any {
+  private formatPostForAPI(formData: BlogFormData): unknown {
     return {
       title: formData.title,
       slug: formData.slug || this.generateSlug(formData.title),
@@ -331,7 +331,7 @@ class BlogDatabaseService {
   }
 
   // Create a revision from current post state
-  private createRevision(post: BlogPost, changeType: 'auto' | 'manual' | 'publish'): any {
+  private createRevision(post: BlogPost, changeType: 'auto' | 'manual' | 'publish'): unknown {
     return {
       id: `revision_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
@@ -771,7 +771,7 @@ class BlogDatabaseService {
       const response = await this.apiCall<BlogPostsResponse>(`${endpoint}?status=scheduled&limit=50`, {
         method: 'GET',
       });
-      return response.data || [];
+      return response.posts || [];
     } catch (error) {
       console.error('Error fetching scheduled posts:', error);
       return [];
@@ -781,7 +781,7 @@ class BlogDatabaseService {
   // Recover draft
   async recoverDraft(postId: number): Promise<string | null> {
     try {
-      const post = await this.getPost(postId);
+      const post = await this.getPostById(postId);
       return post?.draftContent || null;
     } catch (error) {
       console.error('Error recovering draft:', error);

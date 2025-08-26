@@ -1,0 +1,562 @@
+# AI Content Generation System - Test Pipeline
+# Comprehensive testing workflow for all test types
+
+name: Test Pipeline
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '18'
+  POSTGRES_DB: ai_content_test
+  POSTGRES_USER: test_user
+  POSTGRES_PASSWORD: test_password
+  DATABASE_URL: postgresql://test_user:test_password@localhost:5432/ai_content_test
+  
+jobs:
+  # Job 1: Setup and Cache Dependencies
+  setup:
+    name: Setup Dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      node-cache-hit: ${{ steps.cache-node.outputs.cache-hit }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Cache node modules
+        id: cache-node
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            
+      - name: Install dependencies
+        if: steps.cache-node.outputs.cache-hit != 'true'
+        run: npm ci
+        
+  # Job 2: Linting and Code Quality
+  lint:
+    name: Lint and Code Quality
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Run ESLint
+        run: npm run lint
+        
+      - name: Run TypeScript Check
+        run: npm run type-check
+        
+      - name: Check Prettier formatting
+        run: npm run format:check
+
+  # Job 3: Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        test-group: [repositories, services, components, providers]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Run unit tests for ${{ matrix.test-group }}
+        run: npm run test:unit -- --testPathPattern=${{ matrix.test-group }} --coverage --coverageReporters=lcov --coverageDirectory=coverage-${{ matrix.test-group }}
+        
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-${{ matrix.test-group }}/lcov.info
+          flags: unit-${{ matrix.test-group }}
+          name: unit-${{ matrix.test-group }}-coverage
+          
+  # Job 4: Integration Tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+          
+      - name: Run integration tests
+        run: npm run test:integration -- --coverage --coverageReporters=lcov --coverageDirectory=coverage-integration
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          NODE_ENV: test
+          
+      - name: Upload integration coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-integration/lcov.info
+          flags: integration
+          name: integration-coverage
+
+  # Job 5: API Tests
+  api-tests:
+    name: API Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+          
+      - name: Start test server
+        run: npm run dev:test &
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PORT: 3001
+          
+      - name: Wait for server to start
+        run: npx wait-on http://localhost:3001/health --timeout 60000
+        
+      - name: Run API tests
+        run: npm run test:api -- --coverage --coverageReporters=lcov --coverageDirectory=coverage-api
+        env:
+          API_BASE_URL: http://localhost:3001
+          
+      - name: Upload API coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage-api/lcov.info
+          flags: api
+          name: api-coverage
+
+  # Job 6: Security Tests
+  security-tests:
+    name: Security Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Run security tests
+        run: npm run test:security
+        
+      - name: Run npm audit
+        run: npm audit --audit-level high
+        
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+  # Job 7: End-to-End Tests
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [setup, unit-tests]
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+        
+      - name: Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+          
+      - name: Build application
+        run: npm run build
+        
+      - name: Start production server
+        run: npm run preview &
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PORT: 4173
+          
+      - name: Wait for server to start
+        run: npx wait-on http://localhost:4173 --timeout 60000
+        
+      - name: Run E2E tests on ${{ matrix.browser }}
+        run: npx playwright test --project=${{ matrix.browser }}
+        env:
+          BASE_URL: http://localhost:4173
+          
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-results-${{ matrix.browser }}
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  # Job 8: Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [setup, integration-tests]
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        if: needs.setup.outputs.node-cache-hit != 'true'
+        run: npm ci
+        
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          
+      - name: Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+          
+      - name: Build and start application
+        run: |
+          npm run build
+          npm run preview &
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          PORT: 4173
+          
+      - name: Wait for server to start
+        run: npx wait-on http://localhost:4173 --timeout 60000
+        
+      - name: Run performance tests - Light Load
+        run: k6 run tests/performance/load-test.js
+        env:
+          API_BASE_URL: http://localhost:4173
+          SCENARIO: light_load
+          
+      - name: Run performance tests - Medium Load
+        run: k6 run tests/performance/load-test.js
+        env:
+          API_BASE_URL: http://localhost:4173
+          SCENARIO: medium_load
+          
+      - name: Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results
+          path: |
+            k6-results/
+          retention-days: 7
+
+  # Job 9: Coverage Consolidation and Quality Gates
+  quality-gates:
+    name: Quality Gates and Coverage
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, integration-tests, api-tests, security-tests]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Restore node modules cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate consolidated coverage report
+        run: npm run test:coverage:consolidated
+        
+      - name: Check coverage thresholds
+        run: npm run coverage:check
+        
+      - name: Upload consolidated coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: consolidated
+          name: consolidated-coverage
+          
+      - name: Generate coverage badge
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          
+      - name: Quality Gate - Coverage Check
+        run: |
+          COVERAGE=$(npm run coverage:percentage --silent)
+          echo "Current coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "Coverage $COVERAGE% is below 90% threshold"
+            exit 1
+          fi
+          echo "Coverage threshold passed: $COVERAGE%"
+
+  # Job 10: Documentation and Reporting
+  documentation:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: [quality-gates, e2e-tests, performance-tests]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate test documentation
+        run: npm run docs:generate
+        
+      - name: Generate API documentation
+        run: npm run docs:api
+        
+      - name: Deploy documentation to GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/generated
+
+  # Job 11: Notification and Reporting
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [quality-gates, e2e-tests, performance-tests, documentation]
+    if: always()
+    steps:
+      - name: Notify Slack on Success
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: '✅ AI Content Generation System - All tests passed successfully!'
+          SLACK_TITLE: 'Test Pipeline Success'
+          SLACK_COLOR: good
+          
+      - name: Notify Slack on Failure
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: '❌ AI Content Generation System - Test pipeline failed. Check the logs for details.'
+          SLACK_TITLE: 'Test Pipeline Failure'
+          SLACK_COLOR: danger

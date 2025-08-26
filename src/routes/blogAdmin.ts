@@ -61,7 +61,7 @@ router.get('/posts', asyncHandler(async (req: AuthenticatedRequest, res: Respons
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching admin posts:', error);
     return sendError(res, 'Failed to fetch blog posts');
@@ -90,7 +90,7 @@ router.get('/posts/:id', asyncHandler(async (req: AuthenticatedRequest, res: Res
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching post by ID:', error);
     return sendError(res, 'Failed to fetch blog post');
@@ -119,7 +119,7 @@ router.get('/posts/slug/:slug', asyncHandler(async (req: AuthenticatedRequest, r
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching post by slug:', error);
     return sendError(res, 'Failed to fetch blog post');
@@ -144,7 +144,7 @@ router.post('/posts', asyncHandler(async (req: AuthenticatedRequest, res: Respon
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error creating post:', error);
     return sendError(res, 'Failed to create blog post');
@@ -176,7 +176,7 @@ router.put('/posts/:id', asyncHandler(async (req: AuthenticatedRequest, res: Res
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error updating post:', error);
     return sendError(res, 'Failed to update blog post');
@@ -202,7 +202,7 @@ router.delete('/posts/:id', asyncHandler(async (req: AuthenticatedRequest, res: 
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error deleting post:', error);
     return sendError(res, 'Failed to delete blog post');
@@ -234,7 +234,7 @@ router.patch('/posts/:id/publish', asyncHandler(async (req: AuthenticatedRequest
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error toggling publish status:', error);
     return sendError(res, 'Failed to update publish status');
@@ -266,7 +266,7 @@ router.patch('/posts/:id/feature', asyncHandler(async (req: AuthenticatedRequest
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error toggling feature status:', error);
     return sendError(res, 'Failed to update feature status');
@@ -339,7 +339,7 @@ router.get('/drafts', asyncHandler(async (req: AuthenticatedRequest, res: Respon
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching drafts:', error);
     return sendError(res, 'Failed to fetch draft posts');
@@ -367,7 +367,7 @@ router.get('/published', asyncHandler(async (req: AuthenticatedRequest, res: Res
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching published posts:', error);
     return sendError(res, 'Failed to fetch published posts');
@@ -393,18 +393,18 @@ router.post('/posts/:id/duplicate', asyncHandler(async (req: AuthenticatedReques
     const duplicateData = {
       title: `${originalPost.title} (Copy)`,
       slug: `${originalPost.slug}-copy`,
-      excerpt: originalPost.excerpt,
+      excerpt: originalPost.excerpt || undefined,
       content: originalPost.content,
-      featuredImage: originalPost.featuredImage,
+      featuredImage: originalPost.featuredImage || undefined,
       category: originalPost.category,
       tags: originalPost.tags || [],
       featured: false, // Don't duplicate featured status
       published: false, // Always create as draft
       authorName: originalPost.authorName,
-      authorTitle: originalPost.authorTitle,
-      authorImage: originalPost.authorImage,
-      readTime: originalPost.readTime,
-      editorType: originalPost.editorType
+      authorTitle: originalPost.authorTitle || undefined,
+      authorImage: originalPost.authorImage || undefined,
+      readTime: originalPost.readTime || undefined,
+      editorType: 'rich' as 'rich' | 'block'
     };
 
     // Create duplicate post
@@ -417,7 +417,7 @@ router.post('/posts/:id/duplicate', asyncHandler(async (req: AuthenticatedReques
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error duplicating post:', error);
     return sendError(res, 'Failed to duplicate blog post');

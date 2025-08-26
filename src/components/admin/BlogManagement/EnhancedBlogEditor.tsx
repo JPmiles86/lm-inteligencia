@@ -1,7 +1,7 @@
 // Enhanced Blog Editor Component - Rich Text Editor
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom'; - not currently used
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost, SEOFields, BlogRevision } from '../../../data/blogData';
 import { QuillEditor } from './QuillEditor';
@@ -72,7 +72,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
   const [showDraftRecovery, setShowDraftRecovery] = useState(false);
-  const [draftData, setDraftData] = useState<any>(null);
+  const [draftData, setDraftData] = useState<unknown>(null);
   const autoSaveTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const lastFormDataRef = React.useRef<string>('');
   const [categories, setCategories] = useState<string[]>([

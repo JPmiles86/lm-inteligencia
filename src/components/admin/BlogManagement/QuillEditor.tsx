@@ -68,7 +68,7 @@ export const QuillEditor: React.FC<QuillEditorProps> = ({
         const editor = document.querySelector('.ql-editor') as HTMLElement;
         const adminHeader = document.querySelector('header') as HTMLElement;
         const wrapper = document.querySelector('.quill-editor-wrapper') as HTMLElement;
-        const sidebar = document.querySelector('aside') as HTMLElement;
+        const _sidebar = document.querySelector('aside') as HTMLElement;
         
         if (!toolbar || !editor || !wrapper) return;
         

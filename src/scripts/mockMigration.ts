@@ -146,9 +146,9 @@ class MockMigration {
     await new Promise(resolve => setTimeout(resolve, 50));
     
     // Update post with mock GCS URLs
-    let updatedContent = processedPost.content;
-    let featuredImage = processedPost.featuredImage;
-    let authorImage = processedPost.authorImage;
+    const updatedContent = processedPost.content;
+    const featuredImage = processedPost.featuredImage;
+    const authorImage = processedPost.authorImage;
     
     // In reality, we'd replace URLs in content with actual GCS URLs
     // For simulation, we just document the mapping

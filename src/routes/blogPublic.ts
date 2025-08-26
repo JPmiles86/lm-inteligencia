@@ -52,7 +52,7 @@ router.get('/posts', asyncHandler(async (req: Request, res: Response) => {
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching published posts:', error);
     return sendError(res, 'Failed to fetch blog posts');
@@ -81,7 +81,7 @@ router.get('/posts/:slug', asyncHandler(async (req: Request, res: Response) => {
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error fetching post by slug:', error);
     return sendError(res, 'Failed to fetch blog post');
@@ -198,7 +198,7 @@ router.get('/search', asyncHandler(async (req: Request, res: Response) => {
 
   } catch (error) {
     if (error instanceof ZodError) {
-      return sendValidationError(res, error.errors);
+      return sendValidationError(res, error.issues);
     }
     console.error('Error searching posts:', error);
     return sendError(res, 'Failed to search blog posts');

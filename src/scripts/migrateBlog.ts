@@ -20,7 +20,7 @@ interface MigrationResult {
   success: boolean;
   postId?: number;
   originalPostId: number;
-  imageResults: any[];
+  imageResults: unknown[];
   error?: string;
 }
 
@@ -206,7 +206,7 @@ class BlogMigration {
         failedCount++;
         this.logger.logError({
           type: 'post',
-          postId: sourcePost.id,
+          postId: sourcePost.id.toString(),
           message: error instanceof Error ? error.message : String(error),
           timestamp: new Date()
         });
@@ -371,7 +371,7 @@ ${imageReport}
   /**
    * Get migration summary
    */
-  getMigrationSummary(): any {
+  getMigrationSummary(): unknown {
     const stats = this.logger.getStats();
     const imageProgress = this.imageProcessor.getProgress();
     

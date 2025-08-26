@@ -1,0 +1,449 @@
+# AI Content Generation System - Security Scanning Pipeline
+# Regular security scans and vulnerability assessments
+
+name: Security Scan
+
+on:
+  schedule:
+    # Run security scans daily at 1 AM UTC
+    - cron: '0 1 * * *'
+    # Run comprehensive security audit weekly on Saturdays at 2 AM UTC
+    - cron: '0 2 * * 6'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'package*.json'
+      - 'src/**'
+      - 'api/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Dependency Security Scan
+  dependency-scan:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run npm audit
+        run: npm audit --audit-level moderate --json > npm-audit-results.json
+        continue-on-error: true
+        
+      - name: Process npm audit results
+        run: |
+          if [ -s npm-audit-results.json ]; then
+            echo "npm audit found vulnerabilities:"
+            cat npm-audit-results.json | jq '.vulnerabilities | length'
+            cat npm-audit-results.json | jq -r '.vulnerabilities | to_entries[] | select(.value.severity == "high" or .value.severity == "critical") | "\(.key): \(.value.severity)"'
+          fi
+          
+      - name: Snyk vulnerability scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --json-file-output=snyk-results.json
+          
+      - name: Upload dependency scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-scan-results
+          path: |
+            npm-audit-results.json
+            snyk-results.json
+          retention-days: 30
+
+  # Job 2: Code Security Analysis
+  code-security:
+    name: Code Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run ESLint security rules
+        run: npx eslint . --ext .js,.ts,.tsx --format json --output-file eslint-security-results.json || true
+        
+      - name: Install and run semgrep
+        run: |
+          python3 -m pip install semgrep
+          semgrep --config=auto --json --output=semgrep-results.json src/ api/ || true
+          
+      - name: CodeQL Analysis
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+          
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+        
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          upload: true
+          
+      - name: Upload code security results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-security-results
+          path: |
+            eslint-security-results.json
+            semgrep-results.json
+          retention-days: 30
+
+  # Job 3: API Security Testing
+  api-security:
+    name: API Security Testing
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: ai_content_security_test
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Setup test database
+        run: |
+          npm run db:migrate:test
+          npm run db:seed:test
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/ai_content_security_test
+          
+      - name: Start test server
+        run: npm run dev:test &
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/ai_content_security_test
+          PORT: 3001
+          
+      - name: Wait for server to start
+        run: npx wait-on http://localhost:3001/health --timeout 60000
+        
+      - name: Run security-focused API tests
+        run: npm run test:security
+        env:
+          API_BASE_URL: http://localhost:3001
+          
+      - name: Install OWASP ZAP
+        run: |
+          wget -q https://github.com/zaproxy/zaproxy/releases/download/v2.12.0/ZAP_2.12.0_Linux.tar.gz
+          tar -xzf ZAP_2.12.0_Linux.tar.gz
+          sudo mv ZAP_2.12.0 /opt/zaproxy
+          
+      - name: Run OWASP ZAP baseline scan
+        run: |
+          /opt/zaproxy/zap.sh -cmd -quickurl http://localhost:3001 -quickout zap-baseline-report.json -quickprogress
+          
+      - name: Run OWASP ZAP API scan
+        run: |
+          /opt/zaproxy/zap.sh -cmd -quickurl http://localhost:3001/api -quickout zap-api-report.json -quickprogress
+          
+      - name: Upload API security results
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-security-results
+          path: |
+            zap-baseline-report.json
+            zap-api-report.json
+          retention-days: 30
+
+  # Job 4: Infrastructure Security Scan
+  infrastructure-security:
+    name: Infrastructure Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
+          
+      - name: Scan filesystem for secrets
+        run: |
+          trivy fs --security-checks secret --format json --output trivy-secrets-results.json .
+          
+      - name: Scan for infrastructure misconfigurations
+        run: |
+          trivy fs --security-checks config --format json --output trivy-config-results.json .
+          
+      - name: Docker security scan (if Dockerfile exists)
+        if: hashFiles('**/Dockerfile') != ''
+        run: |
+          trivy image --format json --output trivy-docker-results.json $(docker build -q .)
+          
+      - name: Upload infrastructure security results
+        uses: actions/upload-artifact@v3
+        with:
+          name: infrastructure-security-results
+          path: |
+            trivy-*.json
+          retention-days: 30
+
+  # Job 5: Secrets Detection
+  secrets-detection:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Install GitLeaks
+        run: |
+          wget -q https://github.com/zricethezav/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+          
+      - name: Run GitLeaks scan
+        run: |
+          gitleaks detect --source . --report-format json --report-path gitleaks-results.json || true
+          
+      - name: Install TruffleHog
+        run: |
+          wget -q https://github.com/trufflesecurity/trufflehog/releases/download/v3.63.2/trufflehog_3.63.2_linux_amd64.tar.gz
+          tar -xzf trufflehog_3.63.2_linux_amd64.tar.gz
+          sudo mv trufflehog /usr/local/bin/
+          
+      - name: Run TruffleHog scan
+        run: |
+          trufflehog filesystem . --json > trufflehog-results.json || true
+          
+      - name: Upload secrets detection results
+        uses: actions/upload-artifact@v3
+        with:
+          name: secrets-detection-results
+          path: |
+            gitleaks-results.json
+            trufflehog-results.json
+          retention-days: 30
+
+  # Job 6: Container Security (if using containers)
+  container-security:
+    name: Container Security
+    runs-on: ubuntu-latest
+    if: hashFiles('**/Dockerfile') != ''
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Build Docker image
+        run: docker build -t ai-content-app:security-test .
+        
+      - name: Run Trivy container scan
+        run: |
+          trivy image --format json --output trivy-container-results.json ai-content-app:security-test
+          
+      - name: Run Grype vulnerability scanner
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          grype ai-content-app:security-test -o json > grype-results.json
+          
+      - name: Upload container security results
+        uses: actions/upload-artifact@v3
+        with:
+          name: container-security-results
+          path: |
+            trivy-container-results.json
+            grype-results.json
+          retention-days: 30
+
+  # Job 7: Security Report Consolidation
+  security-report:
+    name: Security Report Consolidation
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, code-security, api-security, infrastructure-security, secrets-detection, container-security]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Download all security scan results
+        uses: actions/download-artifact@v3
+        with:
+          path: security-artifacts/
+          
+      - name: Generate consolidated security report
+        run: |
+          echo "Generating consolidated security report..."
+          node scripts/generate-security-report.js security-artifacts/
+          
+      - name: Upload consolidated security report
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report-${{ github.run_number }}
+          path: |
+            security-report.html
+            security-summary.json
+          retention-days: 90
+
+  # Job 8: Security Alerts and Notifications
+  security-alerts:
+    name: Security Alerts
+    runs-on: ubuntu-latest
+    needs: security-report
+    if: always()
+    steps:
+      - name: Download security report
+        uses: actions/download-artifact@v3
+        with:
+          name: security-report-${{ github.run_number }}
+          
+      - name: Check security thresholds
+        id: check-security
+        run: |
+          echo "Checking security thresholds..."
+          
+          CRITICAL_COUNT=$(node -e "
+            const fs = require('fs');
+            try {
+              const summary = JSON.parse(fs.readFileSync('security-summary.json', 'utf8'));
+              console.log(summary.critical_vulnerabilities || 0);
+            } catch (e) {
+              console.log(0);
+            }
+          ")
+          
+          HIGH_COUNT=$(node -e "
+            const fs = require('fs');
+            try {
+              const summary = JSON.parse(fs.readFileSync('security-summary.json', 'utf8'));
+              console.log(summary.high_vulnerabilities || 0);
+            } catch (e) {
+              console.log(0);
+            }
+          ")
+          
+          echo "critical-count=$CRITICAL_COUNT" >> $GITHUB_OUTPUT
+          echo "high-count=$HIGH_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "security-alert=critical" >> $GITHUB_OUTPUT
+          elif [ "$HIGH_COUNT" -gt 5 ]; then
+            echo "security-alert=high" >> $GITHUB_OUTPUT
+          else
+            echo "security-alert=none" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Send critical security alert
+        if: steps.check-security.outputs.security-alert == 'critical'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            🚨 CRITICAL Security Alert - AI Content Generation System
+            
+            Critical Vulnerabilities: ${{ steps.check-security.outputs.critical-count }}
+            High Vulnerabilities: ${{ steps.check-security.outputs.high-count }}
+            
+            IMMEDIATE ACTION REQUIRED!
+            Critical vulnerabilities detected that require immediate attention.
+          SLACK_TITLE: 'CRITICAL Security Alert'
+          SLACK_COLOR: danger
+          
+      - name: Send high security alert
+        if: steps.check-security.outputs.security-alert == 'high'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            ⚠️ Security Alert - AI Content Generation System
+            
+            Critical Vulnerabilities: ${{ steps.check-security.outputs.critical-count }}
+            High Vulnerabilities: ${{ steps.check-security.outputs.high-count }}
+            
+            Multiple high-severity vulnerabilities detected.
+            Please review and address security findings.
+          SLACK_TITLE: 'Security Alert'
+          SLACK_COLOR: warning
+          
+      - name: Send security summary
+        if: steps.check-security.outputs.security-alert == 'none'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            🔒 Security Scan Complete - AI Content Generation System
+            
+            Critical Vulnerabilities: ${{ steps.check-security.outputs.critical-count }}
+            High Vulnerabilities: ${{ steps.check-security.outputs.high-count }}
+            
+            Security posture within acceptable parameters.
+          SLACK_TITLE: 'Security Scan Summary'
+          SLACK_COLOR: good
+
+  # Job 9: Update Security Dashboard (if you have one)
+  update-security-dashboard:
+    name: Update Security Dashboard
+    runs-on: ubuntu-latest
+    needs: security-report
+    if: github.event.schedule # Only run on scheduled scans
+    steps:
+      - name: Download security report
+        uses: actions/download-artifact@v3
+        with:
+          name: security-report-${{ github.run_number }}
+          
+      - name: Update security metrics
+        run: |
+          echo "Updating security dashboard with latest scan results..."
+          # This would typically update a security dashboard or metrics system
+          # with the latest security scan results for trend analysis
+          
+      - name: Store security history
+        run: |
+          echo "Storing security scan history..."
+          # Store historical security data for trend analysis

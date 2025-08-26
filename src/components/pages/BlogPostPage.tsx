@@ -275,7 +275,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <img
-                  src={post.author.image}
+                  src={post.author.image || '/images/default-author.jpg'}
                   alt={post.author.name}
                   className="w-16 h-16 rounded-full object-cover"
                 />
@@ -346,7 +346,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
       {/* Featured Image */}
       <div className="aspect-video max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <img
-          src={post.featuredImage}
+          src={post.featuredImage || '/images/default-blog.jpg'}
           alt={post.title}
           className="w-full h-full object-cover rounded-2xl shadow-lg"
         />
@@ -392,7 +392,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
           >
             <div className="flex items-start gap-6">
               <img
-                src={post.author.image}
+                src={post.author.image || '/images/default-author.jpg'}
                 alt={post.author.name}
                 className="w-24 h-24 rounded-full object-cover flex-shrink-0"
               />
@@ -452,7 +452,7 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug: propSlug }) =>
                   <Link to={`${industryPath}/blog/${relatedPost.slug}`}>
                     <div className="aspect-video overflow-hidden">
                       <img
-                        src={relatedPost.featuredImage}
+                        src={relatedPost.featuredImage || '/images/default-blog.jpg'}
                         alt={relatedPost.title}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />

@@ -117,7 +117,7 @@ export const resizeImageToFit = (base64: string, maxWidth: number, maxHeight: nu
     }
 
     img.onload = () => {
-      let { width, height } = img;
+      const { width, height } = img;
       
       // Calculate scaling factor
       const scaleX = maxWidth / width;

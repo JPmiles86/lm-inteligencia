@@ -1,8 +1,14 @@
-// Simplified Settings Page Component - Content Visibility Only
-import React from 'react';
+// Simplified Settings Page Component - Content Visibility and AI Configuration
+import React, { useState } from 'react';
 import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
+import { AIConfiguration } from './Settings/AIConfiguration';
+import { Settings as SettingsIcon, Brain, Eye } from 'lucide-react';
+
+type SettingsTab = 'content' | 'ai';
 
 export const Settings: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<SettingsTab>('content');
+  
   const handleSettingsSave = (newSettings: AdminSettings) => {
     localStorage.setItem('admin_settings', JSON.stringify(newSettings));
     console.log('[Settings] Settings saved:', newSettings);
@@ -20,16 +26,82 @@ export const Settings: React.FC = () => {
     setTimeout(() => notification.remove(), 3000);
   };
 
+  const tabs = [
+    {
+      id: 'content' as SettingsTab,
+      label: 'Content Visibility',
+      icon: Eye,
+      description: 'Manage what content appears on your website'
+    },
+    {
+      id: 'ai' as SettingsTab,
+      label: 'AI Configuration',
+      icon: Brain,
+      description: 'Configure AI providers and API keys'
+    }
+  ];
+
   return (
     <div className="p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Content Visibility Settings */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-          <ContentVisibilitySettings 
-            onSave={handleSettingsSave}
-            showSaveButton={true}
-            showTitle={true}
-          />
+      <div className="max-w-6xl mx-auto">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center space-x-3">
+            <SettingsIcon className="w-8 h-8 text-blue-600" />
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+              <p className="text-gray-600">Manage your application settings and configuration</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === tab.id
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+          <div className="mt-2">
+            <p className="text-sm text-gray-600">
+              {tabs.find(tab => tab.id === activeTab)?.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+          {activeTab === 'content' && (
+            <div className="p-6">
+              <ContentVisibilitySettings 
+                onSave={handleSettingsSave}
+                showSaveButton={true}
+                showTitle={true}
+              />
+            </div>
+          )}
+          
+          {activeTab === 'ai' && (
+            <div className="p-6">
+              <AIConfiguration />
+            </div>
+          )}
         </div>
       </div>
     </div>

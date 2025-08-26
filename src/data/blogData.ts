@@ -50,6 +50,12 @@ export interface BlogPost {
   status?: 'draft' | 'scheduled' | 'published';
   scheduledPublishDate?: Date;
   timezone?: string;
+  
+  // Editor type field
+  editorType?: 'rich' | 'block';
+  
+  // Draft content for autosave
+  draftContent?: string;
 }
 
 export const blogCategories = [

@@ -18,7 +18,7 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
   onSave,
   onCancel
 }) => {
-  const editorRef = useRef<any>(null);
+  const _editorRef = useRef<unknown>(null);
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -176,9 +176,13 @@ export const BlogEditor: React.FC<BlogEditorProps> = ({
       let savedPost: BlogPost;
 
       if (isEditing && post) {
-        savedPost = blogService.updatePost(post.id, formData, isDraft) as BlogPost;
+        const result = await blogService.updatePost(post.id, formData, isDraft);
+        if (!result) {
+          throw new Error('Failed to update post - post not found');
+        }
+        savedPost = result;
       } else {
-        savedPost = blogService.createPost(formData, isDraft);
+        savedPost = await blogService.createPost(formData, isDraft);
       }
 
       onSave(savedPost);

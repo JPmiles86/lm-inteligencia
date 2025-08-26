@@ -1,0 +1,403 @@
+# AI Content Generation System - Performance Monitoring
+# Scheduled performance tests and monitoring
+
+name: Performance Monitoring
+
+on:
+  schedule:
+    # Run performance tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+    # Run stress tests weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch: # Allow manual triggering
+    inputs:
+      test_type:
+        description: 'Type of performance test'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+        - standard
+        - stress
+        - extended
+        - spike
+      environment:
+        description: 'Environment to test'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Setup Performance Testing
+  setup:
+    name: Setup Performance Testing
+    runs-on: ubuntu-latest
+    outputs:
+      test-type: ${{ steps.determine-test.outputs.test-type }}
+      environment: ${{ steps.determine-test.outputs.environment }}
+      base-url: ${{ steps.determine-test.outputs.base-url }}
+    steps:
+      - name: Determine test configuration
+        id: determine-test
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "test-type=${{ github.event.inputs.test_type }}" >> $GITHUB_OUTPUT
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" == "0 2 * * *" ]; then
+            echo "test-type=standard" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" == "0 3 * * 0" ]; then
+            echo "test-type=stress" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          else
+            echo "test-type=standard" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          fi
+          
+          # Set base URL based on environment
+          if [ "${{ steps.determine-test.outputs.environment || 'staging' }}" == "production" ]; then
+            echo "base-url=${{ secrets.PRODUCTION_URL }}" >> $GITHUB_OUTPUT
+          else
+            echo "base-url=${{ secrets.STAGING_URL }}" >> $GITHUB_OUTPUT
+          fi
+
+  # Job 2: API Performance Tests
+  api-performance:
+    name: API Performance Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+          
+      - name: Run standard performance tests
+        if: needs.setup.outputs.test-type == 'standard'
+        run: |
+          echo "Running standard performance tests..."
+          k6 run tests/performance/load-test.js --out json=results-light.json
+          k6 run tests/performance/load-test.js --out json=results-medium.json
+        env:
+          API_BASE_URL: ${{ needs.setup.outputs.base-url }}
+          SCENARIO: light_load
+          
+      - name: Run stress tests
+        if: needs.setup.outputs.test-type == 'stress'
+        run: |
+          echo "Running stress tests..."
+          k6 run tests/performance/load-test.js --out json=results-stress.json
+          k6 run tests/performance/load-test.js --out json=results-spike.json
+        env:
+          API_BASE_URL: ${{ needs.setup.outputs.base-url }}
+          SCENARIO: stress_test
+          
+      - name: Run extended tests
+        if: needs.setup.outputs.test-type == 'extended'
+        run: |
+          echo "Running extended performance tests..."
+          k6 run tests/performance/load-test.js --out json=results-soak.json
+        env:
+          API_BASE_URL: ${{ needs.setup.outputs.base-url }}
+          SCENARIO: soak_test
+          
+      - name: Run spike tests
+        if: needs.setup.outputs.test-type == 'spike'
+        run: |
+          echo "Running spike tests..."
+          k6 run tests/performance/load-test.js --out json=results-spike.json
+        env:
+          API_BASE_URL: ${{ needs.setup.outputs.base-url }}
+          SCENARIO: spike_test
+          
+      - name: Upload performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-results-${{ needs.setup.outputs.test-type }}-${{ github.run_number }}
+          path: |
+            results-*.json
+            k6-summary.json
+          retention-days: 30
+
+  # Job 3: Frontend Performance Tests
+  frontend-performance:
+    name: Frontend Performance Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Lighthouse CLI
+        run: npm install -g @lhci/cli
+        
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+        
+      - name: Run Lighthouse performance audit
+        run: |
+          lhci autorun \
+            --url="${{ needs.setup.outputs.base-url }}" \
+            --url="${{ needs.setup.outputs.base-url }}/hospitality" \
+            --url="${{ needs.setup.outputs.base-url }}/healthcare" \
+            --url="${{ needs.setup.outputs.base-url }}/tech" \
+            --url="${{ needs.setup.outputs.base-url }}/athletics" \
+            --collect.numberOfRuns=3 \
+            --assert.assertions.performance=0.8 \
+            --assert.assertions.accessibility=0.9 \
+            --assert.assertions.best-practices=0.8 \
+            --assert.assertions.seo=0.8
+            
+      - name: Run Core Web Vitals tests
+        run: npx playwright test core-web-vitals
+        env:
+          BASE_URL: ${{ needs.setup.outputs.base-url }}
+          
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-results-${{ github.run_number }}
+          path: |
+            .lighthouseci/
+            test-results/
+          retention-days: 30
+
+  # Job 4: Database Performance Monitoring
+  database-performance:
+    name: Database Performance Monitoring
+    runs-on: ubuntu-latest
+    needs: setup
+    if: needs.setup.outputs.environment == 'staging' # Only run on staging
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run database performance queries
+        run: npm run test:db:performance
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          
+      - name: Analyze query performance
+        run: |
+          echo "Analyzing database query performance..."
+          npm run db:analyze-performance
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          
+      - name: Upload database performance results
+        uses: actions/upload-artifact@v3
+        with:
+          name: database-performance-${{ github.run_number }}
+          path: |
+            db-performance-results.json
+          retention-days: 30
+
+  # Job 5: Memory and Resource Monitoring
+  resource-monitoring:
+    name: Memory and Resource Monitoring
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install clinic.js for Node.js monitoring
+        run: npm install -g clinic
+        
+      - name: Run memory leak tests
+        run: npm run test:memory
+        
+      - name: Monitor resource usage during load
+        run: |
+          # This would run resource monitoring during load tests
+          echo "Monitoring resource usage..."
+          # clinic doctor -- npm run test:performance:resource
+          
+      - name: Upload resource monitoring results
+        uses: actions/upload-artifact@v3
+        with:
+          name: resource-monitoring-${{ github.run_number }}
+          path: |
+            .clinic/
+            memory-usage-*.json
+          retention-days: 30
+
+  # Job 6: Performance Analysis and Reporting
+  performance-analysis:
+    name: Performance Analysis and Reporting
+    runs-on: ubuntu-latest
+    needs: [setup, api-performance, frontend-performance, database-performance, resource-monitoring]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Download all performance artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: performance-artifacts/
+          
+      - name: Generate performance report
+        run: |
+          echo "Generating comprehensive performance report..."
+          node scripts/generate-performance-report.js performance-artifacts/
+          
+      - name: Upload consolidated performance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report-${{ github.run_number }}
+          path: |
+            performance-report.html
+            performance-summary.json
+          retention-days: 90
+
+  # Job 7: Performance Alerts and Notifications
+  performance-alerts:
+    name: Performance Alerts
+    runs-on: ubuntu-latest
+    needs: [setup, performance-analysis]
+    if: always()
+    steps:
+      - name: Download performance report
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report-${{ github.run_number }}
+          
+      - name: Check performance thresholds
+        id: check-thresholds
+        run: |
+          echo "Checking performance thresholds..."
+          
+          # Parse performance results and check thresholds
+          PERFORMANCE_SCORE=$(node -e "
+            const fs = require('fs');
+            try {
+              const summary = JSON.parse(fs.readFileSync('performance-summary.json', 'utf8'));
+              console.log(summary.overall_score || 0);
+            } catch (e) {
+              console.log(0);
+            }
+          ")
+          
+          echo "performance-score=$PERFORMANCE_SCORE" >> $GITHUB_OUTPUT
+          
+          if (( $(echo "$PERFORMANCE_SCORE < 0.8" | bc -l) )); then
+            echo "performance-alert=true" >> $GITHUB_OUTPUT
+            echo "Performance score $PERFORMANCE_SCORE is below 0.8 threshold"
+          else
+            echo "performance-alert=false" >> $GITHUB_OUTPUT
+            echo "Performance score $PERFORMANCE_SCORE meets threshold"
+          fi
+          
+      - name: Send performance alert
+        if: steps.check-thresholds.outputs.performance-alert == 'true'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            ⚠️ Performance Alert - AI Content Generation System
+            
+            Environment: ${{ needs.setup.outputs.environment }}
+            Test Type: ${{ needs.setup.outputs.test-type }}
+            Performance Score: ${{ steps.check-thresholds.outputs.performance-score }}
+            
+            Performance has degraded below acceptable thresholds.
+            Please review the performance report for details.
+          SLACK_TITLE: 'Performance Alert'
+          SLACK_COLOR: warning
+          
+      - name: Send performance summary
+        if: steps.check-thresholds.outputs.performance-alert == 'false'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: |
+            📊 Performance Monitoring Complete - AI Content Generation System
+            
+            Environment: ${{ needs.setup.outputs.environment }}
+            Test Type: ${{ needs.setup.outputs.test-type }}
+            Performance Score: ${{ steps.check-thresholds.outputs.performance-score }}
+            
+            All performance metrics within acceptable ranges.
+          SLACK_TITLE: 'Performance Summary'
+          SLACK_COLOR: good
+
+  # Job 8: Performance Trend Analysis
+  trend-analysis:
+    name: Performance Trend Analysis
+    runs-on: ubuntu-latest
+    needs: [setup, performance-analysis]
+    if: github.event.schedule # Only run on scheduled tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download performance report
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report-${{ github.run_number }}
+          
+      - name: Update performance history
+        run: |
+          echo "Updating performance history database..."
+          # This would typically store results in a time-series database
+          # for trend analysis and historical reporting
+          
+      - name: Generate trend report
+        run: |
+          echo "Generating performance trend analysis..."
+          # Analysis of performance trends over time
+          
+      - name: Check for performance degradation trends
+        run: |
+          echo "Checking for performance degradation trends..."
+          # Alert if performance has been consistently degrading

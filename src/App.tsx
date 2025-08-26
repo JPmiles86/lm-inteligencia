@@ -6,7 +6,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaApp';
 
 // Admin Components
-import { AdminPanel } from './components/admin/AdminPanel';
 import { AdminAuth } from './components/admin/AdminAuth';
 import { AdminLayout } from './components/admin/AdminLayout';
 import { BlogManagement } from './components/admin/BlogManagement';

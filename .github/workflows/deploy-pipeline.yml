@@ -1,0 +1,306 @@
+# AI Content Generation System - Deployment Pipeline
+# Handles deployment after successful testing
+
+name: Deploy Pipeline
+
+on:
+  workflow_run:
+    workflows: ["Test Pipeline"]
+    types: [completed]
+    branches: [main, develop]
+  workflow_dispatch: # Allow manual deployment
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Pre-deployment Checks
+  pre-deploy-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    outputs:
+      deploy-environment: ${{ steps.determine-env.outputs.environment }}
+      should-deploy: ${{ steps.determine-env.outputs.should-deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Determine deployment environment
+        id: determine-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" == "refs/heads/develop" ]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "should-deploy=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-deploy=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Verify test pipeline success
+        if: github.event_name == 'workflow_run'
+        run: |
+          if [ "${{ github.event.workflow_run.conclusion }}" != "success" ]; then
+            echo "Test pipeline failed. Cannot deploy."
+            exit 1
+          fi
+
+  # Job 2: Build Application
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    if: needs.pre-deploy-checks.outputs.should-deploy == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_API_BASE_URL: ${{ needs.pre-deploy-checks.outputs.deploy-environment == 'production' && secrets.PRODUCTION_API_URL || secrets.STAGING_API_URL }}
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ needs.pre-deploy-checks.outputs.deploy-environment }}
+          path: |
+            dist/
+            package.json
+            package-lock.json
+          retention-days: 7
+
+  # Job 3: Database Migration (if needed)
+  migrate-database:
+    name: Database Migration
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, build]
+    if: needs.pre-deploy-checks.outputs.should-deploy == 'true'
+    environment: ${{ needs.pre-deploy-checks.outputs.deploy-environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run database migrations
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          
+      - name: Verify migration success
+        run: npm run db:status
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  # Job 4: Deploy to Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, build, migrate-database]
+    if: needs.pre-deploy-checks.outputs.deploy-environment == 'staging'
+    environment: staging
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-staging
+          
+      - name: Deploy to Vercel Staging
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prebuilt'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+          
+      - name: Update staging environment variables
+        run: |
+          npx vercel env rm DATABASE_URL staging --yes --token ${{ secrets.VERCEL_TOKEN }}
+          npx vercel env add DATABASE_URL staging --token ${{ secrets.VERCEL_TOKEN }} <<< "${{ secrets.STAGING_DATABASE_URL }}"
+
+  # Job 5: Deploy to Production
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, build, migrate-database]
+    if: needs.pre-deploy-checks.outputs.deploy-environment == 'production'
+    environment: production
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-production
+          
+      - name: Deploy to Vercel Production
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--prebuilt --prod'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+          
+      - name: Update production environment variables
+        run: |
+          npx vercel env rm DATABASE_URL production --yes --token ${{ secrets.VERCEL_TOKEN }}
+          npx vercel env add DATABASE_URL production --token ${{ secrets.VERCEL_TOKEN }} <<< "${{ secrets.PRODUCTION_DATABASE_URL }}"
+
+  # Job 6: Post-deployment Tests
+  post-deploy-tests:
+    name: Post-deployment Tests
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+        
+      - name: Run smoke tests against deployed environment
+        run: npx playwright test smoke
+        env:
+          BASE_URL: ${{ needs.pre-deploy-checks.outputs.deploy-environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}
+          
+      - name: Run API health checks
+        run: |
+          DEPLOY_URL="${{ needs.pre-deploy-checks.outputs.deploy-environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}"
+          
+          echo "Testing API health at: $DEPLOY_URL"
+          
+          # Health check
+          curl -f "$DEPLOY_URL/health" || exit 1
+          
+          # API responsiveness check
+          curl -f "$DEPLOY_URL/api/ai/providers" || exit 1
+          
+          echo "Post-deployment tests passed!"
+
+  # Job 7: Performance Monitoring Setup
+  setup-monitoring:
+    name: Setup Performance Monitoring
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    steps:
+      - name: Setup monitoring alerts
+        run: |
+          # This would typically integrate with your monitoring service
+          # For example: Datadog, New Relic, or custom monitoring
+          echo "Setting up monitoring for ${{ needs.pre-deploy-checks.outputs.deploy-environment }}"
+          
+      - name: Create deployment marker
+        run: |
+          DEPLOY_URL="${{ needs.pre-deploy-checks.outputs.deploy-environment == 'production' && secrets.PRODUCTION_URL || secrets.STAGING_URL }}"
+          echo "Deployment completed: $DEPLOY_URL"
+          echo "Commit: ${{ github.sha }}"
+          echo "Environment: ${{ needs.pre-deploy-checks.outputs.deploy-environment }}"
+
+  # Job 8: Rollback Capability
+  setup-rollback:
+    name: Setup Rollback Capability
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, post-deploy-tests]
+    if: always() && needs.post-deploy-tests.result == 'failure'
+    steps:
+      - name: Prepare rollback
+        run: |
+          echo "Post-deployment tests failed. Preparing rollback..."
+          # This would typically trigger a rollback to the previous version
+          # Implementation depends on your deployment strategy
+          
+      - name: Notify team of rollback need
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: '⚠️ Deployment to ${{ needs.pre-deploy-checks.outputs.deploy-environment }} failed post-deployment tests. Manual rollback may be needed.'
+          SLACK_TITLE: 'Deployment Issue'
+          SLACK_COLOR: warning
+
+  # Job 9: Success Notification
+  notify-success:
+    name: Notify Deployment Success
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, post-deploy-tests, setup-monitoring]
+    if: success()
+    steps:
+      - name: Notify successful deployment
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: '🚀 AI Content Generation System successfully deployed to ${{ needs.pre-deploy-checks.outputs.deploy-environment }}!'
+          SLACK_TITLE: 'Deployment Success'
+          SLACK_COLOR: good
+          
+      - name: Create GitHub release (production only)
+        if: needs.pre-deploy-checks.outputs.deploy-environment == 'production'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Production Release v${{ github.run_number }}
+          body: |
+            Production deployment of AI Content Generation System
+            
+            Commit: ${{ github.sha }}
+            Date: ${{ github.event.head_commit.timestamp }}
+            
+            ## Changes
+            ${{ github.event.head_commit.message }}
+            
+            ## Test Coverage
+            All test suites passed with required coverage thresholds.
+            
+            ## Deployment
+            Successfully deployed to production environment.
+          draft: false
+          prerelease: false

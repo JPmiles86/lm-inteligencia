@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { LogOut, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
 
 export const AdminPanel: React.FC = () => {
   console.log('[AdminPanel] AdminPanel component mounting/rendering');
-  const navigate = useNavigate();
 
   const handleSettingsSave = (newSettings: AdminSettings) => {
     localStorage.setItem('admin_settings', JSON.stringify(newSettings));

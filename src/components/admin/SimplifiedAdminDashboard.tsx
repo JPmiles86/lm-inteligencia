@@ -9,7 +9,7 @@ interface AdminDashboardProps {
   tenantId: string;
 }
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({ /* tenantId */ }) => {
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,7 +42,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
     });
   };
 
-  const getStatusBadge = (post: any) => {
+  const getStatusBadge = (post: unknown) => {
     if (post.status === 'scheduled') {
       return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Scheduled</span>;
     }
@@ -52,7 +52,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ tenantId }) => {
     return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>;
   };
 
-  const handleEditPost = (post: any) => {
+  const handleEditPost = (post: unknown) => {
     window.location.href = `/admin/blog/edit/${post.id}`;
   };
 

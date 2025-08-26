@@ -1,6 +1,6 @@
 // Blog List Component - Displays and manages all blog posts and drafts
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { blogService, BlogPostFilters, BlogPostsResponse } from '../../../services/blogService';
 import { BlogPost } from '../../../data/blogData';
@@ -36,6 +36,7 @@ export const BlogList: React.FC<BlogListProps> = ({
     totalPosts: 0,
     publishedPosts: 0,
     draftPosts: 0,
+    scheduledPosts: 0,
     featuredPosts: 0,
     categoryCounts: {} as Record<string, number>,
     tagCounts: {} as Record<string, number>,
@@ -268,7 +269,7 @@ export const BlogList: React.FC<BlogListProps> = ({
     const pages = [];
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
     
     // Adjust start if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {

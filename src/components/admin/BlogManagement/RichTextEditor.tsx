@@ -4,10 +4,10 @@
 import React from 'react';
 
 interface RichTextEditorProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-export const RichTextEditor: React.FC<RichTextEditorProps> = (props) => {
+export const RichTextEditor: React.FC<RichTextEditorProps> = () => {
   return (
     <div className="p-8 bg-red-50 border border-red-200 rounded-lg">
       <h3 className="text-red-800 font-semibold text-lg mb-2">Component Deprecated</h3>

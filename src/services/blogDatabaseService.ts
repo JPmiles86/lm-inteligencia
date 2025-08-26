@@ -30,8 +30,8 @@ export interface BlogPostsResult {
 
 export interface BlogPostCreateData {
   title: string;
-  slug: string;
-  excerpt: string;
+  slug?: string;
+  excerpt?: string;
   content: string;
   featuredImage?: string;
   category: string;
@@ -44,6 +44,17 @@ export interface BlogPostCreateData {
   authorImage?: string;
   readTime?: number;
   editorType?: 'rich' | 'block';
+  // New scheduling and SEO fields
+  status?: 'draft' | 'scheduled' | 'published';
+  scheduledPublishDate?: Date;
+  timezone?: string;
+  seo?: {
+    metaTitle?: string;
+    metaDescription?: string;
+    keywords?: string[];
+    ogImage?: string;
+    canonicalUrl?: string;
+  };
 }
 
 export interface BlogPostUpdateData extends Partial<BlogPostCreateData> {
@@ -288,7 +299,7 @@ class BlogDatabaseService {
 
       const newPost: NewBlogPost = {
         title: data.title,
-        slug: await this.ensureUniqueSlug(data.slug),
+        slug: await this.ensureUniqueSlug(data.slug || this.generateSlug(data.title)),
         excerpt: data.excerpt,
         content: data.content,
         featuredImage: data.featuredImage || null,
@@ -300,8 +311,7 @@ class BlogDatabaseService {
         authorName: data.authorName,
         authorTitle: data.authorTitle || null,
         authorImage: data.authorImage || null,
-        readTime: data.readTime,
-        editorType: data.editorType || 'rich'
+        readTime: data.readTime
       };
 
       const result = await db
@@ -491,14 +501,16 @@ class BlogDatabaseService {
         totalResult,
         publishedResult,
         draftResult,
-        featuredResult
+        featuredResult,
+        scheduledResult
       ] = await Promise.all([
         db.select({ count: count() }).from(blogPosts),
         db.select({ count: count() }).from(blogPosts).where(eq(blogPosts.published, true)),
         db.select({ count: count() }).from(blogPosts).where(eq(blogPosts.published, false)),
         db.select({ count: count() }).from(blogPosts).where(
           and(eq(blogPosts.published, true), eq(blogPosts.featured, true))
-        )
+        ),
+        db.select({ count: count() }).from(blogPosts).where(eq(blogPosts.status, 'scheduled'))
       ]);
 
       // Get category counts for published posts
@@ -516,12 +528,54 @@ class BlogDatabaseService {
         return acc;
       }, {} as Record<string, number>);
 
+      // Get tag counts for published posts
+      const publishedPosts = await db
+        .select({ tags: blogPosts.tags })
+        .from(blogPosts)
+        .where(eq(blogPosts.published, true));
+
+      const tagCounts: Record<string, number> = {};
+      publishedPosts.forEach(post => {
+        if (post.tags && Array.isArray(post.tags)) {
+          post.tags.forEach(tag => {
+            if (typeof tag === 'string') {
+              tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            }
+          });
+        }
+      });
+
+      // Get monthly publication counts
+      const monthlyResults = await db
+        .select({ 
+          publishedDate: blogPosts.publishedDate,
+          count: count() 
+        })
+        .from(blogPosts)
+        .where(eq(blogPosts.published, true))
+        .groupBy(blogPosts.publishedDate);
+
+      const monthlyPublications: Record<string, number> = {};
+      monthlyResults.forEach(row => {
+        if (row.publishedDate) {
+          // Extract year-month from published date
+          const date = new Date(row.publishedDate);
+          if (!isNaN(date.getTime())) {
+            const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+            monthlyPublications[yearMonth] = (monthlyPublications[yearMonth] || 0) + row.count;
+          }
+        }
+      });
+
       return {
         totalPosts: totalResult[0]?.count || 0,
         publishedPosts: publishedResult[0]?.count || 0,
         draftPosts: draftResult[0]?.count || 0,
+        scheduledPosts: scheduledResult[0]?.count || 0,
         featuredPosts: featuredResult[0]?.count || 0,
-        categoryCounts
+        categoryCounts,
+        tagCounts,
+        monthlyPublications
       };
     } catch (error) {
       console.error('Error fetching stats:', error);

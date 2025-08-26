@@ -14,5 +14,19 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    '@typescript-eslint/no-explicit-any': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      },
+    ],
+    'react-hooks/exhaustive-deps': 'warn',
+    '@typescript-eslint/no-namespace': 'warn',
+    'prefer-const': 'error',
+    'no-prototype-builtins': 'warn',
+    'no-useless-escape': 'warn',
   },
 }

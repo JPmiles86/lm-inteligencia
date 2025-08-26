@@ -12,7 +12,7 @@ import { AboutPage } from '../pages/AboutPage';
 import { ContactPage } from '../pages/ContactPage';
 import { CaseStudiesPage } from '../pages/CaseStudiesPage';
 import { BlogRedirect } from './BlogRedirect';
-import { AdminDashboard } from '../admin/AdminDashboard';
+import AdminDashboard from '../admin/SimplifiedAdminDashboard';
 import { NotFoundPage } from '../layout/ErrorPage';
 
 interface IndustryRoutesProps {
