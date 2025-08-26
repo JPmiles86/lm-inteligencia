@@ -60,7 +60,7 @@ export default async function handler(req, res) {
           limit = '10',
           page = '1',
           featured,
-          sortBy = 'publishedAt',
+          sortBy = 'publishedDate',
           sortOrder = 'desc'
         } = query;
 
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
 
         // Add sorting
         if (sortOrder === 'desc') {
-          queryBuilder = queryBuilder.orderBy(desc(blogPosts[sortBy] || blogPosts.publishedAt));
+          queryBuilder = queryBuilder.orderBy(desc(blogPosts[sortBy] || blogPosts.publishedDate));
         }
 
         // Add pagination
