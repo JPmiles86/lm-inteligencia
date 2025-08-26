@@ -67,7 +67,7 @@ export const BlogListingPage: React.FC = () => {
     const fetchBlogPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/blog/posts?published=true');
+        const response = await fetch('/api/blog?published=true');
         
         if (!response.ok) {
           throw new Error(`Failed to fetch blog posts: ${response.status}`);

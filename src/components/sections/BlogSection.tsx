@@ -43,7 +43,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
           : (import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || '');
         
         // First try to get featured posts
-        const featuredResponse = await fetch(`${apiBaseUrl}/api/blog/posts?featured=true&limit=3`);
+        const featuredResponse = await fetch(`${apiBaseUrl}/api/blog?featured=true&limit=3`);
         
         if (featuredResponse.ok) {
           const featuredData = await featuredResponse.json();
@@ -55,7 +55,7 @@ export const BlogSection: React.FC<BlogSectionProps> = ({ industryPath }) => {
         }
         
         // If not enough featured posts, get the most recent posts
-        const recentResponse = await fetch(`${apiBaseUrl}/api/blog/posts?limit=3&published=true`);
+        const recentResponse = await fetch(`${apiBaseUrl}/api/blog?limit=3&published=true`);
         if (recentResponse.ok) {
           const recentData = await recentResponse.json();
           setDisplayPosts(recentData.data || []);

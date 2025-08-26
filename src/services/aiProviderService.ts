@@ -29,12 +29,12 @@ export interface ProviderUsage {
 }
 
 class AIProviderService {
-  private baseURL = '/api/ai/providers';
+  private baseURL = '/api/ai?action=providers';
 
   // Get all configured providers
   async getProviders(): Promise<ProviderInfo[]> {
     try {
-      const response = await fetch(`${this.baseURL}?action=list`);
+      const response = await fetch(`${this.baseURL}&operation=list`);
       const data = await response.json();
       
       if (!data.success) {
@@ -117,7 +117,7 @@ class AIProviderService {
   // Update API key for a provider
   async updateApiKey(provider: string, apiKey: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseURL}?provider=${provider}`, {
+      const response = await fetch(`${this.baseURL}&provider=${provider}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +142,7 @@ class AIProviderService {
   // Delete provider configuration
   async deleteProvider(provider: string): Promise<void> {
     try {
-      const response = await fetch(`${this.baseURL}?provider=${provider}`, {
+      const response = await fetch(`${this.baseURL}&provider=${provider}`, {
         method: 'DELETE'
       });
 
