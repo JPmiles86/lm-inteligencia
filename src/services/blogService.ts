@@ -171,7 +171,8 @@ class BlogDatabaseService {
       if (filters.sortBy) queryParams.append('sortBy', filters.sortBy);
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
 
-      const endpoint = `/admin/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      queryParams.append('action', 'posts');
+      const endpoint = `/admin${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<unknown>(endpoint);
       
       // The handleApiResponse now properly returns the full structure for paginated responses
@@ -245,7 +246,7 @@ class BlogDatabaseService {
     });
     
     try {
-      const post = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}`);
+      const post = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}`);
       console.log('[blogService] getPostById SUCCESS:', {
         id: id,
         post: post,
@@ -273,7 +274,7 @@ class BlogDatabaseService {
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      const post = await this.apiCall<BlogPost>(`/admin/blog/posts/slug/${slug}`);
+      const post = await this.apiCall<BlogPost>(`/admin?action=post&slug=${slug}`);
       return post;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
@@ -355,7 +356,7 @@ class BlogDatabaseService {
         postData.publishedAt = null;
       }
 
-      const newPost = await this.apiCall<BlogPost>('/admin/blog/posts', {
+      const newPost = await this.apiCall<BlogPost>('/admin?action=posts', {
         method: 'POST',
         body: JSON.stringify(postData),
       });
@@ -378,7 +379,7 @@ class BlogDatabaseService {
         postData.publishedAt = null;
       }
 
-      const updatedPost = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}`, {
+      const updatedPost = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}`, {
         method: 'PUT',
         body: JSON.stringify(postData),
       });
@@ -396,7 +397,7 @@ class BlogDatabaseService {
   // Delete a blog post
   async deletePost(id: number): Promise<boolean> {
     try {
-      await this.apiCall(`/admin/blog/posts/${id}`, {
+      await this.apiCall(`/admin?action=post&id=${id}`, {
         method: 'DELETE',
       });
       return true;
@@ -412,7 +413,7 @@ class BlogDatabaseService {
   // Toggle published status
   async togglePublished(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin/blog/posts/${id}/publish`, {
+      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=publish`, {
         method: 'PATCH',
       });
       return response.post;
@@ -428,7 +429,7 @@ class BlogDatabaseService {
   // Toggle featured status
   async toggleFeatured(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin/blog/posts/${id}/feature`, {
+      const response = await this.apiCall<{ post: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=feature`, {
         method: 'PATCH',
       });
       return response.post;
@@ -449,7 +450,7 @@ class BlogDatabaseService {
   // Get blog statistics
   async getStats(): Promise<BlogStats> {
     try {
-      const stats = await this.apiCall<BlogStats>('/admin/blog/stats');
+      const stats = await this.apiCall<BlogStats>('/admin?action=stats');
       return stats;
     } catch (error) {
       console.error('Error fetching blog stats:', error);
@@ -460,7 +461,7 @@ class BlogDatabaseService {
   // Get available categories
   async getCategories(): Promise<string[]> {
     try {
-      const categories = await this.apiCall<string[]>('/admin/blog/categories');
+      const categories = await this.apiCall<string[]>('/admin?action=categories');
       return categories;
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -471,7 +472,7 @@ class BlogDatabaseService {
   // Get available tags
   async getTags(): Promise<string[]> {
     try {
-      const tags = await this.apiCall<string[]>('/admin/blog/tags');
+      const tags = await this.apiCall<string[]>('/admin?action=tags');
       return tags;
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -534,7 +535,7 @@ class BlogDatabaseService {
       const base64Data = await base64Promise;
 
       // Try to upload to GCS first via the enhanced endpoint
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+      const response = await fetch(`${API_BASE_URL}/upload?action=image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -577,7 +578,7 @@ class BlogDatabaseService {
       const base64Data = await base64Promise;
 
       // Try to upload to GCS first via the enhanced endpoint
-      const response = await fetch(`${API_BASE_URL}/upload/quill-image`, {
+      const response = await fetch(`${API_BASE_URL}/upload?action=quill-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -621,7 +622,7 @@ class BlogDatabaseService {
   // Duplicate a blog post
   async duplicatePost(id: number): Promise<BlogPost | null> {
     try {
-      const duplicatedPost = await this.apiCall<BlogPost>(`/admin/blog/posts/${id}/duplicate`, {
+      const duplicatedPost = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}&operation=duplicate`, {
         method: 'POST',
       });
       return duplicatedPost;
@@ -672,7 +673,7 @@ class BlogDatabaseService {
   // Autosave a draft
   async autosavePost(id: number, content: string): Promise<boolean> {
     try {
-      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const endpoint = USE_ENHANCED_API ? '/admin?action=enhanced' : '/admin?action=posts';
       await this.apiCall(`${endpoint}?id=${id}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -690,7 +691,7 @@ class BlogDatabaseService {
   // Create post with enhanced fields (SEO, scheduling, etc.)
   async createEnhancedPost(formData: BlogFormData): Promise<BlogPost> {
     try {
-      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const endpoint = USE_ENHANCED_API ? '/admin?action=enhanced' : '/admin?action=posts';
       const postData = {
         ...this.formatPostForAPI(formData),
         seo: formData.seo,
@@ -715,7 +716,7 @@ class BlogDatabaseService {
   // Update post with enhanced fields
   async updateEnhancedPost(id: number, formData: BlogFormData): Promise<BlogPost> {
     try {
-      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const endpoint = USE_ENHANCED_API ? '/admin?action=enhanced' : '/admin?action=posts';
       const postData = {
         ...this.formatPostForAPI(formData),
         seo: formData.seo,
@@ -740,7 +741,7 @@ class BlogDatabaseService {
   // Get revisions for a post
   async getRevisions(postId: number): Promise<BlogRevision[]> {
     try {
-      const revisions = await this.apiCall<BlogRevision[]>(`/admin/blog/revisions?postId=${postId}`, {
+      const revisions = await this.apiCall<BlogRevision[]>(`/admin?action=revisions&postId=${postId}`, {
         method: 'GET',
       });
       return revisions || [];
@@ -753,7 +754,7 @@ class BlogDatabaseService {
   // Restore a revision
   async restoreRevision(postId: number, revisionId: number): Promise<boolean> {
     try {
-      await this.apiCall('/admin/blog/revisions', {
+      await this.apiCall('/admin?action=revisions', {
         method: 'POST',
         body: JSON.stringify({ postId, revisionId }),
       });
@@ -767,7 +768,7 @@ class BlogDatabaseService {
   // Get scheduled posts
   async getScheduledPosts(): Promise<BlogPost[]> {
     try {
-      const endpoint = USE_ENHANCED_API ? '/admin/blog/posts-enhanced' : '/admin/blog/posts';
+      const endpoint = USE_ENHANCED_API ? '/admin?action=enhanced' : '/admin?action=posts';
       const response = await this.apiCall<BlogPostsResponse>(`${endpoint}?status=scheduled&limit=50`, {
         method: 'GET',
       });
