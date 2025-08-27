@@ -11,7 +11,7 @@ import { GenerationControls } from './components/GenerationControls';
 import { StreamingDisplay } from './components/StreamingDisplay';
 import { 
   FileText, 
-  // Eye, // Unused - preserved for future use
+  Eye,
   Edit, 
   Split, 
   Layers,
@@ -26,7 +26,7 @@ import {
   // Brain, // Unused - preserved for future use
   Loader2,
   AlertCircle,
-  /* /* Check */ */Circle,
+  Circle, // Check icon alternative
 } from 'lucide-react';
 
 interface GenerationWorkspaceProps {
@@ -419,7 +419,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
             {(['editor', 'preview', 'split'] as const).map((view) => {
               const icons = {
                 editor: Edit,
-                preview: /* /* Eye */ */,
+                preview: Eye, 
                 split: Split,
               };
               const IconComponent = icons[view];
@@ -445,7 +445,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
         <div className="flex items-center space-x-2">
           {/* Save Status */}
           <div className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400">
-            {saveStatus === 'saved' && <CheckCircle className="h-4 w-4 text-green-500" />}
+            {saveStatus === 'saved' && <Circle className="h-4 w-4 text-green-500" />}
             {saveStatus === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}
             {saveStatus === 'unsaved' && <AlertCircle className="h-4 w-4 text-yellow-500" />}
             {saveStatus === 'error' && <AlertCircle className="h-4 w-4 text-red-500" />}
