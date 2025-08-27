@@ -97,6 +97,18 @@ export interface StyleGuide {
   updatedAt: Date;
 }
 
+export interface PreviousBlog {
+  id: string;
+  title: string;
+  vertical: string;
+  publishedDate: string;
+  excerpt: string;
+  category: string;
+  tags: string[];
+  author?: string;
+  content?: string;
+}
+
 export interface Provider {
   name: 'openai' | 'anthropic' | 'google' | 'perplexity';
   apiKey?: string;
@@ -179,7 +191,7 @@ interface AIStore {
   // Context state
   selectedContext: ContextSelection;
   styleGuides: StyleGuide[];
-  previousBlogs: unknown[]; // Blog posts from the existing system
+  previousBlogs: PreviousBlog[]; // Blog posts from the existing system
   
   // Provider state
   providers: Record<string, Provider>;
@@ -222,7 +234,7 @@ interface AIStore {
   // Actions - Context
   updateContext: (context: Partial<ContextSelection>) => void;
   setStyleGuides: (guides: StyleGuide[]) => void;
-  setPreviousBlogs: (blogs: unknown[]) => void;
+  setPreviousBlogs: (blogs: PreviousBlog[]) => void;
   
   // Actions - Providers
   setProviders: (providers: Record<string, Provider>) => void;

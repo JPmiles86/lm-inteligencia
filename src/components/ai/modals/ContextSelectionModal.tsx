@@ -55,7 +55,9 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
   const [blogFilter, setBlogFilter] = useState('all');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['brand', 'vertical']));
   const [previewContext, setPreviewContext] = useState<string>('');
-  const [customContextValue, setCustomContextValue] = useState(selectedContext.additionalContext || '');
+  
+  // Use ref for custom context to avoid re-render issues
+  const customContextRef = useRef<HTMLTextAreaElement>(null);
   
   // Use ref to store timeout for debouncing
   const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -65,10 +67,12 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
     if (isOpen) {
       loadContextData();
       buildPreview();
-      // Sync local state with context when modal opens
-      setCustomContextValue(selectedContext.additionalContext || '');
+      // Set initial value for custom context when modal opens
+      if (customContextRef.current) {
+        customContextRef.current.value = selectedContext.additionalContext || '';
+      }
     }
-  }, [isOpen, selectedContext.additionalContext]);
+  }, [isOpen]);
   
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -244,15 +248,12 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
     buildPreview();
   };
 
-  // Handle custom context change - simple local update
-  const handleCustomContextChange = (value: string) => {
-    setCustomContextValue(value);
-  };
-  
   // Handle when user leaves the textarea (blur event)
   const handleCustomContextBlur = () => {
-    updateContext({ additionalContext: customContextValue });
-    buildPreview();
+    if (customContextRef.current) {
+      updateContext({ additionalContext: customContextRef.current.value });
+      buildPreview();
+    }
   };
 
   // Toggle section expansion
@@ -665,8 +666,8 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
                         </p>
                         
                         <textarea
-                          value={customContextValue}
-                          onChange={(e) => handleCustomContextChange(e.target.value)}
+                          ref={customContextRef}
+                          defaultValue={selectedContext.additionalContext || ''}
                           onBlur={handleCustomContextBlur}
                           placeholder="Enter specific instructions, target audience details, key topics to cover, tone adjustments, or any other context that will help generate better content..."
                           className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
