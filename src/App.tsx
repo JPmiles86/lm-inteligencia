@@ -12,7 +12,7 @@ import { BlogManagement } from './components/admin/BlogManagement';
 // import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
 import { AdminDashboard } from './components/admin/SimplifiedAdminDashboard';
 import { Settings } from './components/admin/SimplifiedSettings';
-import { AIContentDashboard } from './components/admin/AI/AIContentDashboard';
+import { AIContentDashboard } from './components/ai/AIContentDashboard';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
