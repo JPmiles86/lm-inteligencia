@@ -244,20 +244,15 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
     buildPreview();
   };
 
-  // Handle custom context change
+  // Handle custom context change - simple local update
   const handleCustomContextChange = (value: string) => {
-    // Update local state immediately for smooth typing
     setCustomContextValue(value);
-    
-    // Debounce the store update and preview
-    if (previewTimeoutRef.current) {
-      clearTimeout(previewTimeoutRef.current);
-    }
-    
-    previewTimeoutRef.current = setTimeout(() => {
-      updateContext({ additionalContext: value });
-      buildPreview();
-    }, 500); // Wait 500ms after user stops typing
+  };
+  
+  // Handle when user leaves the textarea (blur event)
+  const handleCustomContextBlur = () => {
+    updateContext({ additionalContext: customContextValue });
+    buildPreview();
   };
 
   // Toggle section expansion
@@ -672,6 +667,7 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
                         <textarea
                           value={customContextValue}
                           onChange={(e) => handleCustomContextChange(e.target.value)}
+                          onBlur={handleCustomContextBlur}
                           placeholder="Enter specific instructions, target audience details, key topics to cover, tone adjustments, or any other context that will help generate better content..."
                           className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                         />
