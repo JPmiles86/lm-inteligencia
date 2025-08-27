@@ -12,6 +12,7 @@ import { BlogManagement } from './components/admin/BlogManagement';
 // import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
 import { AdminDashboard } from './components/admin/SimplifiedAdminDashboard';
 import { Settings } from './components/admin/SimplifiedSettings';
+import { AIContentDashboard } from './components/admin/AI/AIContentDashboard';
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
@@ -37,6 +38,9 @@ const AdminRoutes: React.FC = () => {
     if (path.includes('/admin/blog')) {
       console.log('[AdminRoutes] Section determined: blog');
       return 'blog';
+    } else if (path.includes('/admin/ai')) {
+      console.log('[AdminRoutes] Section determined: ai');
+      return 'ai';
     } else if (path.includes('/admin/analytics')) {
       console.log('[AdminRoutes] Section determined: analytics');
       return 'analytics';
@@ -50,7 +54,7 @@ const AdminRoutes: React.FC = () => {
   }, [location.pathname]);
 
   // Handle section change using React Router navigate
-  const handleSectionChange = (section: 'dashboard' | 'blog' | 'analytics' | 'settings') => {
+  const handleSectionChange = (section: 'dashboard' | 'blog' | 'ai' | 'analytics' | 'settings') => {
     console.log('[AdminRoutes] SECTION CHANGE:', {
       from: currentSection,
       to: section,
@@ -73,6 +77,7 @@ const AdminRoutes: React.FC = () => {
         <Route path="/blog" element={<BlogManagement />} />
         <Route path="/blog/new" element={<BlogManagement />} />
         <Route path="/blog/edit/:id" element={<BlogManagement />} />
+        <Route path="/ai/*" element={<AIContentDashboard />} />
         <Route path="/analytics" element={<div className="p-6 text-center text-gray-500">Analytics - Coming Soon</div>} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/*" element={<AdminDashboard tenantId="hospitality" />} />

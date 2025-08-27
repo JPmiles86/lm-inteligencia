@@ -4,7 +4,7 @@ import React, { useState, ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-export type AdminSection = 'dashboard' | 'blog' | 'analytics' | 'settings';
+export type AdminSection = 'dashboard' | 'blog' | 'ai' | 'analytics' | 'settings';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -49,7 +49,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       id: 'blog',
       label: 'Blog Management',
       icon: '📝',
-      description: 'Create and manage blog posts',
+      description: 'Create and manage blog posts'
+    },
+    {
+      id: 'ai',
+      label: 'AI Content',
+      icon: '🤖',
+      description: 'Generate and manage AI content',
       badge: 'New'
     },
     {

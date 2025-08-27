@@ -1,7 +1,7 @@
 // Enhanced Blog Editor Component - Rich Text Editor
 
 import React, { useState, useEffect } from 'react';
-// import { useParams } from 'react-router-dom'; - not currently used
+import { useNavigate } from 'react-router-dom';
 import { blogService, BlogFormData } from '../../../services/blogService';
 import { BlogPost, SEOFields, BlogRevision } from '../../../data/blogData';
 import { QuillEditor } from './QuillEditor';
@@ -21,6 +21,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   onSave,
   onCancel
 }) => {
+  const navigate = useNavigate();
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loadingPost, setLoadingPost] = useState(false);
 
@@ -1117,6 +1118,20 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
 
             {/* Right side - Action buttons */}
             <div className="flex items-center gap-3">
+              {/* AI Generate Button */}
+              <button
+                onClick={() => navigate('/admin/ai')}
+                className="px-5 py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 flex items-center gap-2"
+                title="Generate content with AI"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Generate with AI
+              </button>
+
+              <div className="h-8 w-px bg-gray-300"></div>
+
               {/* Preview/Edit Toggle */}
               <button
                 onClick={() => setIsPreviewMode(!isPreviewMode)}
