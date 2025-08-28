@@ -21,6 +21,8 @@
     "db:seed": "tsx src/scripts/seedBlog.ts",
     "ai:seed": "tsx src/db/seeds/aiSeeds.ts",
     "ai:test": "tsx src/scripts/testAIDatabase.ts",
+    "style-guides:populate": "tsx src/scripts/populateStyleGuides.ts",
+    "style-guides:check": "tsx src/scripts/checkStyleGuides.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
