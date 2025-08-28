@@ -214,7 +214,7 @@ jobs:
           trivy fs --security-checks config --format json --output trivy-config-results.json .
           
       - name: Docker security scan (if Dockerfile exists)
-        if: hashFiles('**/Dockerfile') != ''
+        if: ${{ hashFiles('**/Dockerfile') != '' }}
         run: |
           trivy image --format json --output trivy-docker-results.json $(docker build -q .)
           
@@ -267,7 +267,7 @@ jobs:
   container-security:
     name: Container Security
     runs-on: ubuntu-latest
-    if: hashFiles('**/Dockerfile') != ''
+    if: ${{ hashFiles('**/Dockerfile') != '' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
