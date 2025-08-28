@@ -1,7 +1,7 @@
 // Generation Tree - Interactive tree view for navigating generation history
 // Shows hierarchical structure of AI generations with branching and navigation
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useAIStore, selectRootNodes, selectNodeChildren } from '../../../store/aiStore';
 import { 
   ChevronRight, 
@@ -18,8 +18,6 @@ import {
   EyeOff,
   MoreVertical,
   Plus,
-  Clock,
-  DollarSign,
   Zap,
   CheckCircle,
   XCircle,

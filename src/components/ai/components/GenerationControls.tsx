@@ -43,7 +43,6 @@ export const GenerationControls: React.FC<GenerationControlsProps> = ({
     activeModel,
     selectedContext,
     providers,
-    addNotification,
   } = useAIStore();
 
   const [inputFocused, setInputFocused] = useState(false);

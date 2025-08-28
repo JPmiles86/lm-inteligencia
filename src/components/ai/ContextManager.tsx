@@ -7,13 +7,8 @@ import { aiGenerationService } from '../../services/ai/AIGenerationService';
 import { 
   BookOpen, 
   FileText, 
-  Users, 
   Settings, 
   Plus, 
-  Eye,
-  EyeOff,
-  Check,
-  X,
   ChevronDown,
   ChevronRight,
   Layers,
@@ -44,7 +39,12 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['style-guides', 'previous-content'])
   );
-  const [availableBlogs, setAvailableBlogs] = useState<any[]>([]);
+  const [availableBlogs, setAvailableBlogs] = useState<Array<{
+    id: string;
+    title: string;
+    vertical?: string;
+    excerpt?: string;
+  }>>([]);
   const [/* loading */, setLoading] = useState(false); // loading preserved for future use
 
   // Load initial data

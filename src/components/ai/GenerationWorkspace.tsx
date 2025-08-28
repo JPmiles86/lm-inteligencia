@@ -99,6 +99,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
         handleAutoSave(value);
       }, 2000);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSave]);
 
   // Auto-save functionality

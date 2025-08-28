@@ -9,8 +9,16 @@ interface AdminDashboardProps {
   tenantId: string;
 }
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ /* tenantId */ }) => {
-  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+interface BlogPost {
+  id: number;
+  title: string;
+  status: string;
+  createdAt: string;
+  publishedDate?: string;
+}
+
+export const AdminDashboard: React.FC<AdminDashboardProps> = () => {
+  const [recentPosts, setRecentPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
