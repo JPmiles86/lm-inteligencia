@@ -1,4 +1,4 @@
-// Enhanced Style Guide Modal with Markdown Rendering and Rich Text Editor
+// Enhanced Style Guide Modal with Markdown Rendering, Rich Text Editor, and AI Enhancement
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -9,7 +9,8 @@ import 'react-quill/dist/quill.snow.css';
 import { 
   X, Plus, Edit3, Trash2, Save, Search, Check, Loader2,
   Building, Layers, Type, User, BookOpen, Eye, EyeOff,
-  ChevronLeft, Copy, FileText, ToggleLeft, ToggleRight
+  ChevronLeft, Copy, FileText, ToggleLeft, ToggleRight,
+  Sparkles, History, MessageSquare
 } from 'lucide-react';
 
 interface StyleGuideModalProps {
@@ -26,6 +27,8 @@ interface StyleGuide {
   active: boolean;
   vertical?: string;
   is_default?: boolean;
+  version?: number;
+  parent_id?: string;
 }
 
 // Convert markdown to HTML for Quill editor
@@ -101,14 +104,20 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
   const [selectedGuide, setSelectedGuide] = useState<StyleGuide | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [viewMode, setViewMode] = useState<'preview' | 'markdown'>('preview');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showAIEnhancement, setShowAIEnhancement] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [aiGenerating, setAiGenerating] = useState(false);
   const [newGuide, setNewGuide] = useState({
     name: '',
     description: '',
     content: '',
     type: activeTab as string,
     vertical: null as string | null,
+    aiPrompt: '', // For AI generation
   });
 
   // Quill modules configuration
@@ -152,6 +161,8 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
   const handleEdit = (guide: StyleGuide) => {
     setSelectedGuide(guide);
     setEditContent(guide.content);
+    setEditName(guide.name);
+    setEditDescription(guide.description || '');
     setIsEditing(true);
   };
 
@@ -165,6 +176,8 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
       
       const response = await aiGenerationService.updateStyleGuide(selectedGuide.id, {
         ...selectedGuide,
+        name: editName,
+        description: editDescription,
         content: contentToSave,
       });
       
@@ -192,8 +205,38 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
   const handleCreate = async () => {
     setLoading(true);
     try {
+      // If AI prompt is provided, generate content with AI first
+      let finalContent = newGuide.content;
+      
+      if (newGuide.aiPrompt && newGuide.aiPrompt.trim()) {
+        setAiGenerating(true);
+        
+        // Generate style guide using AI
+        const prompt = `Create a ${newGuide.type.replace('_', ' ')} style guide for "${newGuide.name}".
+        
+        ${newGuide.description ? `Description: ${newGuide.description}` : ''}
+        
+        User requirements: ${newGuide.aiPrompt}
+        
+        Please create a comprehensive style guide in markdown format with appropriate sections.`;
+        
+        const aiResponse = await aiGenerationService.generateContent({
+          prompt,
+          context: {
+            type: 'style_guide_creation',
+            guideType: newGuide.type,
+          },
+        });
+        
+        if (aiResponse.success && aiResponse.generation) {
+          finalContent = aiResponse.generation;
+        }
+        setAiGenerating(false);
+      }
+      
       const response = await aiGenerationService.createStyleGuide({
         ...newGuide,
+        content: finalContent,
         type: activeTab,
         active: true,
       });
@@ -205,7 +248,7 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
           message: 'New style guide has been added',
         });
         setShowCreateForm(false);
-        setNewGuide({ name: '', description: '', content: '', type: activeTab, vertical: null });
+        setNewGuide({ name: '', description: '', content: '', type: activeTab, vertical: null, aiPrompt: '' });
         loadStyleGuides();
       }
     } catch (error) {
@@ -215,8 +258,64 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
         title: 'Failed to create',
         message: 'Please try again',
       });
+      setAiGenerating(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAIEnhance = async () => {
+    if (!selectedGuide || !aiPrompt.trim()) return;
+    
+    setAiGenerating(true);
+    try {
+      const prompt = `Enhance and update this ${selectedGuide.type.replace('_', ' ')} style guide based on the following feedback:
+      
+      Current style guide:
+      ${selectedGuide.content}
+      
+      Feedback/Instructions:
+      ${aiPrompt}
+      
+      Please provide an improved version of the style guide maintaining the same format and structure but incorporating the requested changes.`;
+      
+      const response = await aiGenerationService.generateContent({
+        prompt,
+        context: {
+          type: 'style_guide_enhancement',
+          guideType: selectedGuide.type,
+          guideId: selectedGuide.id,
+        },
+      });
+      
+      if (response.success && response.generation) {
+        // Create a new version of the style guide
+        const updateResponse = await aiGenerationService.updateStyleGuide(selectedGuide.id, {
+          ...selectedGuide,
+          content: response.generation,
+          version: (selectedGuide.version || 1) + 1,
+        });
+        
+        if (updateResponse.success) {
+          addNotification({
+            type: 'success',
+            title: 'Style guide enhanced',
+            message: 'AI has updated your style guide',
+          });
+          setShowAIEnhancement(false);
+          setAiPrompt('');
+          loadStyleGuides();
+        }
+      }
+    } catch (error) {
+      console.error('Error enhancing with AI:', error);
+      addNotification({
+        type: 'error',
+        title: 'AI enhancement failed',
+        message: 'Please try again',
+      });
+    } finally {
+      setAiGenerating(false);
     }
   };
 
@@ -313,6 +412,7 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                   setSelectedGuide(null);
                   setIsEditing(false);
                   setShowCreateForm(false);
+                  setShowAIEnhancement(false);
                 }}
                 className={`flex items-center space-x-2 px-4 py-2 border-b-2 transition-colors ${
                   activeTab === tab
@@ -387,6 +487,7 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                             setSelectedGuide(guide);
                             setIsEditing(false);
                             setShowCreateForm(false);
+                            setShowAIEnhancement(false);
                           }}
                           className={`p-3 rounded-lg border cursor-pointer transition-all ${
                             selectedGuide?.id === guide.id
@@ -403,6 +504,11 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                                   {guide.description}
                                 </p>
+                              )}
+                              {guide.version && guide.version > 1 && (
+                                <span className="inline-block mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                  Version {guide.version}
+                                </span>
                               )}
                             </div>
                             <button
@@ -464,25 +570,42 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      AI Generation Prompt (Optional)
+                    </label>
+                    <textarea
+                      value={newGuide.aiPrompt}
+                      onChange={(e) => setNewGuide({ ...newGuide, aiPrompt: e.target.value })}
+                      placeholder="Describe what you want the AI to create for this style guide..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white h-24"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      If provided, AI will generate the initial content based on your description
+                    </p>
+                  </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Content
+                      Content {newGuide.aiPrompt ? '(Will be generated by AI)' : ''}
                     </label>
-                    <ReactQuill
-                      value={newGuide.content}
-                      onChange={(value) => setNewGuide({ ...newGuide, content: htmlToMarkdown(value) })}
-                      modules={quillModules}
-                      className="bg-white dark:bg-gray-800 rounded-lg"
-                      theme="snow"
-                    />
+                    {!newGuide.aiPrompt && (
+                      <ReactQuill
+                        value={newGuide.content}
+                        onChange={(value) => setNewGuide({ ...newGuide, content: htmlToMarkdown(value) })}
+                        modules={quillModules}
+                        className="bg-white dark:bg-gray-800 rounded-lg"
+                        theme="snow"
+                      />
+                    )}
                   </div>
                   
                   <div className="flex justify-end space-x-3 pt-4">
                     <button
                       onClick={() => {
                         setShowCreateForm(false);
-                        setNewGuide({ name: '', description: '', content: '', type: activeTab, vertical: null });
+                        setNewGuide({ name: '', description: '', content: '', type: activeTab, vertical: null, aiPrompt: '' });
                       }}
                       className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
@@ -490,15 +613,71 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                     </button>
                     <button
                       onClick={handleCreate}
-                      disabled={!newGuide.name || !newGuide.content || loading}
+                      disabled={!newGuide.name || (!newGuide.content && !newGuide.aiPrompt) || loading || aiGenerating}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors inline-flex items-center space-x-2"
                     >
-                      {loading ? (
+                      {loading || aiGenerating ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : newGuide.aiPrompt ? (
+                        <Sparkles className="h-4 w-4" />
                       ) : (
                         <Save className="h-4 w-4" />
                       )}
-                      <span>Create</span>
+                      <span>{aiGenerating ? 'Generating...' : newGuide.aiPrompt ? 'Create with AI' : 'Create'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : showAIEnhancement ? (
+              <div className="p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Enhance Style Guide with AI
+                </h3>
+                <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Current Guide:</p>
+                  <h4 className="font-medium text-gray-900 dark:text-white">{selectedGuide?.name}</h4>
+                  {selectedGuide?.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{selectedGuide.description}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Enhancement Instructions
+                    </label>
+                    <textarea
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      placeholder="Describe how you'd like to improve or modify this style guide..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white h-32"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      AI will update the style guide based on your feedback while preserving the overall structure
+                    </p>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setShowAIEnhancement(false);
+                        setAiPrompt('');
+                      }}
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAIEnhance}
+                      disabled={!aiPrompt.trim() || aiGenerating}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition-colors inline-flex items-center space-x-2"
+                    >
+                      {aiGenerating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                      <span>{aiGenerating ? 'Enhancing...' : 'Enhance with AI'}</span>
                     </button>
                   </div>
                 </div>
@@ -507,19 +686,60 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
               <div className="p-6">
                 {/* Guide Header */}
                 <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {selectedGuide.name}
-                    </h3>
-                    {selectedGuide.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {selectedGuide.description}
-                      </p>
+                  <div className="flex-1">
+                    {isEditing ? (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Name
+                          </label>
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Description
+                          </label>
+                          <input
+                            type="text"
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {selectedGuide.name}
+                        </h3>
+                        {selectedGuide.description && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {selectedGuide.description}
+                          </p>
+                        )}
+                        {selectedGuide.version && selectedGuide.version > 1 && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Version {selectedGuide.version}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="flex items-center space-x-2">
                     {!isEditing && (
                       <>
+                        <button
+                          onClick={() => setShowAIEnhancement(true)}
+                          className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                          title="Enhance with AI"
+                        >
+                          <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </button>
                         <button
                           onClick={() => setViewMode(viewMode === 'preview' ? 'markdown' : 'preview')}
                           className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -542,11 +762,14 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                 <div className="prose dark:prose-invert max-w-none">
                   {isEditing ? (
                     <div>
+                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Content
+                      </label>
                       <ReactQuill
                         value={markdownToHtml(editContent)}
                         onChange={setEditContent}
                         modules={quillModules}
-                        className="bg-white dark:bg-gray-800 rounded-lg min-h-[400px]"
+                        className="bg-white dark:bg-gray-800 rounded-lg min-h-[300px]"
                         theme="snow"
                       />
                       <div className="flex justify-end space-x-3 mt-4">
@@ -554,6 +777,8 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                           onClick={() => {
                             setIsEditing(false);
                             setEditContent('');
+                            setEditName('');
+                            setEditDescription('');
                           }}
                           className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                         >
@@ -574,15 +799,27 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                       </div>
                     </div>
                   ) : viewMode === 'preview' ? (
-                    <ReactMarkdown 
-                      remarkPlugins={[remarkGfm]}
-                      className="prose prose-sm dark:prose-invert max-w-none"
-                    >
-                      {selectedGuide.content}
-                    </ReactMarkdown>
+                    <div className="prose-spacing">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        className="prose prose-sm dark:prose-invert max-w-none"
+                        components={{
+                          h1: ({children}) => <h1 className="text-2xl font-bold mb-4 mt-6">{children}</h1>,
+                          h2: ({children}) => <h2 className="text-xl font-semibold mb-3 mt-5">{children}</h2>,
+                          h3: ({children}) => <h3 className="text-lg font-medium mb-2 mt-4">{children}</h3>,
+                          p: ({children}) => <p className="mb-4">{children}</p>,
+                          ul: ({children}) => <ul className="list-disc pl-5 mb-4 space-y-1">{children}</ul>,
+                          ol: ({children}) => <ol className="list-decimal pl-5 mb-4 space-y-1">{children}</ol>,
+                          li: ({children}) => <li className="mb-1">{children}</li>,
+                          blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4">{children}</blockquote>,
+                        }}
+                      >
+                        {selectedGuide.content}
+                      </ReactMarkdown>
+                    </div>
                   ) : (
                     <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">
-                      <code className="text-sm text-gray-800 dark:text-gray-200">
+                      <code className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
                         {selectedGuide.content}
                       </code>
                     </pre>
