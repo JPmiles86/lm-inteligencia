@@ -64,7 +64,7 @@ export default async function handler(req, res) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST,PUT,PATCH,DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
   if (method === 'OPTIONS') {
@@ -243,6 +243,7 @@ async function handleStyleGuides(req, res) {
         }
 
       case 'PUT':
+      case 'PATCH':
         const { guideId: updateGuideId } = req.query;
         const { action: putAction } = req.body;
         

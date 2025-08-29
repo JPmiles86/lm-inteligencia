@@ -425,8 +425,8 @@ class AIGenerationService {
     updates: Partial<StyleGuide>
   ): Promise<{ success: boolean; data?: StyleGuide; error?: string }> {
     try {
-      const response = await fetch(`${this.baseUrl}/style-guides/${id}`, {
-        method: 'PATCH',
+      const response = await fetch(`${this.baseUrl}/style-guides?guideId=${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
