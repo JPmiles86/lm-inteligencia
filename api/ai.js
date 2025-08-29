@@ -1,23 +1,68 @@
 // Consolidated AI API - All handlers in one file for Vercel compatibility
-import { StyleGuideService } from '../src/services/ai/StyleGuideService.js';
-import { ProviderService } from '../src/services/ai/ProviderService.js';
-import { AnalyticsService } from '../src/services/ai/AnalyticsService.js';
-import { ContextService } from '../src/services/ai/ContextService.js';
-import { GenerationService } from '../src/services/ai/GenerationService.js';
-import { TreeNodeService } from '../src/services/ai/TreeNodeService.js';
-import { ImageGenerationService } from '../src/services/ai/ImageGenerationService.js';
+console.log('[AI API] Starting imports...');
 
-// Initialize services
-const styleGuideService = new StyleGuideService();
-const providerService = new ProviderService();
-const analyticsService = new AnalyticsService();
-const contextService = new ContextService();
-const generationService = new GenerationService();
-const treeNodeService = new TreeNodeService();
-const imageGenerationService = new ImageGenerationService();
+let StyleGuideService, ProviderService, AnalyticsService, ContextService, GenerationService, TreeNodeService, ImageGenerationService;
+let styleGuideService, providerService, analyticsService, contextService, generationService, treeNodeService, imageGenerationService;
+
+try {
+  console.log('[AI API] Importing StyleGuideService...');
+  const module1 = await import('../src/services/ai/StyleGuideService.js');
+  StyleGuideService = module1.StyleGuideService;
+  console.log('[AI API] StyleGuideService imported successfully');
+} catch (error) {
+  console.error('[AI API] Failed to import StyleGuideService:', error.message);
+}
+
+try {
+  console.log('[AI API] Importing other services...');
+  const module2 = await import('../src/services/ai/ProviderService.js');
+  ProviderService = module2.ProviderService;
+  const module3 = await import('../src/services/ai/AnalyticsService.js');
+  AnalyticsService = module3.AnalyticsService;
+  const module4 = await import('../src/services/ai/ContextService.js');
+  ContextService = module4.ContextService;
+  const module5 = await import('../src/services/ai/GenerationService.js');
+  GenerationService = module5.GenerationService;
+  const module6 = await import('../src/services/ai/TreeNodeService.js');
+  TreeNodeService = module6.TreeNodeService;
+  const module7 = await import('../src/services/ai/ImageGenerationService.js');
+  ImageGenerationService = module7.ImageGenerationService;
+  console.log('[AI API] All services imported successfully');
+} catch (error) {
+  console.error('[AI API] Failed to import services:', error.message);
+}
+
+// Initialize services with error handling
+try {
+  console.log('[AI API] Initializing services...');
+  if (StyleGuideService) {
+    styleGuideService = new StyleGuideService();
+    console.log('[AI API] StyleGuideService initialized');
+  }
+  if (ProviderService) providerService = new ProviderService();
+  if (AnalyticsService) analyticsService = new AnalyticsService();
+  if (ContextService) contextService = new ContextService();
+  if (GenerationService) generationService = new GenerationService();
+  if (TreeNodeService) treeNodeService = new TreeNodeService();
+  if (ImageGenerationService) imageGenerationService = new ImageGenerationService();
+  console.log('[AI API] All services initialized');
+} catch (error) {
+  console.error('[AI API] Failed to initialize services:', error.message);
+}
 
 export default async function handler(req, res) {
   const { method, query, body, url } = req;
+  
+  console.log('[AI API] Request received:', {
+    method,
+    url,
+    action: query.action,
+    hasBody: !!body,
+    env: {
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      nodeEnv: process.env.NODE_ENV
+    }
+  });
   
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -50,34 +95,57 @@ export default async function handler(req, res) {
       }
     }
     
+    console.log('[AI API] Determined action:', action);
+    
     // Route to appropriate handler based on action
     switch (action) {
       case 'generate':
+        console.log('[AI API] Routing to handleGenerate');
         return await handleGenerate(req, res);
       case 'providers':
+        console.log('[AI API] Routing to handleProviders');
         return await handleProviders(req, res);
       case 'context':
       case 'context-build':
+        console.log('[AI API] Routing to handleContext');
         return await handleContext(req, res);
       case 'style-guides':
+        console.log('[AI API] Routing to handleStyleGuides');
         return await handleStyleGuides(req, res);
       case 'tree':
+        console.log('[AI API] Routing to handleTree');
         return await handleTree(req, res);
       case 'analytics':
+        console.log('[AI API] Routing to handleAnalytics');
         return await handleAnalytics(req, res);
       case 'images':
+        console.log('[AI API] Routing to handleImages');
         return await handleImages(req, res);
       default:
+        console.log('[AI API] Invalid action:', action);
         return res.status(400).json({ error: 'Invalid action: ' + action });
     }
   } catch (error) {
-    console.error('AI API error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('[AI API] Fatal error:', error.message);
+    console.error('[AI API] Error stack:', error.stack);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
 
 // STYLE GUIDES HANDLER
 async function handleStyleGuides(req, res) {
+  console.log('[handleStyleGuides] Starting with method:', req.method);
+  console.log('[handleStyleGuides] StyleGuideService available:', !!styleGuideService);
+  
+  if (!styleGuideService) {
+    console.error('[handleStyleGuides] StyleGuideService not initialized');
+    return res.status(500).json({ error: 'StyleGuideService not available' });
+  }
+  
   try {
     switch (req.method) {
       case 'GET':
@@ -85,12 +153,19 @@ async function handleStyleGuides(req, res) {
         
         // If no subAction, default to listing guides
         if (!subAction) {
-          const guides = await styleGuideService.getStyleGuides({
-            type,
-            vertical,
-            activeOnly: req.query.activeOnly === 'true'
-          });
-          return res.json({ success: true, guides }); // Note: return as 'guides' not 'data'
+          console.log('[handleStyleGuides] No subAction, fetching all guides...');
+          try {
+            const guides = await styleGuideService.getStyleGuides({
+              type,
+              vertical,
+              activeOnly: req.query.activeOnly === 'true'
+            });
+            console.log('[handleStyleGuides] Fetched guides count:', guides?.length);
+            return res.json({ success: true, guides });
+          } catch (dbError) {
+            console.error('[handleStyleGuides] Database error:', dbError.message);
+            throw dbError;
+          }
         }
         
         switch (subAction) {
