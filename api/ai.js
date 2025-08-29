@@ -5,31 +5,28 @@ let StyleGuideService, ProviderService, AnalyticsService, ContextService, Genera
 let styleGuideService, providerService, analyticsService, contextService, generationService, treeNodeService, imageGenerationService;
 
 try {
-  console.log('[AI API] Importing StyleGuideService...');
+  console.log('[AI API] Importing services...');
+  
+  // Import working StyleGuideService
   const module1 = await import('../src/services/ai/StyleGuideService.js');
   StyleGuideService = module1.StyleGuideService;
-  console.log('[AI API] StyleGuideService imported successfully');
-} catch (error) {
-  console.error('[AI API] Failed to import StyleGuideService:', error.message);
-}
-
-try {
-  console.log('[AI API] Importing other services...');
-  const module2 = await import('../src/services/ai/ProviderService.js');
+  
+  // Import simplified ProviderService
+  const module2 = await import('../src/services/ai/ProviderServiceSimple.js');
   ProviderService = module2.ProviderService;
-  const module3 = await import('../src/services/ai/AnalyticsService.js');
-  AnalyticsService = module3.AnalyticsService;
-  const module4 = await import('../src/services/ai/ContextService.js');
-  ContextService = module4.ContextService;
-  const module5 = await import('../src/services/ai/GenerationService.js');
-  GenerationService = module5.GenerationService;
-  const module6 = await import('../src/services/ai/TreeNodeService.js');
-  TreeNodeService = module6.TreeNodeService;
-  const module7 = await import('../src/services/ai/ImageGenerationService.js');
-  ImageGenerationService = module7.ImageGenerationService;
+  
+  // Import stub services for the rest
+  const stubs = await import('../src/services/ai/StubServices.js');
+  AnalyticsService = stubs.AnalyticsService;
+  ContextService = stubs.ContextService;
+  GenerationService = stubs.GenerationService;
+  TreeNodeService = stubs.TreeNodeService;
+  ImageGenerationService = stubs.ImageGenerationService;
+  
   console.log('[AI API] All services imported successfully');
 } catch (error) {
   console.error('[AI API] Failed to import services:', error.message);
+  console.error('[AI API] Stack:', error.stack);
 }
 
 // Initialize services with error handling
@@ -77,7 +74,9 @@ export default async function handler(req, res) {
   try {
     // Parse the URL path to determine action
     // URL format: /api/ai/[action]/[subpath]
-    const pathParts = url.split('/').filter(Boolean);
+    // Remove query string from URL first
+    const cleanUrl = url.split('?')[0];
+    const pathParts = cleanUrl.split('/').filter(Boolean);
     // pathParts = ['api', 'ai', 'style-guides'] or ['api', 'ai', 'context', 'build']
     
     let action = query.action; // First check query param for backward compatibility
@@ -93,6 +92,12 @@ export default async function handler(req, res) {
       } else {
         action = pathParts[2]; // 'style-guides', 'providers', etc.
       }
+    }
+    
+    // If still no action and we have a path query param (from Vercel rewrite), use it
+    if (!action && query.path) {
+      const pathFromQuery = query.path.split('?')[0]; // Remove any query string
+      action = pathFromQuery;
     }
     
     console.log('[AI API] Determined action:', action);
