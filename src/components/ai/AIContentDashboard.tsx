@@ -10,7 +10,7 @@ import { GenerationWorkspace } from './GenerationWorkspace';
 import { NotificationCenter } from './components/NotificationCenter';
 import { ContextManager } from './ContextManager';
 import { ContextSelectionModal } from './modals/ContextSelectionModal';
-import { StyleGuideModal } from './modals/StyleGuideModal';
+import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
 import { MultiVerticalModal } from './modals/MultiVerticalModal';
 import { 
   Brain, 
@@ -382,7 +382,7 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
       )}
 
       {showStyleGuideModal && (
-        <StyleGuideModal
+        <StyleGuideModalEnhanced
           isOpen={showStyleGuideModal}
           onClose={() => setShowStyleGuideModal(false)}
         />
