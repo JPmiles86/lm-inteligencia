@@ -110,28 +110,47 @@ export class GenerationService {
     const {
       prompt,
       systemPrompt,
-      model = 'gpt-4o',
+      model = 'gpt-5-mini', // Updated default to GPT-5 Mini
       temperature = 0.7,
       maxTokens = 4000,
       task = 'blog'
     } = config;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Check if we should use the new Responses API for GPT-5 models
+    const isGPT5Model = model.startsWith('gpt-5');
+    const endpoint = isGPT5Model 
+      ? 'https://api.openai.com/v1/responses' 
+      : 'https://api.openai.com/v1/chat/completions';
+
+    const requestBody = isGPT5Model ? {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      temperature: temperature,
+      max_completion_tokens: maxTokens,
+      // GPT-5 specific parameters
+      reasoning_effort: 'medium', // minimal, low, medium, high
+      response_format: task === 'blog' ? { type: 'json_object' } : undefined
+    } : {
+      model: model,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: prompt }
+      ],
+      temperature: temperature,
+      max_tokens: maxTokens,
+      response_format: task === 'blog' ? { type: 'json_object' } : undefined
+    };
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: prompt }
-        ],
-        temperature: temperature,
-        max_tokens: maxTokens,
-        response_format: task === 'blog' ? { type: 'json_object' } : undefined
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
@@ -151,18 +170,30 @@ export class GenerationService {
     const {
       prompt,
       systemPrompt,
-      model = 'claude-3-opus-20240229',
+      model = 'claude-sonnet-4-20250514', // Updated to Claude Sonnet 4
       temperature = 0.7,
       maxTokens = 4000
     } = config;
 
+    // Add beta headers for specific models
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    };
+
+    // Add 1M context header for Sonnet 4
+    if (model === 'claude-sonnet-4-20250514' || model === 'claude-sonnet-4-0') {
+      headers['anthropic-beta'] = 'context-1m-2025-08-07';
+    }
+    // Add 128K output header for Sonnet 3.7
+    else if (model === 'claude-3-7-sonnet-20250219') {
+      headers['anthropic-beta'] = 'output-128k-2025-02-19';
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers,
       body: JSON.stringify({
         model: model,
         system: systemPrompt,
@@ -193,10 +224,25 @@ export class GenerationService {
     const {
       prompt,
       systemPrompt,
-      model = 'gemini-pro',
+      model = 'gemini-2.5-flash', // Updated to Gemini 2.5 Flash
       temperature = 0.7,
-      maxTokens = 4000
+      maxTokens = 4000,
+      task = 'blog'
     } = config;
+
+    const generationConfig = {
+      temperature: temperature,
+      maxOutputTokens: maxTokens
+    };
+
+    // Add thinking configuration for Gemini 2.5 models
+    if (model.includes('2.5')) {
+      // Thinking is ON by default for 2.5 models
+      // Set thinkingBudget: 0 to disable, or leave default for adaptive thinking
+      generationConfig.thinkingConfig = {
+        thinkingBudget: task === 'blog' ? 'medium' : 'low' // adaptive thinking budget
+      };
+    }
 
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: 'POST',
@@ -209,10 +255,7 @@ export class GenerationService {
             text: `${systemPrompt}\n\n${prompt}`
           }]
         }],
-        generationConfig: {
-          temperature: temperature,
-          maxOutputTokens: maxTokens
-        }
+        generationConfig
       })
     });
 
@@ -237,7 +280,7 @@ export class GenerationService {
     const {
       prompt,
       systemPrompt,
-      model = 'llama-3-sonar-large-32k-online',
+      model = 'sonar-pro', // Updated to Sonar Pro as default
       temperature = 0.7,
       maxTokens = 4000
     } = config;
@@ -464,31 +507,66 @@ Make the content engaging, informative, and valuable for readers in the ${vertic
   // Get default model for provider
   getDefaultModel(provider) {
     const defaults = {
-      openai: 'gpt-4o',
-      anthropic: 'claude-3-opus-20240229',
-      google: 'gemini-pro',
-      perplexity: 'llama-3-sonar-large-32k-online'
+      openai: 'gpt-5-mini', // GPT-5 Mini for balanced performance
+      anthropic: 'claude-sonnet-4-20250514', // Claude Sonnet 4 for best value
+      google: 'gemini-2.5-flash', // Gemini 2.5 Flash with thinking
+      perplexity: 'sonar-pro' // Sonar Pro for advanced research
     };
-    return defaults[provider] || 'gpt-4o';
+    return defaults[provider] || 'gpt-5-mini';
   }
 
-  // Calculate cost based on provider and model
+  // Calculate cost based on provider and model (per 1K tokens)
   calculateCost(provider, model, tokens) {
-    // Rough cost estimates per 1K tokens
+    // Updated costs from AI_MODELS_CONFIG_2025.md
     const costs = {
       openai: {
-        'gpt-4o': 0.03,
-        'gpt-4': 0.03,
-        'gpt-3.5-turbo': 0.002
+        // GPT-5 Series
+        'gpt-5': 0.003 + 0.015, // input + output averaged
+        'gpt-5-mini': 0.0006 + 0.0024, // $0.6/$2.4 per 1M
+        'gpt-5-nano': 0.00015 + 0.0006, // $0.15/$0.6 per 1M
+        // GPT-4.1 Series  
+        'gpt-4.1': 0.0025 + 0.01, // $2.5/$10 per 1M
+        'gpt-4.1-mini': 0.00015 + 0.0006, // $0.15/$0.6 per 1M
+        'gpt-4.1-nano': 0.000075 + 0.0003, // $0.075/$0.3 per 1M
+        // Legacy
+        'gpt-4o': 0.0025 + 0.01,
+        'gpt-4': 0.03 + 0.06,
+        'gpt-3.5-turbo': 0.0005 + 0.0015
       },
       anthropic: {
-        'claude-3-opus-20240229': 0.015,
-        'claude-3-sonnet-20240229': 0.003
+        // Claude Opus 4 Series
+        'claude-opus-4-1-20250805': 0.015 + 0.075, // $15/$75 per 1M
+        'claude-opus-4-20250514': 0.015 + 0.075,
+        // Claude Sonnet Series
+        'claude-sonnet-4-20250514': 0.003 + 0.015, // $3/$15 per 1M
+        'claude-3-7-sonnet-20250219': 0.003 + 0.015,
+        // Claude Haiku Series
+        'claude-3-5-haiku-20241022': 0.0008 + 0.004, // $0.80/$4 per 1M
+        'claude-3-haiku-20240307': 0.00025 + 0.00125, // $0.25/$1.25 per 1M
+        // Legacy
+        'claude-3-opus-20240229': 0.015 + 0.075,
+        'claude-3-sonnet-20240229': 0.003 + 0.015
       },
       google: {
-        'gemini-pro': 0.001
+        // Gemini 2.5 Series
+        'gemini-2.5-pro': 0.00125 + 0.005, // $1.25/$5 per 1M
+        'gemini-2.5-flash': 0.000075 + 0.0003, // $0.075/$0.3 per 1M
+        'gemini-2.5-flash-lite': 0.00002 + 0.00008, // $0.02/$0.08 per 1M
+        // Gemini 2.0 Series
+        'gemini-2.0-flash': 0.000075 + 0.0003,
+        // Legacy
+        'gemini-1.5-pro': 0.00125 + 0.005,
+        'gemini-1.5-flash': 0.000075 + 0.0003,
+        'gemini-pro': 0.00125 + 0.005
       },
       perplexity: {
+        // Sonar Models
+        'sonar': 0.0002 + 0.0008, // $0.2/$0.8 per 1M
+        'sonar-pro': 0.003 + 0.015, // $3/$15 per 1M
+        'sonar-deep-research': 0.005 + 0.025, // $5/$25 per 1M
+        'sonar-reasoning': 0.003 + 0.015,
+        'sonar-reasoning-pro': 0.008 + 0.04, // $8/$40 per 1M
+        // Legacy names
         'llama-3-sonar-large-32k-online': 0.001
       }
     };
