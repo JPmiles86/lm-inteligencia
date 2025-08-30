@@ -47,7 +47,7 @@ export interface ImagePrompt {
   editedText?: string;
   finalText?: string;
   position: number;
-  type: 'hero' | 'section' | 'footer';
+  type: 'hero' | 'section' | 'footer' | 'illustration' | 'infographic';
   characterIds: string[];
   styleReferenceIds: string[];
   generatedImages: GeneratedImage[];
@@ -55,13 +55,28 @@ export interface ImagePrompt {
 }
 
 export interface GeneratedImage {
+  id: string;
   url: string;
+  data?: string; // Base64 image data for Gemini images
+  mimeType?: string; // Image format (image/png, image/jpeg, etc.)
   provider: string;
   model: string;
   prompt: string;
+  caption?: string; // Generated caption for the image
+  placement?: string; // Where in content this image should be placed
+  style?: string; // Style used for generation (photorealistic, illustration, etc.)
   selected: boolean;
   createdAt: string;
   cost: number;
+  metadata?: {
+    vertical?: string;
+    imageType?: string;
+    aspectRatio?: string;
+    quality?: string;
+    generatedFromBlog?: boolean;
+    index?: number;
+    [key: string]: any;
+  };
 }
 
 export interface ContextData {
@@ -181,6 +196,92 @@ export interface Notification {
   createdAt: Date;
 }
 
+export interface BrainstormingIdea {
+  id: string;
+  title: string;
+  angle: string;
+  description: string;
+  tags: string[];
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  estimatedWordCount: number;
+  isFavorited: boolean;
+  createdAt: string;
+  score: number;
+  metadata?: {
+    generatedFromTopic: string;
+    generationIndex: number;
+    fallback?: boolean;
+  };
+}
+
+export interface BrainstormingSession {
+  id: string;
+  topic: string;
+  config: {
+    count: number;
+    vertical: string;
+    tone: string;
+    contentTypes: string[];
+    customContext: string;
+  };
+  ideas: BrainstormingIdea[];
+  favoriteIds: string[];
+  selectedIds: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkflowStep {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'current' | 'completed' | 'error';
+  estimatedMinutes?: number;
+  optional?: boolean;
+  data?: any; // Step-specific data storage
+}
+
+export interface StructuredWorkflowState {
+  id: string;
+  sessionId: string;
+  steps: WorkflowStep[];
+  currentStepId: string;
+  isActive: boolean;
+  startedAt: string;
+  completedAt?: string;
+  totalEstimatedMinutes: number;
+  
+  // Step data
+  stepData: {
+    ideation?: {
+      selectedIdea?: any;
+      topic: string;
+    };
+    title?: {
+      selectedTitles: any[];
+      topic: string;
+      context: string;
+    };
+    synopsis?: {
+      selectedSynopses: any[];
+      topic: string;
+      title: string;
+      context: string;
+    };
+    outline?: {
+      selectedOutlines: any[];
+      topic: string;
+      title: string;
+      synopsis: string;
+      targetWordCount: number;
+    };
+    content?: {
+      finalContent?: string;
+      generationConfig?: any;
+    };
+  };
+}
+
 // Main store interface
 interface AIStore {
   // Generation state
@@ -223,6 +324,16 @@ interface AIStore {
   generationCount: number;
   successRate: number;
   
+  // Brainstorming state
+  brainstormingSessions: Record<string, BrainstormingSession>;
+  activeBrainstormingSession: string | null;
+  brainstormingLoading: boolean;
+  
+  // Structured workflow state
+  structuredWorkflows: Record<string, StructuredWorkflowState>;
+  activeWorkflow: string | null;
+  workflowLoading: boolean;
+  
   // Actions - Generation
   setCurrentGeneration: (generation: GenerationNode | null) => void;
   addGenerationNode: (node: GenerationNode) => void;
@@ -258,6 +369,9 @@ interface AIStore {
   addToImageQueue: (promptId: string) => void;
   removeFromImageQueue: (promptId: string) => void;
   setGeneratingImages: (generating: boolean) => void;
+  addGeneratedImages: (nodeId: string, images: GeneratedImage[]) => void;
+  updateGeneratedImage: (nodeId: string, imageId: string, updates: Partial<GeneratedImage>) => void;
+  removeGeneratedImage: (nodeId: string, imageId: string) => void;
   
   // Actions - Analytics
   updateAnalytics: (data: { tokens?: number; cost?: number; generations?: number }) => void;
@@ -266,6 +380,30 @@ interface AIStore {
   // Actions - Generation lifecycle
   startGeneration: (nodeId: string) => void;
   completeGeneration: (nodeId: string, success: boolean, errorMessage?: string) => void;
+  
+  // Actions - Brainstorming
+  createBrainstormingSession: (session: BrainstormingSession) => void;
+  updateBrainstormingSession: (sessionId: string, updates: Partial<BrainstormingSession>) => void;
+  deleteBrainstormingSession: (sessionId: string) => void;
+  setActiveBrainstormingSession: (sessionId: string | null) => void;
+  setBrainstormingLoading: (loading: boolean) => void;
+  addBrainstormingIdea: (sessionId: string, idea: BrainstormingIdea) => void;
+  updateBrainstormingIdea: (sessionId: string, ideaId: string, updates: Partial<BrainstormingIdea>) => void;
+  deleteBrainstormingIdea: (sessionId: string, ideaId: string) => void;
+  toggleBrainstormingFavorite: (sessionId: string, ideaId: string) => void;
+  selectBrainstormingIdeas: (sessionId: string, ideaIds: string[]) => void;
+  
+  // Actions - Structured Workflow
+  createWorkflow: (workflow: StructuredWorkflowState) => void;
+  updateWorkflow: (workflowId: string, updates: Partial<StructuredWorkflowState>) => void;
+  deleteWorkflow: (workflowId: string) => void;
+  setActiveWorkflow: (workflowId: string | null) => void;
+  setWorkflowLoading: (loading: boolean) => void;
+  updateWorkflowStep: (workflowId: string, stepId: string, updates: Partial<WorkflowStep>) => void;
+  updateWorkflowStepData: (workflowId: string, stepId: string, data: any) => void;
+  navigateToStep: (workflowId: string, stepId: string) => void;
+  completeWorkflowStep: (workflowId: string, stepId: string) => void;
+  resetWorkflow: (workflowId: string) => void;
 }
 
 // Default context selection
@@ -336,6 +474,14 @@ export const useAIStore = create<AIStore>()(
         totalCost: 0,
         generationCount: 0,
         successRate: 100,
+        
+        brainstormingSessions: {},
+        activeBrainstormingSession: null,
+        brainstormingLoading: false,
+        
+        structuredWorkflows: {},
+        activeWorkflow: null,
+        workflowLoading: false,
         
         // Actions - Generation
         setCurrentGeneration: (generation) => set({ currentGeneration: generation }),
@@ -484,6 +630,88 @@ export const useAIStore = create<AIStore>()(
           })),
         
         setGeneratingImages: (generating) => set({ generatingImages: generating }),
+
+        addGeneratedImages: (nodeId, images) =>
+          set((state) => {
+            const node = state.generationTree[nodeId];
+            if (!node) return state;
+            
+            const existingImagePrompts = node.structuredContent?.imagePrompts || [];
+            const newImagePrompts = images.map((image, index) => ({
+              id: image.id,
+              originalText: image.caption || image.prompt,
+              finalText: image.caption || image.prompt,
+              position: index,
+              type: (image.placement as any) || 'section',
+              characterIds: [],
+              styleReferenceIds: [],
+              generatedImages: [image],
+              generated: true
+            }));
+            
+            return {
+              generationTree: {
+                ...state.generationTree,
+                [nodeId]: {
+                  ...node,
+                  structuredContent: {
+                    ...node.structuredContent,
+                    imagePrompts: [...existingImagePrompts, ...newImagePrompts]
+                  }
+                }
+              }
+            };
+          }),
+
+        updateGeneratedImage: (nodeId, imageId, updates) =>
+          set((state) => {
+            const node = state.generationTree[nodeId];
+            if (!node?.structuredContent?.imagePrompts) return state;
+            
+            const updatedImagePrompts = node.structuredContent.imagePrompts.map(prompt => ({
+              ...prompt,
+              generatedImages: prompt.generatedImages.map(image =>
+                image.id === imageId ? { ...image, ...updates } : image
+              )
+            }));
+            
+            return {
+              generationTree: {
+                ...state.generationTree,
+                [nodeId]: {
+                  ...node,
+                  structuredContent: {
+                    ...node.structuredContent,
+                    imagePrompts: updatedImagePrompts
+                  }
+                }
+              }
+            };
+          }),
+
+        removeGeneratedImage: (nodeId, imageId) =>
+          set((state) => {
+            const node = state.generationTree[nodeId];
+            if (!node?.structuredContent?.imagePrompts) return state;
+            
+            const updatedImagePrompts = node.structuredContent.imagePrompts.map(prompt => ({
+              ...prompt,
+              generatedImages: prompt.generatedImages.filter(image => image.id !== imageId)
+            })).filter(prompt => prompt.generatedImages.length > 0);
+            
+            return {
+              generationTree: {
+                ...state.generationTree,
+                [nodeId]: {
+                  ...node,
+                  structuredContent: {
+                    ...node.structuredContent,
+                    imagePrompts: updatedImagePrompts
+                  }
+                }
+              }
+            };
+          }),
         
         // Actions - Analytics
         updateAnalytics: (data) =>
@@ -525,6 +753,291 @@ export const useAIStore = create<AIStore>()(
               },
             },
           })),
+        
+        // Actions - Brainstorming
+        createBrainstormingSession: (session) =>
+          set((state) => ({
+            brainstormingSessions: {
+              ...state.brainstormingSessions,
+              [session.id]: session,
+            },
+          })),
+
+        updateBrainstormingSession: (sessionId, updates) =>
+          set((state) => ({
+            brainstormingSessions: {
+              ...state.brainstormingSessions,
+              [sessionId]: {
+                ...state.brainstormingSessions[sessionId],
+                ...updates,
+                updatedAt: new Date().toISOString(),
+              },
+            },
+          })),
+
+        deleteBrainstormingSession: (sessionId) =>
+          set((state) => {
+            const newSessions = { ...state.brainstormingSessions };
+            delete newSessions[sessionId];
+            return {
+              brainstormingSessions: newSessions,
+              activeBrainstormingSession: state.activeBrainstormingSession === sessionId ? null : state.activeBrainstormingSession,
+            };
+          }),
+
+        setActiveBrainstormingSession: (sessionId) =>
+          set({ activeBrainstormingSession: sessionId }),
+
+        setBrainstormingLoading: (loading) =>
+          set({ brainstormingLoading: loading }),
+
+        addBrainstormingIdea: (sessionId, idea) =>
+          set((state) => {
+            const session = state.brainstormingSessions[sessionId];
+            if (!session) return state;
+            
+            return {
+              brainstormingSessions: {
+                ...state.brainstormingSessions,
+                [sessionId]: {
+                  ...session,
+                  ideas: [...session.ideas, idea],
+                  updatedAt: new Date().toISOString(),
+                },
+              },
+            };
+          }),
+
+        updateBrainstormingIdea: (sessionId, ideaId, updates) =>
+          set((state) => {
+            const session = state.brainstormingSessions[sessionId];
+            if (!session) return state;
+            
+            return {
+              brainstormingSessions: {
+                ...state.brainstormingSessions,
+                [sessionId]: {
+                  ...session,
+                  ideas: session.ideas.map(idea =>
+                    idea.id === ideaId ? { ...idea, ...updates } : idea
+                  ),
+                  updatedAt: new Date().toISOString(),
+                },
+              },
+            };
+          }),
+
+        deleteBrainstormingIdea: (sessionId, ideaId) =>
+          set((state) => {
+            const session = state.brainstormingSessions[sessionId];
+            if (!session) return state;
+            
+            return {
+              brainstormingSessions: {
+                ...state.brainstormingSessions,
+                [sessionId]: {
+                  ...session,
+                  ideas: session.ideas.filter(idea => idea.id !== ideaId),
+                  favoriteIds: session.favoriteIds.filter(id => id !== ideaId),
+                  selectedIds: session.selectedIds.filter(id => id !== ideaId),
+                  updatedAt: new Date().toISOString(),
+                },
+              },
+            };
+          }),
+
+        toggleBrainstormingFavorite: (sessionId, ideaId) =>
+          set((state) => {
+            const session = state.brainstormingSessions[sessionId];
+            if (!session) return state;
+            
+            const isFavorited = session.favoriteIds.includes(ideaId);
+            const newFavoriteIds = isFavorited
+              ? session.favoriteIds.filter(id => id !== ideaId)
+              : [...session.favoriteIds, ideaId];
+            
+            return {
+              brainstormingSessions: {
+                ...state.brainstormingSessions,
+                [sessionId]: {
+                  ...session,
+                  ideas: session.ideas.map(idea =>
+                    idea.id === ideaId ? { ...idea, isFavorited: !isFavorited } : idea
+                  ),
+                  favoriteIds: newFavoriteIds,
+                  updatedAt: new Date().toISOString(),
+                },
+              },
+            };
+          }),
+
+        selectBrainstormingIdeas: (sessionId, ideaIds) =>
+          set((state) => {
+            const session = state.brainstormingSessions[sessionId];
+            if (!session) return state;
+            
+            return {
+              brainstormingSessions: {
+                ...state.brainstormingSessions,
+                [sessionId]: {
+                  ...session,
+                  selectedIds: ideaIds,
+                  updatedAt: new Date().toISOString(),
+                },
+              },
+            };
+          }),
+
+        // Actions - Structured Workflow
+        createWorkflow: (workflow) =>
+          set((state) => ({
+            structuredWorkflows: {
+              ...state.structuredWorkflows,
+              [workflow.id]: workflow,
+            },
+          })),
+
+        updateWorkflow: (workflowId, updates) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: { ...workflow, ...updates },
+              },
+            };
+          }),
+
+        deleteWorkflow: (workflowId) =>
+          set((state) => {
+            const newWorkflows = { ...state.structuredWorkflows };
+            delete newWorkflows[workflowId];
+            return {
+              structuredWorkflows: newWorkflows,
+              activeWorkflow: state.activeWorkflow === workflowId ? null : state.activeWorkflow,
+            };
+          }),
+
+        setActiveWorkflow: (workflowId) => set({ activeWorkflow: workflowId }),
+
+        setWorkflowLoading: (loading) => set({ workflowLoading: loading }),
+
+        updateWorkflowStep: (workflowId, stepId, updates) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: {
+                  ...workflow,
+                  steps: workflow.steps.map(step =>
+                    step.id === stepId ? { ...step, ...updates } : step
+                  ),
+                },
+              },
+            };
+          }),
+
+        updateWorkflowStepData: (workflowId, stepId, data) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: {
+                  ...workflow,
+                  stepData: {
+                    ...workflow.stepData,
+                    [stepId]: { ...workflow.stepData[stepId as keyof typeof workflow.stepData], ...data },
+                  },
+                },
+              },
+            };
+          }),
+
+        navigateToStep: (workflowId, stepId) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            // Update current step and mark new step as current
+            const updatedSteps = workflow.steps.map(step => ({
+              ...step,
+              status: step.id === stepId ? 'current' as const : 
+                      step.status === 'current' ? 'pending' as const : 
+                      step.status
+            }));
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: {
+                  ...workflow,
+                  currentStepId: stepId,
+                  steps: updatedSteps,
+                },
+              },
+            };
+          }),
+
+        completeWorkflowStep: (workflowId, stepId) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            const stepIndex = workflow.steps.findIndex(step => step.id === stepId);
+            const nextStep = workflow.steps[stepIndex + 1];
+            
+            const updatedSteps = workflow.steps.map((step, index) => ({
+              ...step,
+              status: step.id === stepId ? 'completed' as const :
+                      nextStep && step.id === nextStep.id ? 'current' as const :
+                      step.status
+            }));
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: {
+                  ...workflow,
+                  currentStepId: nextStep ? nextStep.id : stepId,
+                  steps: updatedSteps,
+                  completedAt: !nextStep ? new Date().toISOString() : workflow.completedAt,
+                },
+              },
+            };
+          }),
+
+        resetWorkflow: (workflowId) =>
+          set((state) => {
+            const workflow = state.structuredWorkflows[workflowId];
+            if (!workflow) return state;
+            
+            const resetSteps = workflow.steps.map((step, index) => ({
+              ...step,
+              status: index === 0 ? 'current' as const : 'pending' as const,
+              data: undefined,
+            }));
+            
+            return {
+              structuredWorkflows: {
+                ...state.structuredWorkflows,
+                [workflowId]: {
+                  ...workflow,
+                  currentStepId: workflow.steps[0]?.id || '',
+                  steps: resetSteps,
+                  stepData: {},
+                  completedAt: undefined,
+                },
+              },
+            };
+          }),
       }),
       {
         name: 'ai-content-store',
@@ -539,6 +1052,10 @@ export const useAIStore = create<AIStore>()(
           tokensUsed: state.tokensUsed,
           totalCost: state.totalCost,
           generationCount: state.generationCount,
+          brainstormingSessions: state.brainstormingSessions,
+          activeBrainstormingSession: state.activeBrainstormingSession,
+          structuredWorkflows: state.structuredWorkflows,
+          activeWorkflow: state.activeWorkflow,
         }),
       }
     )

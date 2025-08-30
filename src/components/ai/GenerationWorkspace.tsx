@@ -9,12 +9,15 @@ import { GenerationTree } from './components/GenerationTree';
 import { MetadataPanel } from './components/MetadataPanel';
 import { GenerationControls } from './components/GenerationControls';
 import { StreamingDisplay } from './components/StreamingDisplay';
+import { StructuredWorkflow } from './modules/StructuredWorkflow';
+import { EditEnhancer } from './modules/EditEnhancer';
 import { 
   FileText, 
   Eye,
   Edit, 
   Split, 
   Layers,
+  Wand2,
   // Play, // Unused - preserved for future use
   // Pause, // Unused - preserved for future use
   // Square, // Unused - preserved for future use
@@ -68,7 +71,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
   } = useAIStore();
 
   // Local state
-  const [workspaceView, setWorkspaceView] = useState<'editor' | 'preview' | 'split'>('editor');
+  const [workspaceView, setWorkspaceView] = useState<'editor' | 'preview' | 'split' | 'enhance'>('editor');
   const [generationInput, setGenerationInput] = useState('');
   const [streamingContent, setStreamingContent] = useState('');
   const [showMetadata, setShowMetadata] = useState(false);
@@ -392,6 +395,10 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
             event.preventDefault();
             setWorkspaceView('split');
             break;
+          case '4':
+            event.preventDefault();
+            setWorkspaceView('enhance');
+            break;
         }
       }
 
@@ -415,32 +422,35 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
             Generation Workspace
           </h2>
           
-          {/* View Toggle */}
-          <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-            {(['editor', 'preview', 'split'] as const).map((view) => {
-              const icons = {
-                editor: Edit,
-                preview: Eye, 
-                split: Split,
-              };
-              const IconComponent = icons[view];
-              
-              return (
-                <button
-                  key={view}
-                  onClick={() => setWorkspaceView(view)}
-                  className={`p-1.5 rounded transition-colors ${
-                    workspaceView === view
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                  title={`${view} view`}
-                >
-                  <IconComponent className="h-4 w-4" />
-                </button>
-              );
-            })}
-          </div>
+          {/* View Toggle - Only show for non-structured modes */}
+          {mode !== 'structured' && (
+            <div className="flex items-center space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              {(['editor', 'preview', 'split', 'enhance'] as const).map((view) => {
+                const icons = {
+                  editor: Edit,
+                  preview: Eye, 
+                  split: Split,
+                  enhance: Wand2,
+                };
+                const IconComponent = icons[view];
+                
+                return (
+                  <button
+                    key={view}
+                    onClick={() => setWorkspaceView(view)}
+                    className={`p-1.5 rounded transition-colors ${
+                      workspaceView === view
+                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                    title={`${view} view`}
+                  >
+                    <IconComponent className="h-4 w-4" />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">
@@ -498,21 +508,45 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-h-0">
-          {/* Generation Controls */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <GenerationControls
-              value={generationInput}
-              onChange={handleInputChange}
-              onGenerate={handleGenerate}
-              onCancel={handleCancelGeneration}
-              loading={loading}
-              streaming={streaming}
-            />
-          </div>
+          {/* Generation Controls - Only show for non-structured modes */}
+          {mode !== 'structured' && (
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <GenerationControls
+                value={generationInput}
+                onChange={handleInputChange}
+                onGenerate={handleGenerate}
+                onCancel={handleCancelGeneration}
+                loading={loading}
+                streaming={streaming}
+              />
+            </div>
+          )}
 
           {/* Editor/Preview Area */}
           <div className="flex-1 overflow-hidden">
-            {workspaceView === 'editor' && (
+            {mode === 'structured' ? (
+              /* Structured Workflow Mode */
+              <StructuredWorkflow
+                initialTopic={generationInput}
+                onComplete={(result) => {
+                  // Handle workflow completion
+                  setCurrentGeneration(result.metadata);
+                  addGenerationNode(result.metadata);
+                  setActiveNode(result.metadata.id);
+                  
+                  addNotification({
+                    type: 'success',
+                    title: 'Structured Blog Complete',
+                    message: 'Your blog has been generated through the structured workflow!',
+                    duration: 5000,
+                  });
+                  
+                  // Clear input after successful generation
+                  setGenerationInput('');
+                  setSaveStatus('saved');
+                }}
+              />
+            ) : workspaceView === 'editor' && (
               <div className="h-full">
                 {streaming ? (
                   <StreamingDisplay content={streamingContent} />
@@ -531,7 +565,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
               </div>
             )}
 
-            {workspaceView === 'preview' && (
+            {mode !== 'structured' && workspaceView === 'preview' && (
               <div className="h-full p-4 overflow-y-auto">
                 <div className="prose dark:prose-invert max-w-none">
                   {activeNode?.content ? (
@@ -546,7 +580,7 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
               </div>
             )}
 
-            {workspaceView === 'split' && (
+            {mode !== 'structured' && workspaceView === 'split' && (
               <div className="flex h-full">
                 <div className="w-1/2 border-r border-gray-200 dark:border-gray-700">
                   {streaming ? (
@@ -578,6 +612,21 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
                     )}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {mode !== 'structured' && workspaceView === 'enhance' && (
+              <div className="h-full">
+                <EditEnhancer
+                  content={activeNode?.content || ''}
+                  onChange={(content) => {
+                    if (activeNode) {
+                      updateGenerationNode(activeNode.id, { content });
+                    }
+                  }}
+                  mode="suggestions"
+                  onClose={() => setWorkspaceView('editor')}
+                />
               </div>
             )}
           </div>

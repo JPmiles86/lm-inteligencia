@@ -136,6 +136,9 @@ export default async function handler(req, res) {
       case 'images':
         console.log('[AI API] Routing to handleImages');
         return await handleImages(req, res);
+      case 'brainstorm':
+        console.log('[AI API] Routing to handleBrainstorm');
+        return await handleBrainstorm(req, res);
       default:
         console.log('[AI API] Invalid action:', action);
         return res.status(400).json({ error: 'Invalid action: ' + action });
@@ -715,4 +718,385 @@ async function handleImages(req, res) {
     console.error('Images API error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
+}
+
+// BRAINSTORMING HANDLER
+async function handleBrainstorm(req, res) {
+  try {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+    }
+
+    const {
+      action = 'generate-ideas',
+      topic,
+      count = 10,
+      vertical = 'all',
+      tone = 'professional',
+      contentTypes = [],
+      provider = 'openai',
+      model = 'gpt-4o',
+      customContext = ''
+    } = req.body;
+
+    console.log('[handleBrainstorm] Request:', {
+      action,
+      topic,
+      count,
+      vertical,
+      tone,
+      provider,
+      model
+    });
+
+    // Validate required fields
+    if (!topic || topic.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Topic is required and cannot be empty'
+      });
+    }
+
+    if (count < 1 || count > 50) {
+      return res.status(400).json({
+        success: false,
+        error: 'Count must be between 1 and 50'
+      });
+    }
+
+    if (action === 'generate-ideas') {
+      const startTime = Date.now();
+
+      // Build the brainstorming prompt
+      const prompt = buildBrainstormingPrompt({
+        topic,
+        count,
+        vertical,
+        tone,
+        contentTypes,
+        customContext
+      });
+
+      // Generate ideas using the existing generation service
+      const generationConfig = {
+        mode: 'direct',
+        task: 'brainstorming',
+        prompt: prompt,
+        provider: provider,
+        model: model,
+        vertical: vertical,
+        context: {
+          styleGuides: { brand: true },
+          previousContent: { 
+            mode: 'none',
+            includeElements: {
+              titles: false,
+              synopsis: false,
+              content: false,
+              tags: false,
+              metadata: false,
+              images: false
+            }
+          },
+          additionalContext: `Brainstorming session for topic: ${topic}`
+        }
+      };
+
+      if (!generationService) {
+        console.error('[handleBrainstorm] GenerationService not available');
+        return res.status(500).json({
+          success: false,
+          error: 'Generation service not available'
+        });
+      }
+
+      const result = await generationService.generateContent(generationConfig);
+      
+      if (!result.success) {
+        console.error('[handleBrainstorm] Generation failed:', result.error);
+        // Provide fallback ideas
+        const fallbackIdeas = generateBrainstormingFallback(topic, count);
+        
+        return res.status(200).json({
+          success: true,
+          ideas: fallbackIdeas,
+          tokensUsed: 0,
+          cost: 0,
+          durationMs: Date.now() - startTime,
+          fallback: true,
+          error: `Generation failed, provided fallback ideas: ${result.error}`,
+          metadata: {
+            topic,
+            count: fallbackIdeas.length,
+            requestedCount: count,
+            vertical,
+            tone,
+            fallback: true,
+            generatedAt: new Date().toISOString()
+          }
+        });
+      }
+
+      const endTime = Date.now();
+      const durationMs = endTime - startTime;
+
+      // Parse the generated content into structured ideas
+      const ideas = parseBrainstormingIdeas(result.generation, topic, count);
+
+      console.log('[handleBrainstorm] Generated ideas count:', ideas.length);
+
+      return res.json({
+        success: true,
+        ideas: ideas,
+        tokensUsed: result.tokensUsed || 0,
+        cost: result.cost || 0,
+        durationMs: durationMs,
+        metadata: {
+          topic,
+          count: ideas.length,
+          requestedCount: count,
+          vertical,
+          tone,
+          contentTypes,
+          provider,
+          model,
+          generatedAt: new Date().toISOString()
+        }
+      });
+
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: `Unknown action: ${action}`
+      });
+    }
+
+  } catch (error) {
+    console.error('[handleBrainstorm] Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+}
+
+// Helper functions for brainstorming
+function buildBrainstormingPrompt({ topic, count, vertical, tone, contentTypes, customContext }) {
+  const verticalContext = vertical !== 'all' ? 
+    `Focus specifically on the ${vertical} industry/vertical.` : 
+    'Consider multiple industries and verticals where relevant.';
+  
+  const contentTypeContext = contentTypes.length > 0 ?
+    `Prioritize these content types: ${contentTypes.join(', ')}.` :
+    'Include a variety of content types (how-to guides, listicles, tutorials, comparisons, case studies, etc.).';
+
+  const toneContext = `Maintain a ${tone} tone throughout.`;
+  
+  const customSection = customContext ? 
+    `\nAdditional Context: ${customContext}` : '';
+
+  return `
+You are an expert content strategist and creative ideation specialist. Generate exactly ${count} unique, compelling blog post ideas about the topic: "${topic}".
+
+Requirements:
+- ${verticalContext}
+- ${contentTypeContext}  
+- ${toneContext}
+- Each idea must be unique and offer a distinct angle or perspective
+- Ideas should be specific enough to create actionable content
+- Include SEO potential and audience appeal considerations
+- Ensure ideas are practical and feasible to write
+
+${customSection}
+
+For each idea, provide:
+1. Title: A compelling, specific headline (50-70 characters ideal for SEO)
+2. Angle: The unique perspective or approach (1-2 sentences)
+3. Description: Brief overview of what the content would cover (2-3 sentences)
+4. Tags: 3-5 relevant tags for categorization
+5. Difficulty: Content creation difficulty (Beginner/Intermediate/Advanced)
+6. Estimated Word Count: Suggested length for the full article
+
+Format your response as a JSON array where each idea is an object with the above properties. Ensure valid JSON syntax.
+
+Example structure:
+[
+  {
+    "title": "5 Proven Strategies That Transform Customer Service",
+    "angle": "Focus on actionable, data-backed strategies with real examples",
+    "description": "Explore five evidence-based approaches to customer service excellence, including communication techniques, technology integration, and staff training methodologies that demonstrably improve satisfaction scores.",
+    "tags": ["customer-service", "strategy", "improvement", "business", "guide"],
+    "difficulty": "Intermediate",
+    "estimatedWordCount": 1500
+  }
+]
+
+IMPORTANT: Return ONLY the JSON array, no additional text or formatting. Generate exactly ${count} unique ideas for "${topic}".
+  `.trim();
+}
+
+function parseBrainstormingIdeas(rawContent, topic, requestedCount) {
+  try {
+    let ideas = [];
+    
+    if (typeof rawContent === 'string') {
+      const cleanContent = rawContent.trim();
+      
+      // Look for JSON array pattern
+      const jsonMatch = cleanContent.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        try {
+          ideas = JSON.parse(jsonMatch[0]);
+        } catch (parseError) {
+          console.log('[handleBrainstorm] JSON parse failed, using fallback');
+          ideas = generateBrainstormingFallback(topic, requestedCount);
+        }
+      } else {
+        ideas = generateBrainstormingFallback(topic, requestedCount);
+      }
+    } else if (Array.isArray(rawContent)) {
+      ideas = rawContent;
+    } else {
+      ideas = generateBrainstormingFallback(topic, requestedCount);
+    }
+
+    // Ensure we have an array
+    if (!Array.isArray(ideas)) {
+      ideas = [ideas];
+    }
+
+    // Format and validate each idea
+    const formattedIdeas = ideas.map((idea, index) => {
+      const id = `idea_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 6)}`;
+      
+      return {
+        id,
+        title: (idea.title || `${topic} - Idea ${index + 1}`).substring(0, 100),
+        angle: (idea.angle || 'Unique perspective on the topic').substring(0, 200),
+        description: (idea.description || 'A comprehensive exploration of the topic').substring(0, 500),
+        tags: Array.isArray(idea.tags) ? idea.tags.slice(0, 5) : ['general', 'content'],
+        difficulty: ['Beginner', 'Intermediate', 'Advanced'].includes(idea.difficulty) ? idea.difficulty : 'Intermediate',
+        estimatedWordCount: typeof idea.estimatedWordCount === 'number' && idea.estimatedWordCount > 0 ? 
+          Math.min(5000, Math.max(500, idea.estimatedWordCount)) : 1200,
+        isFavorited: false,
+        createdAt: new Date().toISOString(),
+        score: 85,
+        metadata: {
+          generatedFromTopic: topic,
+          generationIndex: index
+        }
+      };
+    }).filter(idea => idea.title && idea.title.length > 0);
+
+    // Ensure we have at least some ideas
+    while (formattedIdeas.length < Math.min(requestedCount, 3)) {
+      const fallbackIdea = generateSingleBrainstormingIdea(topic, formattedIdeas.length);
+      formattedIdeas.push(fallbackIdea);
+    }
+
+    return formattedIdeas.slice(0, requestedCount);
+
+  } catch (error) {
+    console.error('[handleBrainstorm] Error parsing ideas:', error);
+    return generateBrainstormingFallback(topic, requestedCount);
+  }
+}
+
+function generateBrainstormingFallback(topic, count) {
+  const fallbackTemplates = [
+    {
+      title: `Complete Guide to ${topic}`,
+      angle: 'Comprehensive overview covering all essential aspects',
+      tags: ['guide', 'comprehensive', 'basics']
+    },
+    {
+      title: `Top 10 ${topic} Tips for Beginners`,
+      angle: 'Beginner-friendly approach with practical, actionable advice',
+      tags: ['tips', 'beginners', 'practical']
+    },
+    {
+      title: `${topic}: Common Mistakes and How to Avoid Them`,
+      angle: 'Problem-solving approach focusing on pitfalls and solutions',
+      tags: ['mistakes', 'solutions', 'troubleshooting']
+    },
+    {
+      title: `The Future of ${topic}: Trends and Predictions`,
+      angle: 'Forward-looking analysis of industry developments',
+      tags: ['trends', 'future', 'predictions']
+    },
+    {
+      title: `${topic} Case Studies: Real Success Stories`,
+      angle: 'Evidence-based approach using real-world examples',
+      tags: ['case-studies', 'success', 'examples']
+    }
+  ];
+
+  const ideas = [];
+  
+  for (let i = 0; i < Math.min(count, fallbackTemplates.length); i++) {
+    const template = fallbackTemplates[i];
+    const id = `fallback_${Date.now()}_${i}_${Math.random().toString(36).substr(2, 6)}`;
+    
+    ideas.push({
+      id,
+      title: template.title,
+      angle: template.angle,
+      description: `An in-depth exploration of ${topic}. This post would provide valuable insights, practical advice, and actionable information for readers looking to understand or improve their knowledge of ${topic}.`,
+      tags: template.tags,
+      difficulty: 'Intermediate',
+      estimatedWordCount: 1200 + (i * 300),
+      isFavorited: false,
+      createdAt: new Date().toISOString(),
+      score: 70,
+      metadata: {
+        generatedFromTopic: topic,
+        generationIndex: i,
+        fallback: true
+      }
+    });
+  }
+
+  // Fill remaining slots if needed
+  while (ideas.length < count) {
+    const extraIdea = generateSingleBrainstormingIdea(topic, ideas.length);
+    ideas.push(extraIdea);
+  }
+
+  return ideas;
+}
+
+function generateSingleBrainstormingIdea(topic, index) {
+  const approaches = [
+    'How to Master',
+    'The Ultimate Guide to',
+    'Best Practices for',
+    '5 Ways to Improve Your',
+    'Understanding',
+    'Advanced Techniques in',
+    'The Business of',
+    'Troubleshooting'
+  ];
+  
+  const approach = approaches[index % approaches.length];
+  const id = `fallback_single_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 6)}`;
+  
+  return {
+    id,
+    title: `${approach} ${topic}`,
+    angle: `${approach.toLowerCase()} approach with practical insights`,
+    description: `A detailed exploration of ${topic} using a ${approach.toLowerCase()} methodology. This content would provide readers with actionable information and valuable insights.`,
+    tags: [topic.toLowerCase().replace(/\s+/g, '-'), 'guide', 'practical'],
+    difficulty: 'Intermediate',
+    estimatedWordCount: 1000 + (index * 200),
+    isFavorited: false,
+    createdAt: new Date().toISOString(),
+    score: 65,
+    metadata: {
+      generatedFromTopic: topic,
+      generationIndex: index,
+      fallback: true
+    }
+  };
 }

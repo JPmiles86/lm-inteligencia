@@ -12,6 +12,7 @@ import { ContextManager } from './ContextManager';
 import { ContextSelectionModal } from './modals/ContextSelectionModal';
 import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
 import { MultiVerticalModal } from './modals/MultiVerticalModal';
+import { SocialMediaModal } from './modals/SocialMediaModal';
 import { 
   Brain, 
   Settings, 
@@ -55,6 +56,7 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
   const [showContextModal, setShowContextModal] = useState(false);
   const [showStyleGuideModal, setShowStyleGuideModal] = useState(false);
   const [showMultiVerticalModal, setShowMultiVerticalModal] = useState(false);
+  const [showSocialMediaModal, setShowSocialMediaModal] = useState(false);
   
   // Dashboard state
   const [dashboardStats, setDashboardStats] = useState({
@@ -319,6 +321,7 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
                   onContextModal={() => setShowContextModal(true)}
                   onStyleGuideModal={() => setShowStyleGuideModal(true)}
                   onMultiVerticalModal={() => setShowMultiVerticalModal(true)}
+                  onSocialMediaModal={() => setShowSocialMediaModal(true)}
                 />
               </div>
 
@@ -392,6 +395,13 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
         <MultiVerticalModal
           isOpen={showMultiVerticalModal}
           onClose={() => setShowMultiVerticalModal(false)}
+        />
+      )}
+
+      {showSocialMediaModal && (
+        <SocialMediaModal
+          isOpen={showSocialMediaModal}
+          onClose={() => setShowSocialMediaModal(false)}
         />
       )}
 

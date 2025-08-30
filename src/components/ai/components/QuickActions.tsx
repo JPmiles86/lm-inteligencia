@@ -21,12 +21,16 @@ interface QuickActionsProps {
   onContextModal: () => void;
   onStyleGuideModal: () => void;
   onMultiVerticalModal: () => void;
+  onIdeationModal?: () => void;
+  onSocialMediaModal?: () => void;
 }
 
 export const QuickActions: React.FC<QuickActionsProps> = ({
   onContextModal,
   onStyleGuideModal,
   onMultiVerticalModal,
+  onIdeationModal,
+  onSocialMediaModal,
 }) => {
   const {
     setMode,
@@ -121,13 +125,16 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       description: 'Generate content ideas',
       color: 'text-yellow-600 bg-yellow-50 hover:bg-yellow-100',
       action: () => {
-        // TODO: Implement idea brainstorming
-        addNotification({
-          type: 'info',
-          title: 'Coming Soon',
-          message: 'Idea brainstorming feature in development',
-          duration: 3000,
-        });
+        if (onIdeationModal) {
+          onIdeationModal();
+        } else {
+          addNotification({
+            type: 'info',
+            title: 'Brainstorming Available',
+            message: 'Use the AI Dashboard to access the brainstorming module',
+            duration: 3000,
+          });
+        }
       },
     },
     {
@@ -137,29 +144,38 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       description: 'Transform to social media',
       color: 'text-pink-600 bg-pink-50 hover:bg-pink-100',
       action: () => {
-        // TODO: Implement social media generation
-        addNotification({
-          type: 'info',
-          title: 'Coming Soon',
-          message: 'Social media generation feature in development',
-          duration: 3000,
-        });
+        if (onSocialMediaModal) {
+          onSocialMediaModal();
+        } else {
+          addNotification({
+            type: 'info',
+            title: 'Social Media Generator',
+            message: 'Use the AI Dashboard to access the social media generation module',
+            duration: 3000,
+          });
+        }
       },
     },
     {
       id: 'images',
       icon: Image,
       label: 'Generate Images',
-      description: 'AI-powered visuals',
+      description: 'AI-powered visuals with Gemini 2.5 Flash',
       color: 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100',
       action: () => {
-        // TODO: Implement image generation
+        // Open image generation modal or navigate to image generator
         addNotification({
           type: 'info',
-          title: 'Coming Soon',
-          message: 'Image generation feature in development',
-          duration: 3000,
+          title: 'Image Generation Ready',
+          message: 'Gemini 2.5 Flash image generation is now available in the AI Dashboard',
+          duration: 4000,
         });
+        
+        // Set mode to trigger image generation workflow
+        setMode('quick');
+        
+        // You can add modal trigger here when integrated with the main dashboard
+        // For now, notify users where to find the feature
       },
     },
   ];
