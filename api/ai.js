@@ -15,11 +15,21 @@ try {
   const module2 = await import('../src/services/ai/ProviderServiceSimple.js');
   ProviderService = module2.ProviderService;
   
+  // Try to import real GenerationService, fallback to stub if it fails
+  try {
+    const genModule = await import('../src/services/ai/GenerationServiceReal.js');
+    GenerationService = genModule.GenerationService;
+    console.log('[AI API] Using real GenerationService');
+  } catch (genError) {
+    console.log('[AI API] Failed to load real GenerationService, using stub:', genError.message);
+    const stubs = await import('../src/services/ai/StubServices.js');
+    GenerationService = stubs.GenerationService;
+  }
+  
   // Import stub services for the rest
   const stubs = await import('../src/services/ai/StubServices.js');
   AnalyticsService = stubs.AnalyticsService;
   ContextService = stubs.ContextService;
-  GenerationService = stubs.GenerationService;
   TreeNodeService = stubs.TreeNodeService;
   ImageGenerationService = stubs.ImageGenerationService;
   
@@ -469,28 +479,29 @@ async function handleGenerate(req, res) {
     
     // Default to content generation if no subAction specified
     if (!subAction || subAction === 'content') {
-      const { prompt, context, provider, model, temperature, maxTokens } = req.body;
-      const content = await generationService.generateContent({
-        prompt,
-        context,
-        provider,
-        model,
-        temperature,
-        maxTokens
-      });
+      // Pass through all parameters from the request
+      const content = await generationService.generateContent(req.body);
+      
+      // Check if generation was successful
+      if (!content.success) {
+        return res.status(500).json({
+          success: false,
+          error: content.error || 'Generation failed'
+        });
+      }
       
       // Track usage
       await analyticsService.trackGeneration({
-        provider,
-        model,
-        tokensUsed: content.usage?.totalTokens,
-        generationType: 'content'
+        provider: req.body.provider || 'openai',
+        model: req.body.model || 'gpt-4o',
+        tokensUsed: content.tokensUsed,
+        generationType: req.body.task || 'content'
       });
       
       return res.json({ 
         success: true, 
         generation: content.generation, // Note: return as 'generation'
-        tokensUsed: content.usage?.totalTokens,
+        tokensUsed: content.tokensUsed,
         cost: content.cost,
         durationMs: content.durationMs
       });
