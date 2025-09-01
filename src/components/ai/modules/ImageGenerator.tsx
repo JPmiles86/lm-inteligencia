@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import type { GeneratedImage, ImageGenerationResult } from '@/types/image';
 import { 
   Image, 
   Download, 
@@ -29,21 +30,6 @@ interface ImageGeneratorProps {
   onClose?: () => void;
 }
 
-interface GeneratedImage {
-  id: string;
-  data: string;
-  mimeType: string;
-  url: string;
-  caption: string;
-  placement: string;
-  style: string;
-  provider: string;
-  model: string;
-  selected: boolean;
-  createdAt: string;
-  cost: number;
-  metadata: any;
-}
 
 export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
   blogContent,
@@ -144,21 +130,18 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     try {
       console.log('[ImageGenerator] Starting blog image generation');
       
-      const result = await geminiService.generateImagesFromBlog(
-        blogContent,
-        imageCount,
-        {
-          style: selectedStyle,
-          vertical: vertical,
-          imageTypes: imageTypes
-        }
-      );
+      const result = await geminiService.generateBlogImages(blogContent, {
+        imageCount: imageCount,
+        style: selectedStyle,
+        vertical: vertical,
+        imageTypes: imageTypes
+      });
 
       if (result.success && result.images.length > 0) {
         setImages(result.images);
         
         // Select all images by default
-        setSelectedImages(new Set(result.images.map(img => img.id)));
+        setSelectedImages(new Set(result.images.map((img: GeneratedImage) => img.id)));
         
         // Update analytics
         updateAnalytics({
@@ -185,12 +168,12 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
       }
     } catch (error) {
       console.error('[ImageGenerator] Error generating images:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Unknown error');
       
       addNotification({
         type: 'error',
         title: 'Generation Failed',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
         duration: 5000
       });
     } finally {
@@ -218,19 +201,16 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
     try {
       console.log('[ImageGenerator] Starting custom prompt generation');
       
-      const result = await geminiService.generateImageWithPrompt(
-        customPrompt,
-        selectedStyle,
-        {
-          aspectRatio: aspectRatio,
-          quality: quality
-        }
-      );
+      const result = await geminiService.generateSingleImage(customPrompt, {
+        style: selectedStyle,
+        aspectRatio: aspectRatio,
+        quality: quality
+      });
 
-      if (result.success && result.image) {
-        const newImages = [...images, result.image];
+      if (result.success && result.images && result.images.length > 0) {
+        const newImages = [...images, ...result.images];
         setImages(newImages);
-        setSelectedImages(prev => new Set([...prev, result.image.id]));
+        setSelectedImages(prev => new Set([...prev, ...result.images.map((img: GeneratedImage) => img.id)]));
 
         // Update analytics
         updateAnalytics({
@@ -246,18 +226,18 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
           duration: 3000
         });
 
-        console.log('[ImageGenerator] Generated custom image:', result.image.id);
+        console.log('[ImageGenerator] Generated custom images:', result.images.length);
       } else {
         throw new Error(result.error || 'Failed to generate image');
       }
     } catch (error) {
       console.error('[ImageGenerator] Error generating custom image:', error);
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'Unknown error');
       
       addNotification({
         type: 'error',
         title: 'Generation Failed',
-        message: error.message,
+        message: error instanceof Error ? error.message : 'Unknown error',
         duration: 5000
       });
     } finally {
@@ -268,19 +248,19 @@ export const ImageGenerator: React.FC<ImageGeneratorProps> = ({
 
   // Download image
   const downloadImage = (image: GeneratedImage) => {
-    const success = geminiService.downloadImage(
-      image,
-      `${image.style}-${image.placement}-${image.id}.${image.mimeType.split('/')[1]}`
-    );
-    
-    if (success) {
+    try {
+      geminiService.downloadImage(
+        image,
+        `${image.style}-${image.placement}-${image.id}.${image.mimeType.split('/')[1]}`
+      );
+      
       addNotification({
         type: 'success',
         title: 'Download Started',
         message: 'Image download has started',
         duration: 2000
       });
-    } else {
+    } catch (error) {
       addNotification({
         type: 'error',
         title: 'Download Failed',

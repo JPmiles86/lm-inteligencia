@@ -312,8 +312,8 @@ class BlogMigration {
     await this.backupManager.updateBackup(this.backupFile, {
       migratedPostIds: this.results.filter(r => r.success && r.postId).map(r => r.postId!),
       imageMapping: this.results.reduce((acc, result) => {
-        result.imageResults.forEach(img => {
-          if (img.success) {
+        result.imageResults.forEach((img: any) => {
+          if (img && img.success) {
             acc[img.originalUrl] = img.newUrl;
           }
         });

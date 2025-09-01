@@ -20,7 +20,7 @@ export const ProviderSelector: React.FC = () => {
     activeModel,
     setActiveProvider,
     setActiveModel,
-    // addNotification, // Unused - preserved for future use
+    addNotification,
   } = useAIStore();
 
   const [isOpen, setIsOpen] = useState(false);

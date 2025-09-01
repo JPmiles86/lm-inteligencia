@@ -86,6 +86,7 @@ export const SynopsisGenerator: React.FC<SynopsisGeneratorProps> = ({
   // Configuration state
   const [topic, setTopic] = useState(initialTopic);
   const [blogTitle, setBlogTitle] = useState(title);
+  const [localContext, setLocalContext] = useState(context);
   const [count, setCount] = useState(3);
   const [lengthTarget, setLengthTarget] = useState<'short' | 'medium' | 'long'>('medium');
   const [tonePreferences, setTonePreferences] = useState<string[]>(['professional', 'friendly']);
@@ -141,7 +142,7 @@ export const SynopsisGenerator: React.FC<SynopsisGeneratorProps> = ({
           action: 'generate-synopses',
           topic: topic,
           title: blogTitle,
-          context: context,
+          context: localContext,
           targetAudience: targetAudience,
           count: count,
           lengthTarget: lengthTarget,
@@ -293,7 +294,7 @@ export const SynopsisGenerator: React.FC<SynopsisGeneratorProps> = ({
           action: 'regenerate-single',
           topic: topic,
           title: blogTitle,
-          context: context,
+          context: localContext,
           lengthTarget: synopsis.lengthTarget,
           tone: synopsis.tone,
           hook: synopsis.hook,
@@ -664,8 +665,8 @@ export const SynopsisGenerator: React.FC<SynopsisGeneratorProps> = ({
                 Additional Context (Optional)
               </label>
               <textarea
-                value={context}
-                onChange={(e) => setContext(e.target.value)}
+                value={localContext}
+                onChange={(e) => setLocalContext(e.target.value)}
                 placeholder="Any specific requirements, target audience details, or key points to emphasize..."
                 rows={3}
                 className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"

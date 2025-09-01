@@ -46,14 +46,14 @@ async function checkStyleGuides() {
     console.log('='.repeat(40));
     
     Object.entries(groupedGuides).forEach(([type, typeGuides]) => {
-      const activeCount = typeGuides.filter(g => g.active).length;
+      const activeCount = typeGuides.filter((g: any) => g.active).length;
       totalActive += activeCount;
       
       console.log(`\n📁 ${type.toUpperCase()} (${typeGuides.length} total, ${activeCount} active):`);
       
       typeGuides
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .forEach(guide => {
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .forEach((guide: any) => {
           const status = guide.active ? '🟢 ACTIVE' : '⚪ inactive';
           const vertical = guide.vertical ? ` [${guide.vertical}]` : '';
           const isDefault = guide.isDefault ? ' ⭐ DEFAULT' : '';
@@ -78,8 +78,8 @@ async function checkStyleGuides() {
     return true;
     
   } catch (error) {
-    console.error('\n❌ Error querying style guides:', error.message);
-    console.error('Stack trace:', error.stack);
+    console.error('\n❌ Error querying style guides:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
     return false;
   }
 }

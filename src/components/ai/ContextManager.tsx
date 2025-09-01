@@ -2,7 +2,7 @@
 // Displays current context settings and provides quick access to modify them
 
 import React, { useState, useEffect } from 'react';
-import { useAIStore } from '../../store/aiStore';
+import { useAIStore, PreviousBlog } from '../../store/aiStore';
 import { aiGenerationService } from '../../services/ai/AIGenerationService';
 import { 
   BookOpen, 
@@ -39,12 +39,7 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
     new Set(['style-guides', 'previous-content'])
   );
-  const [availableBlogs, setAvailableBlogs] = useState<Array<{
-    id: string;
-    title: string;
-    vertical?: string;
-    excerpt?: string;
-  }>>([]);
+  const [availableBlogs, setAvailableBlogs] = useState<PreviousBlog[]>([]);
   const [/* loading */, setLoading] = useState(false); // loading preserved for future use
 
   // Load initial data
@@ -67,7 +62,7 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
             publishedDate: '2024-01-15',
             excerpt: 'Exploring the latest digital marketing strategies...',
             category: 'Marketing',
-            readTime: 8,
+            tags: ['digital marketing', 'hospitality', 'trends'],
           },
           {
             id: '2',
@@ -76,7 +71,7 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
             publishedDate: '2024-01-10',
             excerpt: 'How hotels can leverage social media...',
             category: 'Social Media',
-            readTime: 6,
+            tags: ['social media', 'hotels', 'best practices'],
           },
           {
             id: '3',
@@ -85,7 +80,7 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
             publishedDate: '2024-01-08',
             excerpt: 'Navigating marketing compliance in healthcare...',
             category: 'Compliance',
-            readTime: 10,
+            tags: ['healthcare', 'compliance', 'marketing'],
           },
         ];
         setAvailableBlogs(mockBlogs);
@@ -394,7 +389,7 @@ export const ContextManager: React.FC<ContextManagerProps> = ({
                           {blog.title}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {blog.publishedDate} • {blog.readTime} min read • {blog.category}
+                          {blog.publishedDate} • {blog.category}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">
                           {blog.excerpt}

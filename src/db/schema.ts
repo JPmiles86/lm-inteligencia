@@ -440,6 +440,51 @@ export const imagePrompts = pgTable('image_prompts', {
   generatedIdx: index('image_prompts_generated_idx').on(table.generated),
 }));
 
+// Generated Images - Store AI-generated images with metadata
+export const generatedImages = pgTable('generated_images', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  blogPostId: integer('blog_post_id').references(() => blogPosts.id, { onDelete: 'cascade' }),
+  promptId: varchar('prompt_id', { length: 255 }).notNull(),
+  originalPrompt: text('original_prompt').notNull(),
+  enhancedPrompt: text('enhanced_prompt'),
+  imageUrl: text('image_url').notNull(),
+  storagePath: text('storage_path'),
+  thumbnailUrl: text('thumbnail_url'),
+  
+  // Image metadata
+  width: integer('width'),
+  height: integer('height'),
+  format: varchar('format', { length: 20 }),
+  fileSize: integer('file_size'),
+  
+  // Generation metadata
+  provider: varchar('provider', { length: 50 }).notNull(),
+  model: varchar('model', { length: 100 }),
+  generationTime: integer('generation_time'),
+  generationCost: decimal('generation_cost', { precision: 10, scale: 6 }),
+  
+  // Status and quality
+  status: varchar('status', { length: 50 }).default('generated'),
+  qualityScore: decimal('quality_score', { precision: 3, scale: 2 }),
+  altText: text('alt_text'),
+  caption: text('caption'),
+  
+  // Position in content
+  positionInContent: integer('position_in_content'),
+  sectionTitle: varchar('section_title', { length: 255 }),
+  importance: varchar('importance', { length: 20 }),
+  
+  // Timestamps
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow()
+}, (table) => ({
+  blogPostIdx: index('generated_images_blog_post_idx').on(table.blogPostId),
+  promptIdx: index('generated_images_prompt_idx').on(table.promptId),
+  statusIdx: index('generated_images_status_idx').on(table.status),
+  providerIdx: index('generated_images_provider_idx').on(table.provider),
+  createdAtIdx: index('generated_images_created_at_idx').on(table.createdAt),
+}));
+
 // Usage Logs - Detailed logging for debugging and analytics
 export const usageLogs = pgTable('usage_logs', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -504,6 +549,8 @@ export type GenerationAnalytics = typeof generationAnalytics.$inferSelect;
 export type NewGenerationAnalytics = typeof generationAnalytics.$inferInsert;
 export type ImagePrompt = typeof imagePrompts.$inferSelect;
 export type NewImagePrompt = typeof imagePrompts.$inferInsert;
+export type GeneratedImage = typeof generatedImages.$inferSelect;
+export type NewGeneratedImage = typeof generatedImages.$inferInsert;
 export type UsageLog = typeof usageLogs.$inferSelect;
 export type NewUsageLog = typeof usageLogs.$inferInsert;
 
@@ -643,15 +690,7 @@ export interface ImageGenerationRequest {
   styleReferenceIds?: string[];
 }
 
-export interface GeneratedImage {
-  url: string;
-  prompt: string;
-  provider: string;
-  model: string;
-  cost: number;
-  selected: boolean;
-  createdAt: string;
-}
+// GeneratedImage type is now defined by the database schema above
 
 // Analytics and reporting
 export interface GenerationStats {

@@ -40,6 +40,10 @@ export interface BlogPost {
   featuredImage: string;
   featured: boolean;
   
+  // Database timestamp fields
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  
   // New SEO fields
   seo?: SEOFields;
   

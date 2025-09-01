@@ -425,7 +425,7 @@ async function checkExistingGuides() {
       
       Object.entries(groupedGuides).forEach(([type, guides]) => {
         console.log(`  ${type}: ${guides.length} guides`);
-        guides.forEach(guide => {
+        guides.forEach((guide: any) => {
           console.log(`    - ${guide.name} ${guide.active ? '(active)' : '(inactive)'}`);
         });
       });
@@ -441,7 +441,7 @@ async function checkExistingGuides() {
       return [];
     }
   } catch (error) {
-    console.error('❌ Error checking existing guides:', error.message);
+    console.error('❌ Error checking existing guides:', error instanceof Error ? error.message : 'Unknown error');
     throw error;
   }
 }
@@ -474,12 +474,12 @@ async function populateStyleGuides(replaceExisting = false) {
       
       if (existing.length > 0 && !replaceExisting) {
         console.log(`⏭️  Skipping existing guide: ${guideData.name}`);
-        results.skipped.push(guideData.name);
+        (results.skipped as string[]).push(guideData.name);
         continue;
       }
       
       // Insert the guide
-      const [newGuide] = await db.insert(styleGuides)
+      const result = await db.insert(styleGuides)
         .values({
           type: guideData.type,
           name: guideData.name,
@@ -494,34 +494,36 @@ async function populateStyleGuides(replaceExisting = false) {
         })
         .returning();
       
+      const newGuide = Array.isArray(result) ? result[0] : result;
       console.log(`✅ Created ${guideData.type} guide: ${guideData.name} ${newGuide.active ? '(active)' : '(inactive)'}`);
-      results.success.push(newGuide);
+      (results.success as any[]).push(newGuide);
       
     } catch (error) {
-      console.error(`❌ Failed to create guide "${guideData.name}":`, error.message);
-      results.errors.push({ name: guideData.name, error: error.message });
+      console.error(`❌ Failed to create guide "${guideData.name}":`, error instanceof Error ? error.message : 'Unknown error');
+      (results.errors as any[]).push({ name: guideData.name, error: error instanceof Error ? error.message : 'Unknown error' });
     }
   }
   
   return results;
 }
 
-async function displayResults(results) {
+async function displayResults(results: any) {
   console.log('\n📊 POPULATION RESULTS');
   console.log('='.repeat(50));
   
   if (results.success.length > 0) {
     console.log(`\n✅ Successfully created ${results.success.length} style guides:`);
     
-    const byType = results.success.reduce((acc, guide) => {
+    const byType = results.success.reduce((acc: any, guide: any) => {
       if (!acc[guide.type]) acc[guide.type] = [];
       acc[guide.type].push(guide);
       return acc;
     }, {});
     
     Object.entries(byType).forEach(([type, guides]) => {
-      console.log(`\n  📁 ${type.toUpperCase()} (${guides.length}):`);
-      guides.forEach(guide => {
+      const guidesList = guides as any[];
+      console.log(`\n  📁 ${type.toUpperCase()} (${guidesList.length}):`);
+      guidesList.forEach((guide: any) => {
         const status = guide.active ? '🟢 active' : '⚪ inactive';
         const vertical = guide.vertical ? ` [${guide.vertical}]` : '';
         console.log(`    ${status} ${guide.name}${vertical}`);
@@ -531,12 +533,12 @@ async function displayResults(results) {
   
   if (results.skipped.length > 0) {
     console.log(`\n⏭️  Skipped ${results.skipped.length} existing guides:`);
-    results.skipped.forEach(name => console.log(`    - ${name}`));
+    results.skipped.forEach((name: any) => console.log(`    - ${name}`));
   }
   
   if (results.errors.length > 0) {
     console.log(`\n❌ Failed to create ${results.errors.length} guides:`);
-    results.errors.forEach(error => console.log(`    - ${error.name}: ${error.error}`));
+    results.errors.forEach((error: any) => console.log(`    - ${error.name}: ${error.error}`));
   }
   
   console.log(`\n📈 Summary: ${results.success.length} created, ${results.skipped.length} skipped, ${results.errors.length} failed`);
@@ -563,14 +565,14 @@ async function displayCurrentGuides() {
     let totalActive = 0;
     
     Object.entries(groupedGuides).forEach(([type, typeGuides]) => {
-      const activeCount = typeGuides.filter(g => g.active).length;
+      const activeCount = typeGuides.filter((g: any) => g.active).length;
       totalActive += activeCount;
       
       console.log(`\n📁 ${type.toUpperCase()} (${typeGuides.length} total, ${activeCount} active):`);
       
       typeGuides
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .forEach(guide => {
+        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .forEach((guide: any) => {
           const status = guide.active ? '🟢' : '⚪';
           const vertical = guide.vertical ? ` [${guide.vertical}]` : '';
           const isDefault = guide.isDefault ? ' ⭐' : '';
@@ -584,7 +586,7 @@ async function displayCurrentGuides() {
     console.log(`\n📊 Total: ${guides.length} guides (${totalActive} active)`);
     
   } catch (error) {
-    console.error('❌ Error fetching guides:', error.message);
+    console.error('❌ Error fetching guides:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -657,8 +659,8 @@ async function main() {
     }
     
   } catch (error) {
-    console.error('\n💥 Script failed:', error.message);
-    console.error('Stack trace:', error.stack);
+    console.error('\n💥 Script failed:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
     process.exit(1);
   }
   

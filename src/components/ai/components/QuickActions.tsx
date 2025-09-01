@@ -23,6 +23,8 @@ interface QuickActionsProps {
   onMultiVerticalModal: () => void;
   onIdeationModal?: () => void;
   onSocialMediaModal?: () => void;
+  onImageGenerationModal?: () => void;
+  onContentPlanningModal?: () => void;
 }
 
 export const QuickActions: React.FC<QuickActionsProps> = ({
@@ -31,6 +33,8 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   onMultiVerticalModal,
   onIdeationModal,
   onSocialMediaModal,
+  onImageGenerationModal,
+  onContentPlanningModal,
 }) => {
   const {
     setMode,
@@ -163,19 +167,35 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       description: 'AI-powered visuals with Gemini 2.5 Flash',
       color: 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100',
       action: () => {
-        // Open image generation modal or navigate to image generator
-        addNotification({
-          type: 'info',
-          title: 'Image Generation Ready',
-          message: 'Gemini 2.5 Flash image generation is now available in the AI Dashboard',
-          duration: 4000,
-        });
-        
-        // Set mode to trigger image generation workflow
-        setMode('quick');
-        
-        // You can add modal trigger here when integrated with the main dashboard
-        // For now, notify users where to find the feature
+        if (onImageGenerationModal) {
+          onImageGenerationModal();
+        } else {
+          addNotification({
+            type: 'info',
+            title: 'Image Generation Available',
+            message: 'Use the AI Dashboard to access the image generation module',
+            duration: 3000,
+          });
+        }
+      },
+    },
+    {
+      id: 'planning',
+      icon: Calendar,
+      label: 'Content Planning',
+      description: '5-step structured workflow',
+      color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100',
+      action: () => {
+        if (onContentPlanningModal) {
+          onContentPlanningModal();
+        } else {
+          addNotification({
+            type: 'info',
+            title: 'Content Planning',
+            message: 'Use the AI Dashboard to access the content planning workflow',
+            duration: 3000,
+          });
+        }
       },
     },
   ];

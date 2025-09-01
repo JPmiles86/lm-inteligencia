@@ -637,10 +637,6 @@ export const ContextSelectionModal: React.FC<ContextSelectionModalProps> = ({
                                       <span>{new Date(blog.publishedDate).toLocaleDateString()}</span>
                                     </div>
                                     <div className="flex items-center space-x-1">
-                                      <FileText className="h-3 w-3" />
-                                      <span>{blog.readTime} min</span>
-                                    </div>
-                                    <div className="flex items-center space-x-1">
                                       <Tag className="h-3 w-3" />
                                       <span>{blog.category}</span>
                                     </div>

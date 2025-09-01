@@ -1,13 +1,14 @@
 // Simplified Settings Page Component - Content Visibility and AI Configuration
 import React, { useState } from 'react';
 import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
-import { AIConfiguration } from './Settings/AIConfiguration';
-import { Settings as SettingsIcon, Brain, Eye } from 'lucide-react';
+import { ProviderSettings } from './ProviderSettings';
+import { APIKeySetup } from '../setup/APIKeySetup';
+import { Settings as SettingsIcon, Brain, Eye, Key } from 'lucide-react';
 
-type SettingsTab = 'content' | 'ai';
+type SettingsTab = 'content' | 'ai' | 'apikeys';
 
 export const Settings: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTab>('content');
+  const [activeTab, setActiveTab] = useState<SettingsTab>('apikeys');
   
   const handleSettingsSave = (newSettings: AdminSettings) => {
     localStorage.setItem('admin_settings', JSON.stringify(newSettings));
@@ -28,16 +29,22 @@ export const Settings: React.FC = () => {
 
   const tabs = [
     {
+      id: 'apikeys' as SettingsTab,
+      label: 'API Keys',
+      icon: Key,
+      description: 'Add and manage your AI provider API keys'
+    },
+    {
+      id: 'ai' as SettingsTab,
+      label: 'Provider Settings',
+      icon: Brain,
+      description: 'Configure AI provider preferences and fallback'
+    },
+    {
       id: 'content' as SettingsTab,
       label: 'Content Visibility',
       icon: Eye,
       description: 'Manage what content appears on your website'
-    },
-    {
-      id: 'ai' as SettingsTab,
-      label: 'AI Configuration',
-      icon: Brain,
-      description: 'Configure AI providers and API keys'
     }
   ];
 
@@ -87,6 +94,12 @@ export const Settings: React.FC = () => {
 
         {/* Tab Content */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200">
+          {activeTab === 'apikeys' && (
+            <div className="p-6">
+              <APIKeySetup />
+            </div>
+          )}
+          
           {activeTab === 'content' && (
             <div className="p-6">
               <ContentVisibilitySettings 
@@ -99,7 +112,7 @@ export const Settings: React.FC = () => {
           
           {activeTab === 'ai' && (
             <div className="p-6">
-              <AIConfiguration />
+              <ProviderSettings />
             </div>
           )}
         </div>

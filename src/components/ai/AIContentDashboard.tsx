@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAIStore } from '../../store/aiStore';
 import { aiGenerationService } from '../../services/ai/AIGenerationService';
+import { withErrorBoundary } from '../ErrorBoundary';
+import { ErrorFallback } from '../errors/ErrorFallback';
 import { ProviderSelector } from './components/ProviderSelector';
 import { QuickActions } from './components/QuickActions';
 import { GenerationWorkspace } from './GenerationWorkspace';
@@ -13,6 +15,9 @@ import { ContextSelectionModal } from './modals/ContextSelectionModal';
 import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
 import { MultiVerticalModal } from './modals/MultiVerticalModal';
 import { SocialMediaModal } from './modals/SocialMediaModal';
+import { IdeationModal } from './modals/IdeationModal';
+import { ImageGenerationModal } from './modals/ImageGenerationModal';
+import { ContentPlanningModal } from './modals/ContentPlanningModal';
 import { 
   Brain, 
   Settings, 
@@ -32,7 +37,7 @@ interface AIContentDashboardProps {
   activeVertical?: string;
 }
 
-export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
+const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
   user,
   activeVertical = 'hospitality',
 }) => {
@@ -42,6 +47,7 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
     loading,
     streaming,
     errors,
+    modals,
     
     // Actions
     setMode,
@@ -50,13 +56,11 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
     setLoading,
     addNotification,
     clearErrors,
+    openModal,
+    closeModal,
   } = useAIStore();
 
-  // Modal states
-  const [showContextModal, setShowContextModal] = useState(false);
-  const [showStyleGuideModal, setShowStyleGuideModal] = useState(false);
-  const [showMultiVerticalModal, setShowMultiVerticalModal] = useState(false);
-  const [showSocialMediaModal, setShowSocialMediaModal] = useState(false);
+  // Modal states are now managed in Zustand store
   
   // Dashboard state
   const [dashboardStats, setDashboardStats] = useState({
@@ -127,23 +131,90 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if any modal is currently open to prevent shortcut conflicts
+      const anyModalOpen = Object.values(modals).some(isOpen => isOpen);
+      
       if (event.metaKey || event.ctrlKey) {
-        switch (event.key) {
+        // Handle Cmd+Shift combinations first
+        if (event.shiftKey) {
+          switch (event.key.toLowerCase()) {
+            case 'i':
+              event.preventDefault();
+              if (!anyModalOpen) {
+                openModal('imageGeneration');
+                addNotification({
+                  type: 'info',
+                  title: 'Image Generation',
+                  message: 'Opening AI image generation studio',
+                  duration: 2000,
+                });
+              }
+              break;
+          }
+          return;
+        }
+        
+        // Handle regular Cmd/Ctrl shortcuts
+        switch (event.key.toLowerCase()) {
           case 'g':
             event.preventDefault();
-            setShowContextModal(true);
+            if (!anyModalOpen) {
+              openModal('context');
+            }
             break;
           case 'e':
             event.preventDefault();
-            setMode(mode === 'edit' ? 'quick' : 'edit');
+            if (!anyModalOpen) {
+              setMode(mode === 'edit' ? 'quick' : 'edit');
+            }
             break;
           case 's':
             event.preventDefault();
-            setShowStyleGuideModal(true);
+            if (!anyModalOpen) {
+              openModal('styleGuide');
+            }
             break;
           case 'm':
             event.preventDefault();
-            setShowMultiVerticalModal(true);
+            if (!anyModalOpen) {
+              openModal('multiVertical');
+            }
+            break;
+          case 'i':
+            event.preventDefault();
+            if (!anyModalOpen) {
+              openModal('ideation');
+              addNotification({
+                type: 'info',
+                title: 'Brainstorming',
+                message: 'Opening ideation modal',
+                duration: 2000,
+              });
+            }
+            break;
+          case 'p':
+            event.preventDefault();
+            if (!anyModalOpen) {
+              openModal('contentPlanning');
+              addNotification({
+                type: 'info',
+                title: 'Content Planning',
+                message: 'Opening 5-step workflow',
+                duration: 2000,
+              });
+            }
+            break;
+          case 'k':
+            event.preventDefault();
+            if (!anyModalOpen) {
+              openModal('socialMedia');
+              addNotification({
+                type: 'info',
+                title: 'Social Media',
+                message: 'Opening social media generator',
+                duration: 2000,
+              });
+            }
             break;
           case '/':
             event.preventDefault();
@@ -155,7 +226,13 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [mode, setMode]);
+  }, [
+    mode, 
+    setMode, 
+    modals,
+    openModal,
+    addNotification
+  ]);
 
   // Handle mode change
   const handleModeChange = (newMode: 'quick' | 'structured' | 'edit') => {
@@ -272,7 +349,7 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
 
               {/* Settings */}
               <button
-                onClick={() => setShowStyleGuideModal(true)}
+                onClick={() => openModal('styleGuide')}
                 className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Settings"
               >
@@ -318,10 +395,13 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
                   Quick Actions
                 </h3>
                 <QuickActions 
-                  onContextModal={() => setShowContextModal(true)}
-                  onStyleGuideModal={() => setShowStyleGuideModal(true)}
-                  onMultiVerticalModal={() => setShowMultiVerticalModal(true)}
-                  onSocialMediaModal={() => setShowSocialMediaModal(true)}
+                  onContextModal={() => openModal('context')}
+                  onStyleGuideModal={() => openModal('styleGuide')}
+                  onMultiVerticalModal={() => openModal('multiVertical')}
+                  onSocialMediaModal={() => openModal('socialMedia')}
+                  onIdeationModal={() => openModal('ideation')}
+                  onImageGenerationModal={() => openModal('imageGeneration')}
+                  onContentPlanningModal={() => openModal('contentPlanning')}
                 />
               </div>
 
@@ -376,32 +456,64 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
       </div>
 
       {/* Modals */}
-      {showContextModal && (
+      {modals.context && (
         <ContextSelectionModal
-          isOpen={showContextModal}
-          onClose={() => setShowContextModal(false)}
+          isOpen={modals.context}
+          onClose={() => closeModal('context')}
           activeVertical={activeVertical}
         />
       )}
 
-      {showStyleGuideModal && (
+      {modals.styleGuide && (
         <StyleGuideModalEnhanced
-          isOpen={showStyleGuideModal}
-          onClose={() => setShowStyleGuideModal(false)}
+          isOpen={modals.styleGuide}
+          onClose={() => closeModal('styleGuide')}
         />
       )}
 
-      {showMultiVerticalModal && (
+      {modals.multiVertical && (
         <MultiVerticalModal
-          isOpen={showMultiVerticalModal}
-          onClose={() => setShowMultiVerticalModal(false)}
+          isOpen={modals.multiVertical}
+          onClose={() => closeModal('multiVertical')}
         />
       )}
 
-      {showSocialMediaModal && (
+      {modals.socialMedia && (
         <SocialMediaModal
-          isOpen={showSocialMediaModal}
-          onClose={() => setShowSocialMediaModal(false)}
+          isOpen={modals.socialMedia}
+          onClose={() => closeModal('socialMedia')}
+        />
+      )}
+
+      {modals.ideation && (
+        <IdeationModal
+          isOpen={modals.ideation}
+          onClose={() => closeModal('ideation')}
+          onSelectIdeas={(ideas) => {
+            // Handle selected ideas for blog generation
+            addNotification({
+              type: 'success',
+              title: 'Ideas Selected',
+              message: `Selected ${ideas.length} ideas for blog generation`,
+              duration: 3000
+            });
+          }}
+        />
+      )}
+
+      {modals.imageGeneration && (
+        <ImageGenerationModal
+          isOpen={modals.imageGeneration}
+          onClose={() => closeModal('imageGeneration')}
+          title="AI Image Generation Studio"
+        />
+      )}
+
+      {/* Content Planning Modal */}
+      {modals.contentPlanning && (
+        <ContentPlanningModal
+          isOpen={modals.contentPlanning}
+          onClose={() => closeModal('contentPlanning')}
         />
       )}
 
@@ -429,3 +541,11 @@ export const AIContentDashboard: React.FC<AIContentDashboardProps> = ({
     </div>
   );
 };
+
+// Export with error boundary
+export const AIContentDashboard = withErrorBoundary(AIContentDashboardBase, {
+  fallback: <ErrorFallback componentName="AI Content Dashboard" />,
+  onError: (error, errorInfo) => {
+    console.error('AIContentDashboard Error:', error, errorInfo);
+  },
+});

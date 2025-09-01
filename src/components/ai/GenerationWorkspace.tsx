@@ -4,6 +4,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useAIStore } from '../../store/aiStore';
 import { aiGenerationService } from '../../services/ai/AIGenerationService';
+import { withErrorBoundary } from '../ErrorBoundary';
+import { ErrorFallback } from '../errors/ErrorFallback';
 import { ContentEditor } from './components/ContentEditor';
 import { GenerationTree } from './components/GenerationTree';
 import { MetadataPanel } from './components/MetadataPanel';
@@ -41,7 +43,7 @@ interface GenerationWorkspaceProps {
   activeVertical?: string;
 }
 
-export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
+const GenerationWorkspaceBase: React.FC<GenerationWorkspaceProps> = ({
   user: _user, // Preserved for future use
   activeVertical = 'hospitality',
 }) => {
@@ -85,6 +87,15 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
 
   // Get current active node
   const activeNode = activeNodeId ? generationTree[activeNodeId] : null;
+
+  // Auto-switch to enhance view when edit mode is selected
+  useEffect(() => {
+    if (mode === 'edit' && workspaceView !== 'enhance') {
+      setWorkspaceView('enhance');
+    } else if (mode !== 'edit' && workspaceView === 'enhance') {
+      setWorkspaceView('editor');
+    }
+  }, [mode, workspaceView]);
 
   // Handle input change with auto-save
   const handleInputChange = useCallback((value: string) => {
@@ -647,3 +658,11 @@ export const GenerationWorkspace: React.FC<GenerationWorkspaceProps> = ({
     </div>
   );
 };
+
+// Export with error boundary
+export const GenerationWorkspace = withErrorBoundary(GenerationWorkspaceBase, {
+  fallback: <ErrorFallback componentName="Generation Workspace" compact />,
+  onError: (error, errorInfo) => {
+    console.error('GenerationWorkspace Error:', error, errorInfo);
+  },
+});

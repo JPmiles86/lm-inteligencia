@@ -3,7 +3,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAIStore } from '../../../store/aiStore';
-import { brainstormingService } from '../../../services/ai/BrainstormingService.js';
+import { brainstormingService } from '../../../services/ai/BrainstormingService';
 import { 
   X, 
   Lightbulb, 
@@ -306,7 +306,7 @@ export const IdeationModal: React.FC<IdeationModalProps> = ({
       addNotification({
         type: 'success',
         title: 'Export Complete',
-        message: `Downloaded ${result.ideaCount} ideas as ${result.format.toUpperCase()}`,
+        message: `Downloaded ${result.ideaCount} ideas as ${result.format?.toUpperCase() || 'file'}`,
         duration: 3000
       });
     } else {

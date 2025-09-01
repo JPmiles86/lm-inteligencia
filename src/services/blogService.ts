@@ -215,11 +215,11 @@ class BlogDatabaseService {
       if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
 
       const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const response = await this.apiCall<unknown>(endpoint);
+      const response = await this.apiCall<BlogPostsResponse>(endpoint);
       
       // The handleApiResponse now properly returns the full structure for paginated responses
       return {
-        posts: response.data || [],
+        posts: response.posts || [],
         pagination: response.pagination || {
           currentPage: 1,
           totalPages: 1,
@@ -306,7 +306,7 @@ class BlogDatabaseService {
   }
 
   // Convert form data to API format
-  private formatPostForAPI(formData: BlogFormData): unknown {
+  private formatPostForAPI(formData: BlogFormData): any {
     return {
       title: formData.title,
       slug: formData.slug || this.generateSlug(formData.title),
@@ -354,7 +354,7 @@ class BlogDatabaseService {
   // Create a new blog post
   async createPost(formData: BlogFormData, isDraft: boolean = false): Promise<BlogPost> {
     try {
-      const postData = this.formatPostForAPI(formData);
+      const postData: any = this.formatPostForAPI(formData);
       
       // Set published status based on isDraft flag
       postData.published = !isDraft;
@@ -377,7 +377,7 @@ class BlogDatabaseService {
   // Update an existing blog post
   async updatePost(id: number, formData: BlogFormData, isDraft: boolean = false): Promise<BlogPost | null> {
     try {
-      const postData = this.formatPostForAPI(formData);
+      const postData: any = this.formatPostForAPI(formData);
       
       // Set published status based on isDraft flag
       postData.published = !isDraft;

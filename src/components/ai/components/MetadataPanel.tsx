@@ -470,38 +470,38 @@ export const MetadataPanel: React.FC<MetadataPanelProps> = ({ node }) => {
             </div>
           ) : (
             <div className="space-y-2">
-              {node.structuredContent?.metadata?.seoTitle && (
+              {node.structuredContent?.metadata?.seoTitle ? (
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     SEO Title
                   </label>
                   <p className="text-sm text-gray-900 dark:text-white">
-                    {node.structuredContent.metadata.seoTitle}
+                    {String(node.structuredContent.metadata.seoTitle)}
                   </p>
                 </div>
-              )}
+              ) : null}
               
-              {node.structuredContent?.metadata?.metaDescription && (
+              {node.structuredContent?.metadata?.metaDescription ? (
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Meta Description
                   </label>
                   <p className="text-sm text-gray-900 dark:text-white">
-                    {node.structuredContent.metadata.metaDescription}
+                    {String(node.structuredContent.metadata.metaDescription)}
                   </p>
                 </div>
-              )}
+              ) : null}
               
-              {node.structuredContent?.metadata?.keywords && (
+              {node.structuredContent?.metadata?.keywords ? (
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     Keywords
                   </label>
                   <p className="text-sm text-gray-900 dark:text-white">
-                    {node.structuredContent.metadata.keywords}
+                    {String(node.structuredContent.metadata.keywords)}
                   </p>
                 </div>
-              )}
+              ) : null}
               
               {(!node.structuredContent?.metadata?.seoTitle && 
                 !node.structuredContent?.metadata?.metaDescription && 

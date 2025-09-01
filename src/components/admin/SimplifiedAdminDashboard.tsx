@@ -4,17 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ContentVisibilitySettings } from './shared/ContentVisibilitySettings';
 import { blogService } from '../../services/blogService';
+import { BlogPost } from '../../data/blogData';
 
 interface AdminDashboardProps {
   tenantId: string;
-}
-
-interface BlogPost {
-  id: number;
-  title: string;
-  status: string;
-  createdAt: string;
-  publishedDate?: string;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = () => {
@@ -50,7 +43,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     });
   };
 
-  const getStatusBadge = (post: unknown) => {
+  const getStatusBadge = (post: BlogPost) => {
     if (post.status === 'scheduled') {
       return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Scheduled</span>;
     }
@@ -60,7 +53,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = () => {
     return <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Published</span>;
   };
 
-  const handleEditPost = (post: unknown) => {
+  const handleEditPost = (post: BlogPost) => {
     window.location.href = `/admin/blog/edit/${post.id}`;
   };
 

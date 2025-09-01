@@ -16,6 +16,11 @@ interface EnhancedBlogEditorProps {
   onCancel: () => void;
 }
 
+interface DraftData {
+  formData: BlogFormData;
+  timestamp: number;
+}
+
 export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   postId,
   onSave,
@@ -73,7 +78,7 @@ export const EnhancedBlogEditor: React.FC<EnhancedBlogEditorProps> = ({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [autoSaveError, setAutoSaveError] = useState<string | null>(null);
   const [showDraftRecovery, setShowDraftRecovery] = useState(false);
-  const [draftData, setDraftData] = useState<unknown>(null);
+  const [draftData, setDraftData] = useState<DraftData | null>(null);
   const autoSaveTimerRef = React.useRef<NodeJS.Timeout | null>(null);
   const lastFormDataRef = React.useRef<string>('');
   const [categories, setCategories] = useState<string[]>([

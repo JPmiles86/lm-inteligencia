@@ -1,24 +1,36 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
-// Unified Component
-import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaApp';
+// Error Boundary
+import { ErrorBoundary } from './components/ErrorBoundary';
 
-// Admin Components
+// Core components that should be in the initial bundle
+import { UnifiedInteligenciaApp } from './components/layout/UnifiedInteligenciaApp';
 import { AdminAuth } from './components/admin/AdminAuth';
 import { AdminLayout } from './components/admin/AdminLayout';
-import { BlogManagement } from './components/admin/BlogManagement';
-// import { BlogEditor } from './components/admin/BlogManagement/BlogEditor'; // REMOVED: Use BlogManagement instead
-import { AdminDashboard } from './components/admin/SimplifiedAdminDashboard';
-import { Settings } from './components/admin/SimplifiedSettings';
-import { AIContentDashboard } from './components/ai/AIContentDashboard';
+
+// Lazy load heavy admin components
+const BlogManagement = lazy(() => import('./components/admin/BlogManagement').then(m => ({ default: m.BlogManagement })));
+const AdminDashboard = lazy(() => import('./components/admin/SimplifiedAdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const Settings = lazy(() => import('./components/admin/SimplifiedSettings').then(m => ({ default: m.Settings || m.default })));
+const AIContentDashboard = lazy(() => import('./components/ai/AIContentDashboard').then(m => ({ default: m.AIContentDashboard })));
 
 // Debug Component (temporary for testing) - REMOVE IN PRODUCTION
 // import { RoutingDebugger } from './components/debug/RoutingDebugger';
 
 // Hooks
 import { useVideoPreloaderWithTrigger } from './hooks/useVideoPreloaderWithTrigger';
+
+// Loading fallback component
+const LoadingFallback: React.FC = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+      <p className="mt-4 text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
 
 /**
  * AdminRoutes - Handles all admin section routing with proper React Router navigation
@@ -73,15 +85,17 @@ const AdminRoutes: React.FC = () => {
       onSectionChange={handleSectionChange}
       tenantId="hospitality"
     >
-      <Routes>
-        <Route path="/blog" element={<BlogManagement />} />
-        <Route path="/blog/new" element={<BlogManagement />} />
-        <Route path="/blog/edit/:id" element={<BlogManagement />} />
-        <Route path="/ai/*" element={<AIContentDashboard />} />
-        <Route path="/analytics" element={<div className="p-6 text-center text-gray-500">Analytics - Coming Soon</div>} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/*" element={<AdminDashboard tenantId="hospitality" />} />
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          <Route path="/blog" element={<BlogManagement />} />
+          <Route path="/blog/new" element={<BlogManagement />} />
+          <Route path="/blog/edit/:id" element={<BlogManagement />} />
+          <Route path="/ai/*" element={<AIContentDashboard />} />
+          <Route path="/analytics" element={<div className="p-6 text-center text-gray-500">Analytics - Coming Soon</div>} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/*" element={<AdminDashboard tenantId="hospitality" />} />
+        </Routes>
+      </Suspense>
     </AdminLayout>
   );
 };
@@ -148,35 +162,37 @@ const App: React.FC = () => {
   console.log('[App.tsx] Rendering App component with routes');
   
   return (
-    <HelmetProvider>
-      <Router>
-        {/* Add routing debugger for testing - REMOVE IN PRODUCTION */}
-        {/* <RoutingDebugger /> */}
-        
-        <Routes>
-          {/* Admin routes with proper layout and navigation */}
-          <Route 
-            path="/admin/*" 
-            element={
-              <AdminAuth>
-                <AdminRoutes />
-              </AdminAuth>
-            } 
-          />
+    <ErrorBoundary>
+      <HelmetProvider>
+        <Router>
+          {/* Add routing debugger for testing - REMOVE IN PRODUCTION */}
+          {/* <RoutingDebugger /> */}
           
-          {/* Main app with seamless transitions - catch-all route comes last */}
-          <Route 
-            path="/*" 
-            element={
-              (() => {
-                console.log('[App.tsx] Catch-all route matched. Current path:', window.location.pathname);
-                return <UnifiedInteligenciaApp />;
-              })()
-            } 
-          />
-        </Routes>
-      </Router>
-    </HelmetProvider>
+          <Routes>
+            {/* Admin routes with proper layout and navigation */}
+            <Route 
+              path="/admin/*" 
+              element={
+                <AdminAuth>
+                  <AdminRoutes />
+                </AdminAuth>
+              } 
+            />
+            
+            {/* Main app with seamless transitions - catch-all route comes last */}
+            <Route 
+              path="/*" 
+              element={
+                (() => {
+                  console.log('[App.tsx] Catch-all route matched. Current path:', window.location.pathname);
+                  return <UnifiedInteligenciaApp />;
+                })()
+              } 
+            />
+          </Routes>
+        </Router>
+      </HelmetProvider>
+    </ErrorBoundary>
   );
 };
 

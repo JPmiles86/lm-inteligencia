@@ -101,6 +101,7 @@ export const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
   const [topic, setTopic] = useState(initialTopic);
   const [blogTitle, setBlogTitle] = useState(title);
   const [blogSynopsis, setBlogSynopsis] = useState(synopsis);
+  const [localTargetWordCount, setLocalTargetWordCount] = useState(targetWordCount);
   const [count, setCount] = useState(2);
   const [outlineStructure, setOutlineStructure] = useState<'linear' | 'hierarchical' | 'modular'>('hierarchical');
   const [sectionCount, setSectionCount] = useState<'auto' | number>('auto');
@@ -152,7 +153,7 @@ export const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
           count: count,
           structure: outlineStructure,
           sectionCount: sectionCount,
-          targetWordCount: targetWordCount,
+          targetWordCount: localTargetWordCount,
           includeIntroConclusion: includeIntroConclusion,
           includeSubsections: includeSubsections,
           includeKeywords: includeKeywords,
@@ -210,7 +211,7 @@ export const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [topic, blogTitle, blogSynopsis, context, count, outlineStructure, sectionCount, targetWordCount, includeIntroConclusion, includeSubsections, includeKeywords, optimizeForSEO, activeProvider, activeModel, addNotification, updateAnalytics, updateProviderUsage]);
+  }, [topic, blogTitle, blogSynopsis, context, count, outlineStructure, sectionCount, localTargetWordCount, includeIntroConclusion, includeSubsections, includeKeywords, optimizeForSEO, activeProvider, activeModel, addNotification, updateAnalytics, updateProviderUsage]);
 
   // Toggle outline selection
   const toggleOutlineSelection = useCallback((outlineId: string) => {
@@ -480,8 +481,8 @@ export const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
               </label>
               <input
                 type="number"
-                value={targetWordCount}
-                onChange={(e) => setTargetWordCount(Number(e.target.value))}
+                value={localTargetWordCount}
+                onChange={(e) => setLocalTargetWordCount(Number(e.target.value))}
                 min="500"
                 max="5000"
                 step="100"

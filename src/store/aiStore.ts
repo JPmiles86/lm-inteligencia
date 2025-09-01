@@ -306,6 +306,18 @@ interface AIStore {
   errors: string[];
   notifications: Notification[];
   
+  // Modal state management
+  modals: {
+    context: boolean;
+    styleGuide: boolean;
+    multiVertical: boolean;
+    socialMedia: boolean;
+    ideation: boolean;
+    imageGeneration: boolean;
+    contentPlanning: boolean;
+  };
+  modalHistory: string[];  // Track modal navigation history
+  
   // Multi-vertical state
   multiVerticalConfig: {
     verticals: string[];
@@ -361,6 +373,14 @@ interface AIStore {
   clearErrors: () => void;
   addNotification: (notification: Omit<Notification, 'id' | 'createdAt'>) => void;
   removeNotification: (id: string) => void;
+  
+  // Actions - Modal Management
+  openModal: (modalName: keyof AIStore['modals']) => void;
+  closeModal: (modalName: keyof AIStore['modals']) => void;
+  closeAllModals: () => void;
+  toggleModal: (modalName: keyof AIStore['modals']) => void;
+  pushModalHistory: (modalName: string) => void;
+  popModalHistory: () => string | undefined;
   
   // Actions - Multi-vertical
   setMultiVerticalConfig: (config: Partial<AIStore['multiVerticalConfig']>) => void;
@@ -464,6 +484,17 @@ export const useAIStore = create<AIStore>()(
         streaming: false,
         errors: [],
         notifications: [],
+        
+        modals: {
+          context: false,
+          styleGuide: false,
+          multiVertical: false,
+          socialMedia: false,
+          ideation: false,
+          imageGeneration: false,
+          contentPlanning: false,
+        },
+        modalHistory: [],
         
         multiVerticalConfig: defaultMultiVerticalConfig,
         
@@ -611,6 +642,54 @@ export const useAIStore = create<AIStore>()(
           set((state) => ({
             notifications: state.notifications.filter((n) => n.id !== id),
           })),
+        
+        // Actions - Modal Management
+        openModal: (modalName) =>
+          set((state) => ({
+            modals: { ...state.modals, [modalName]: true },
+            modalHistory: [...state.modalHistory, modalName],
+          })),
+        
+        closeModal: (modalName) =>
+          set((state) => ({
+            modals: { ...state.modals, [modalName]: false },
+          })),
+        
+        closeAllModals: () =>
+          set((state) => ({
+            modals: {
+              context: false,
+              styleGuide: false,
+              multiVertical: false,
+              socialMedia: false,
+              ideation: false,
+              imageGeneration: false,
+              contentPlanning: false,
+            },
+            modalHistory: [],
+          })),
+        
+        toggleModal: (modalName) =>
+          set((state) => ({
+            modals: { ...state.modals, [modalName]: !state.modals[modalName] },
+            modalHistory: state.modals[modalName] 
+              ? state.modalHistory 
+              : [...state.modalHistory, modalName],
+          })),
+        
+        pushModalHistory: (modalName) =>
+          set((state) => ({
+            modalHistory: [...state.modalHistory, modalName],
+          })),
+        
+        popModalHistory: () => {
+          const history = get().modalHistory;
+          if (history.length > 0) {
+            set({ modalHistory: history.slice(0, -1) });
+            return history[history.length - 1];
+          }
+          return undefined;
+        },
         
         // Actions - Multi-vertical
         setMultiVerticalConfig: (config) =>

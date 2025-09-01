@@ -87,8 +87,8 @@ export const UpdateBlogPostSchema = CreateBlogPostSchema.partial();
 
 // Schema for query parameters when fetching posts
 export const BlogPostQuerySchema = z.object({
-  page: z.string().transform(val => parseInt(val, 10)).pipe(z.number().int().positive()).default(1),
-  limit: z.string().transform(val => parseInt(val, 10)).pipe(z.number().int().positive().max(100)).default(10),
+  page: z.string().transform(val => parseInt(val, 10)).pipe(z.number().int().positive()).default('1'),
+  limit: z.string().transform(val => parseInt(val, 10)).pipe(z.number().int().positive().max(100)).default('10'),
   category: z.string().optional(),
   featured: z.string().transform(val => val === 'true').pipe(z.boolean()).optional(),
   published: z.string().transform(val => val === 'true').pipe(z.boolean()).optional(),

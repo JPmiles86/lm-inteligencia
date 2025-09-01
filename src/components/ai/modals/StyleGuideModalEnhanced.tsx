@@ -96,7 +96,7 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { styleGuides, setStyleGuides, addNotification } = useAIStore();
+  const { styleGuides, setStyleGuides, addNotification, activeProvider, activeModel } = useAIStore();
   
   const [activeTab, setActiveTab] = useState<'brand' | 'vertical' | 'writing_style' | 'persona'>('brand');
   const [searchTerm, setSearchTerm] = useState('');
@@ -221,15 +221,41 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
         Please create a comprehensive style guide in markdown format with appropriate sections.`;
         
         const aiResponse = await aiGenerationService.generateContent({
+          mode: 'direct',
+          vertical: 'all',
+          task: 'style_guide_creation',
           prompt,
           context: {
-            type: 'style_guide_creation',
-            guideType: newGuide.type,
+            styleGuides: {
+              brand: true,
+              vertical: [],
+              writingStyle: [],
+              persona: [],
+            },
+            previousContent: {
+              mode: 'none',
+              includeElements: {
+                titles: false,
+                synopsis: false,
+                content: false,
+                tags: false,
+                metadata: false,
+                images: false
+              }
+            },
+            referenceImages: {
+              style: [],
+              logo: [],
+              persona: []
+            },
+            additionalContext: `Creating ${newGuide.type} style guide`,
           },
+          provider: activeProvider as 'openai' | 'anthropic' | 'google' | 'perplexity',
+          model: activeModel,
         });
         
-        if (aiResponse.success && aiResponse.generation) {
-          finalContent = aiResponse.generation;
+        if (aiResponse.success && aiResponse.data?.content) {
+          finalContent = aiResponse.data.content;
         }
         setAiGenerating(false);
       }
@@ -239,6 +265,10 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
         content: finalContent,
         type: activeTab,
         active: true,
+        version: 1,
+        isDefault: false,
+        voiceCharacteristics: [],
+        vertical: newGuide.vertical || undefined,
       });
       
       if (response.success) {
@@ -280,19 +310,44 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
       Please provide an improved version of the style guide maintaining the same format and structure but incorporating the requested changes.`;
       
       const response = await aiGenerationService.generateContent({
+        mode: 'direct',
+        vertical: 'all',
+        task: 'style_guide_enhancement',
         prompt,
         context: {
-          type: 'style_guide_enhancement',
-          guideType: selectedGuide.type,
-          guideId: selectedGuide.id,
+          styleGuides: {
+            brand: true,
+            vertical: [],
+            writingStyle: [],
+            persona: [],
+          },
+          previousContent: {
+            mode: 'none',
+            includeElements: {
+              titles: false,
+              synopsis: false,
+              content: false,
+              tags: false,
+              metadata: false,
+              images: false
+            }
+          },
+          referenceImages: {
+            style: [],
+            logo: [],
+            persona: []
+          },
+          additionalContext: `Enhancing ${selectedGuide.type} style guide (ID: ${selectedGuide.id})`,
         },
+        provider: activeProvider as 'openai' | 'anthropic' | 'google' | 'perplexity',
+        model: activeModel,
       });
       
-      if (response.success && response.generation) {
+      if (response.success && response.data?.content) {
         // Create a new version of the style guide
         const updateResponse = await aiGenerationService.updateStyleGuide(selectedGuide.id, {
           ...selectedGuide,
-          content: response.generation,
+          content: response.data.content,
           version: (selectedGuide.version || 1) + 1,
         });
         
@@ -800,10 +855,10 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                     </div>
                   ) : viewMode === 'preview' ? (
                     <div className="prose-spacing">
-                      <ReactMarkdown 
-                        remarkPlugins={[remarkGfm]}
-                        className="prose prose-sm dark:prose-invert max-w-none"
-                        components={{
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm]}
+                          components={{
                           h1: ({children}) => <h1 className="text-2xl font-bold mb-4 mt-6">{children}</h1>,
                           h2: ({children}) => <h2 className="text-xl font-semibold mb-3 mt-5">{children}</h2>,
                           h3: ({children}) => <h3 className="text-lg font-medium mb-2 mt-4">{children}</h3>,
@@ -816,6 +871,7 @@ export const StyleGuideModalEnhanced: React.FC<StyleGuideModalProps> = ({
                       >
                         {selectedGuide.content}
                       </ReactMarkdown>
+                      </div>
                     </div>
                   ) : (
                     <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto">

@@ -2,7 +2,7 @@
 // Integrates BrainstormingModule, TitleGenerator, SynopsisGenerator, OutlineGenerator, and final content generation
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore, StructuredWorkflowState, WorkflowStep } from '../../../store/aiStore';
+import { useAIStore, StructuredWorkflowState, WorkflowStep, GenerationConfig } from '../../../store/aiStore';
 import { StepProgress, defaultBlogWorkflowSteps } from '../components/StepProgress';
 import { BrainstormingModule } from './BrainstormingModule';
 import { TitleGenerator } from './TitleGenerator';
@@ -162,7 +162,8 @@ export const StructuredWorkflow: React.FC<StructuredWorkflowProps> = ({
     
     updateWorkflowStepData(workflow.id, 'title', {
       selectedTitles,
-      finalTitle: selectedTitles[0]?.title || ''
+      topic: workflow.stepData.ideation?.topic || '',
+      context: workflow.stepData.ideation?.selectedIdea?.description || ''
     });
     
     updateWorkflowStepData(workflow.id, 'synopsis', {
@@ -179,12 +180,14 @@ export const StructuredWorkflow: React.FC<StructuredWorkflowProps> = ({
     
     updateWorkflowStepData(workflow.id, 'synopsis', {
       selectedSynopses,
-      finalSynopsis: selectedSynopses[0]?.synopsis || ''
+      topic: workflow.stepData.ideation?.topic || '',
+      title: workflow.stepData.title?.selectedTitles?.[0]?.title || '',
+      context: workflow.stepData.ideation?.selectedIdea?.description || ''
     });
     
     updateWorkflowStepData(workflow.id, 'outline', {
       topic: workflow.stepData.ideation?.topic || '',
-      title: workflow.stepData.title?.finalTitle || '',
+      title: workflow.stepData.title?.selectedTitles?.[0]?.title || '',
       synopsis: selectedSynopses[0]?.synopsis || '',
       targetWordCount: 1500
     });
@@ -197,14 +200,17 @@ export const StructuredWorkflow: React.FC<StructuredWorkflowProps> = ({
     
     updateWorkflowStepData(workflow.id, 'outline', {
       selectedOutlines,
-      finalOutline: selectedOutlines[0] || null
+      topic: workflow.stepData.ideation?.topic || '',
+      title: workflow.stepData.title?.selectedTitles?.[0]?.title || '',
+      synopsis: workflow.stepData.synopsis?.selectedSynopses?.[0]?.synopsis || '',
+      targetWordCount: 1500
     });
     
     updateWorkflowStepData(workflow.id, 'content', {
       generationConfig: {
         idea: workflow.stepData.ideation?.selectedIdea,
-        title: workflow.stepData.title?.finalTitle,
-        synopsis: workflow.stepData.synopsis?.finalSynopsis,
+        title: workflow.stepData.title?.selectedTitles?.[0]?.title,
+        synopsis: workflow.stepData.synopsis?.selectedSynopses?.[0]?.synopsis,
         outline: selectedOutlines[0]
       }
     });
@@ -220,15 +226,15 @@ export const StructuredWorkflow: React.FC<StructuredWorkflowProps> = ({
     setWorkflowLoading(true);
     
     try {
-      const generationConfig = {
-        mode: 'structured',
+      const generationConfig: GenerationConfig = {
+        mode: 'structured' as const,
         vertical: 'all',
         task: 'blog',
         prompt: `Generate a complete blog post based on the following structured workflow:
         
-Title: ${workflow.stepData.title?.finalTitle || ''}
-Synopsis: ${workflow.stepData.synopsis?.finalSynopsis || ''}
-Outline: ${JSON.stringify(workflow.stepData.outline?.finalOutline?.sections || [])}
+Title: ${workflow.stepData.title?.selectedTitles?.[0]?.title || ''}
+Synopsis: ${workflow.stepData.synopsis?.selectedSynopses?.[0]?.synopsis || ''}
+Outline: ${JSON.stringify(workflow.stepData.outline?.selectedOutlines?.[0]?.sections || [])}
         
 Create engaging, well-structured content that follows the outline and matches the synopsis.`,
         context: {
@@ -237,7 +243,7 @@ Create engaging, well-structured content that follows the outline and matches th
           referenceImages: { style: [], logo: [], persona: [] },
           additionalContext: ''
         },
-        provider: activeProvider,
+        provider: activeProvider as 'openai' | 'anthropic' | 'google' | 'perplexity',
         model: activeModel,
         outputCount: 1
       };
@@ -487,7 +493,7 @@ Create engaging, well-structured content that follows the outline and matches th
             {currentStep?.id === 'synopsis' && (
               <SynopsisGenerator
                 topic={workflow.stepData.ideation?.topic || ''}
-                title={workflow.stepData.title?.finalTitle || ''}
+                title={workflow.stepData.title?.selectedTitles?.[0]?.title || ''}
                 context={workflow.stepData.ideation?.selectedIdea?.description || ''}
                 onMultipleSynopsisSelected={handleSynopsisComplete}
                 mode="structured"
@@ -498,8 +504,8 @@ Create engaging, well-structured content that follows the outline and matches th
             {currentStep?.id === 'outline' && (
               <OutlineGenerator
                 topic={workflow.stepData.ideation?.topic || ''}
-                title={workflow.stepData.title?.finalTitle || ''}
-                synopsis={workflow.stepData.synopsis?.finalSynopsis || ''}
+                title={workflow.stepData.title?.selectedTitles?.[0]?.title || ''}
+                synopsis={workflow.stepData.synopsis?.selectedSynopses?.[0]?.synopsis || ''}
                 targetWordCount={workflow.stepData.outline?.targetWordCount || 1500}
                 onMultipleOutlinesSelected={handleOutlineComplete}
                 mode="structured"
@@ -532,19 +538,19 @@ Create engaging, well-structured content that follows the outline and matches th
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Title:</span>
                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                          {workflow.stepData.title?.finalTitle}
+                          {workflow.stepData.title?.selectedTitles?.[0]?.title}
                         </span>
                       </div>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Sections:</span>
                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                          {workflow.stepData.outline?.finalOutline?.totalSections || 0} sections
+                          {workflow.stepData.outline?.selectedOutlines?.[0]?.totalSections || 0} sections
                         </span>
                       </div>
                       <div>
                         <span className="font-medium text-gray-700 dark:text-gray-300">Est. Words:</span>
                         <span className="ml-2 text-gray-600 dark:text-gray-400">
-                          ~{workflow.stepData.outline?.finalOutline?.estimatedWords || 1500} words
+                          ~{workflow.stepData.outline?.selectedOutlines?.[0]?.estimatedWords || 1500} words
                         </span>
                       </div>
                     </div>
