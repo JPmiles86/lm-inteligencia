@@ -10,7 +10,7 @@ import { usageTracker } from '../services/usageTracker';
 const router = Router();
 
 // Get all provider settings (without exposing API keys)
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   try {
     const providers = await db.select().from(providerSettings);
     
@@ -33,7 +33,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 // Get specific provider settings
-router.get('/:provider', asyncHandler(async (req, res) => {
+router.get('/:provider', asyncHandler(async (req: Request, res: Response) => {
   const { provider } = req.params;
   
   if (!['openai', 'anthropic', 'google', 'perplexity'].includes(provider)) {
@@ -67,7 +67,7 @@ router.get('/:provider', asyncHandler(async (req, res) => {
 }));
 
 // Add or update provider API key
-router.post('/:provider', asyncHandler(async (req, res) => {
+router.post('/:provider', asyncHandler(async (req: Request, res: Response) => {
   const { provider } = req.params;
   const { apiKey, settings = {} } = req.body;
   
@@ -184,7 +184,7 @@ router.post('/:provider', asyncHandler(async (req, res) => {
 }));
 
 // Test provider connection
-router.post('/:provider/test', asyncHandler(async (req, res) => {
+router.post('/:provider/test', asyncHandler(async (req: Request, res: Response) => {
   const { provider } = req.params;
   
   if (!['openai', 'anthropic', 'google', 'perplexity'].includes(provider)) {
@@ -249,7 +249,7 @@ router.post('/:provider/test', asyncHandler(async (req, res) => {
 }));
 
 // Delete provider configuration
-router.delete('/:provider', asyncHandler(async (req, res) => {
+router.delete('/:provider', asyncHandler(async (req: Request, res: Response) => {
   const { provider } = req.params;
   
   if (!['openai', 'anthropic', 'google', 'perplexity'].includes(provider)) {
@@ -372,7 +372,7 @@ async function testProviderConnection(provider: string, apiKey: string, model: s
 // ================================
 
 // Get provider health status
-router.get('/health', asyncHandler(async (req, res) => {
+router.get('/health', asyncHandler(async (req: Request, res: Response) => {
   try {
     const healthStatus = intelligentProviderSelector.getHealthStatus();
     res.json(healthStatus);
@@ -382,7 +382,7 @@ router.get('/health', asyncHandler(async (req, res) => {
 }));
 
 // Get specific provider health
-router.get('/:provider/health', asyncHandler(async (req, res) => {
+router.get('/:provider/health', asyncHandler(async (req: Request, res: Response) => {
   const { provider } = req.params;
   
   if (!['openai', 'anthropic', 'google', 'perplexity'].includes(provider)) {
@@ -405,7 +405,7 @@ router.get('/:provider/health', asyncHandler(async (req, res) => {
 }));
 
 // Get usage statistics
-router.get('/usage', asyncHandler(async (req, res) => {
+router.get('/usage', asyncHandler(async (req: Request, res: Response) => {
   try {
     const { provider, days = '30' } = req.query;
     const daysParsed = parseInt(days as string, 10);
@@ -427,7 +427,7 @@ router.get('/usage', asyncHandler(async (req, res) => {
 }));
 
 // Get monthly usage limits status
-router.get('/monthly-usage', asyncHandler(async (req, res) => {
+router.get('/monthly-usage', asyncHandler(async (req: Request, res: Response) => {
   try {
     const monthlyUsage = await usageTracker.getMonthlyUsage();
     res.json(monthlyUsage);
@@ -437,7 +437,7 @@ router.get('/monthly-usage', asyncHandler(async (req, res) => {
 }));
 
 // Get cost breakdown
-router.get('/cost-breakdown', asyncHandler(async (req, res) => {
+router.get('/cost-breakdown', asyncHandler(async (req: Request, res: Response) => {
   try {
     const { days = '30' } = req.query;
     const daysParsed = parseInt(days as string, 10);
@@ -455,7 +455,7 @@ router.get('/cost-breakdown', asyncHandler(async (req, res) => {
 }));
 
 // Get provider performance comparison
-router.get('/performance-comparison', asyncHandler(async (req, res) => {
+router.get('/performance-comparison', asyncHandler(async (req: Request, res: Response) => {
   try {
     const { days = '7' } = req.query;
     const daysParsed = parseInt(days as string, 10);
@@ -473,7 +473,7 @@ router.get('/performance-comparison', asyncHandler(async (req, res) => {
 }));
 
 // Get provider capabilities
-router.get('/capabilities', asyncHandler(async (req, res) => {
+router.get('/capabilities', asyncHandler(async (req: Request, res: Response) => {
   try {
     const capabilities = intelligentProviderSelector.getCapabilities();
     res.json(capabilities);
@@ -483,7 +483,7 @@ router.get('/capabilities', asyncHandler(async (req, res) => {
 }));
 
 // Get fallback chains
-router.get('/fallback-chains', asyncHandler(async (req, res) => {
+router.get('/fallback-chains', asyncHandler(async (req: Request, res: Response) => {
   try {
     const chains = intelligentProviderSelector.getFallbackChains();
     res.json(chains);
@@ -493,7 +493,7 @@ router.get('/fallback-chains', asyncHandler(async (req, res) => {
 }));
 
 // Intelligent provider selection endpoint
-router.post('/select', asyncHandler(async (req, res) => {
+router.post('/select', asyncHandler(async (req: Request, res: Response) => {
   const { taskType, requirements, preferredProvider } = req.body;
   
   if (!taskType || typeof taskType !== 'string') {
@@ -525,7 +525,7 @@ router.post('/select', asyncHandler(async (req, res) => {
 }));
 
 // Export usage data
-router.get('/export-usage', asyncHandler(async (req, res) => {
+router.get('/export-usage', asyncHandler(async (req: Request, res: Response) => {
   try {
     const { startDate, endDate, format = 'json' } = req.query;
     
@@ -562,7 +562,7 @@ router.get('/export-usage', asyncHandler(async (req, res) => {
 }));
 
 // Reset monthly usage counters (admin only)
-router.post('/reset-monthly', asyncHandler(async (req, res) => {
+router.post('/reset-monthly', asyncHandler(async (req: Request, res: Response) => {
   try {
     await usageTracker.resetMonthlyCounters();
     
