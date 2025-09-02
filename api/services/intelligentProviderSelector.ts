@@ -85,7 +85,7 @@ export class IntelligentProviderSelector {
   };
   
   // Task-specific fallback chains as specified in the assignment
-  private readonly fallbackChains = {
+  private readonly fallbackChains: Record<string, string[]> = {
     research: ['perplexity', 'anthropic', 'google', 'openai'],
     writing: ['anthropic', 'openai', 'google'],
     image: ['google', 'openai'],
@@ -237,7 +237,7 @@ export class IntelligentProviderSelector {
    * Get optimal models for provider and task
    */
   private getModelsForTask(provider: string, taskType: string): string[] {
-    const modelMap = {
+    const modelMap: Record<string, Record<string, string[]>> = {
       openai: {
         writing: ['gpt-4o', 'gpt-4-turbo'],
         creative: ['gpt-4o', 'gpt-4-turbo'],
@@ -285,7 +285,7 @@ export class IntelligentProviderSelector {
       maxTokens: 4000
     };
     
-    const taskConfigs = {
+    const taskConfigs: Record<string, { temperature: number; maxTokens: number }> = {
       writing: { temperature: 0.7, maxTokens: 4000 },
       creative: { temperature: 0.9, maxTokens: 4000 },
       research: { temperature: 0.3, maxTokens: 8000 },
@@ -306,7 +306,7 @@ export class IntelligentProviderSelector {
     const remainingChain = index >= 0 ? chain.slice(index + 1) : chain;
     
     // Filter to only include available providers
-    return remainingChain.filter(p => availableProviders.includes(p));
+    return remainingChain.filter((p: string) => availableProviders.includes(p));
   }
   
   /**
@@ -367,13 +367,21 @@ export class IntelligentProviderSelector {
     const startTime = Date.now();
     
     try {
-      const response = await fetch(`${process.env.BASE_URL || 'http://localhost:3000'}/api/providers/${provider}/test`, {
-        method: 'POST',
-        timeout: 10000, // 10 second timeout
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      // Create a timeout promise
+      const timeoutPromise = new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 10000)
+      );
+      
+      // Race between fetch and timeout
+      const response = await Promise.race([
+        fetch(`${process.env.BASE_URL || 'http://localhost:3000'}/api/providers/${provider}/test`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }),
+        timeoutPromise
+      ]);
       
       const latency = Date.now() - startTime;
       const existing = this.providerHealth.get(provider);

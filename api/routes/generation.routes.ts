@@ -172,7 +172,7 @@ router.get('/providers', async (req: Request, res: Response) => {
     const result = await db.select({
       id: providerSettings.id,
       provider: providerSettings.provider,
-      isActive: providerSettings.isActive,
+      active: providerSettings.active,
       defaultModel: providerSettings.defaultModel,
       taskDefaults: providerSettings.taskDefaults,
       createdAt: providerSettings.createdAt,
