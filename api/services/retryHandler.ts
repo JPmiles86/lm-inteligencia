@@ -95,9 +95,9 @@ export class RetryHandler {
         // Log the attempt failure
         console.warn(`Attempt ${attempt} failed:`, {
           error: error instanceof Error ? error.message : 'Unknown error',
-          status: error.status,
-          code: error.code,
-          type: error.type
+          status: (error as any).status,
+          code: (error as any).code,
+          type: (error as any).type
         });
         
         // If this was the last attempt, break and throw

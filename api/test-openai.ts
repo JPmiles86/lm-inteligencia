@@ -59,7 +59,7 @@ async function testOpenAI() {
       quality: 'standard',
     });
 
-    const imageUrl = imageResponse.data[0]?.url;
+    const imageUrl = imageResponse.data?.[0]?.url;
     console.log('✅ Image generated successfully:');
     console.log('   Image URL:', imageUrl ? 'Generated (URL available)' : 'Failed');
 

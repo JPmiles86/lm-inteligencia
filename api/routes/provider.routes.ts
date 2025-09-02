@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { eq } from 'drizzle-orm';
 import { db } from '../server';
 import { providerSettings } from '../../src/db/schema';
@@ -577,7 +577,7 @@ router.post('/reset-monthly', asyncHandler(async (req, res) => {
 }));
 
 // Track usage manually (for testing purposes)
-router.post('/track-usage', asyncHandler(async (req, res) => {
+router.post('/track-usage', asyncHandler(async (req: Request, res: Response) => {
   const { provider, task, tokensUsed, cost, duration, success, model, errorMessage } = req.body;
   
   if (!provider || !task || typeof tokensUsed !== 'number' || typeof cost !== 'number') {

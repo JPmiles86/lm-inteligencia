@@ -66,7 +66,7 @@ interface ProviderReliabilityTest {
 }
 
 export class FallbackTester {
-  private readonly testPrompts = {
+  private readonly testPrompts: Record<string, string> = {
     writing: 'Write a brief introduction about artificial intelligence.',
     research: 'What are the latest developments in renewable energy?',
     creative: 'Create a short story about a robot learning to paint.',
@@ -486,7 +486,7 @@ export class FallbackTester {
    * Get fallback chain for task type
    */
   private getFallbackChain(taskType: string): string[] {
-    const chains = {
+    const chains: Record<string, string[]> = {
       research: ['perplexity', 'anthropic', 'google', 'openai'],
       writing: ['anthropic', 'openai', 'google'],
       image: ['google', 'openai'],
@@ -508,7 +508,7 @@ export class FallbackTester {
    * Estimate cost based on provider and tokens
    */
   private estimateCost(provider: string, tokens: number): number {
-    const costPer1k = {
+    const costPer1k: Record<string, number> = {
       openai: 0.03,
       anthropic: 0.025,
       google: 0.02,
