@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { db } from '../server';
+import { db } from '../index';
 import { providerSettings } from '../../src/db/schema';
 import { decrypt } from '../utils/encryption';
 import { ProviderError } from '../middleware/error.middleware';
@@ -152,8 +152,8 @@ export class IntelligentProviderSelector {
       const providers = await db.select().from(providerSettings);
       
       return providers
-        .filter(p => p.active && p.apiKeyEncrypted && p.testSuccess !== false)
-        .map(p => p.provider);
+        .filter((p: any) => p.active && p.apiKeyEncrypted && p.testSuccess !== false)
+        .map((p: any) => p.provider);
     } catch (error) {
       throw new Error(`Failed to get available providers: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

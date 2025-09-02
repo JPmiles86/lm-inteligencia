@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { eq } from 'drizzle-orm';
-import { db } from '../server';
+import { db } from '../index';
 import { providerSettings } from '../../src/db/schema';
 import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
 import { encrypt, decrypt } from '../utils/encryption';

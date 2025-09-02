@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { db } from '../server';
+import { db } from '../index';
 import { providerSettings } from '../../src/db/schema';
 import { decrypt } from '../utils/encryption';
 import { ProviderError } from '../middleware/error.middleware';
