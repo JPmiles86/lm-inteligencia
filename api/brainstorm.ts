@@ -1,8 +1,63 @@
 /**
  * Standalone brainstorm API endpoint
+ * Uses API keys stored securely in the database
  */
 
 import { OpenAI } from 'openai';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import { eq } from 'drizzle-orm';
+import crypto from 'crypto';
+
+// Import schema
+import { providerSettings } from '../src/db/schema';
+
+// Encryption service (simplified inline version)
+class SimpleEncryptionService {
+  private algorithm = 'aes-256-gcm';
+  private keyLength = 32;
+  private ivLength = 16;
+  private tagLength = 16;
+  private iterations = 100000;
+  private masterKey: Buffer;
+
+  constructor() {
+    const envKey = process.env.ENCRYPTION_KEY;
+    if (!envKey) {
+      // Use a default key for development (NOT for production!)
+      this.masterKey = this.deriveKey('default-dev-key-do-not-use-in-production');
+    } else {
+      this.masterKey = this.deriveKey(envKey);
+    }
+  }
+
+  private deriveKey(password: string): Buffer {
+    const salt = Buffer.from('static-salt-for-key-derivation', 'utf8');
+    return crypto.pbkdf2Sync(password, salt, this.iterations, this.keyLength, 'sha256');
+  }
+
+  decrypt(encryptedKey: string): string {
+    try {
+      const combined = Buffer.from(encryptedKey, 'base64');
+      const iv = combined.slice(0, this.ivLength);
+      const tag = combined.slice(this.ivLength, this.ivLength + this.tagLength);
+      const encrypted = combined.slice(this.ivLength + this.tagLength);
+      
+      const decipher = crypto.createDecipheriv(this.algorithm, this.masterKey, iv);
+      (decipher as any).setAuthTag(tag);
+      
+      const decrypted = Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final()
+      ]);
+      
+      return decrypted.toString('utf8');
+    } catch (error) {
+      console.error('Decryption error:', error);
+      throw new Error('Failed to decrypt API key');
+    }
+  }
+}
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -22,7 +77,24 @@ export default async function handler(req: any, res: any) {
     });
   }
 
+  let db: any;
+  let sql: any;
+
   try {
+    // Initialize database connection
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL not configured');
+    }
+
+    sql = postgres(connectionString, {
+      ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+      max: 1,
+      idle_timeout: 20,
+      connect_timeout: 10
+    });
+    db = drizzle(sql);
+
     const {
       topic,
       count = 10,
@@ -39,6 +111,43 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({
         success: false,
         error: 'Topic is required and must be a string'
+      });
+    }
+
+    // Fetch the provider settings from database
+    const providerSettingsResult = await db
+      .select()
+      .from(providerSettings)
+      .where(eq(providerSettings.provider, provider))
+      .limit(1);
+
+    if (!providerSettingsResult || providerSettingsResult.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: `No API key configured for provider: ${provider}. Please add your API key in the admin settings.`
+      });
+    }
+
+    const settings = providerSettingsResult[0];
+    
+    if (!settings.active) {
+      return res.status(400).json({
+        success: false,
+        error: `Provider ${provider} is not active. Please enable it in settings.`
+      });
+    }
+
+    // Decrypt the API key
+    const encryptionService = new SimpleEncryptionService();
+    let apiKey: string;
+    
+    try {
+      apiKey = encryptionService.decrypt(settings.apiKeyEncrypted);
+    } catch (decryptError) {
+      console.error('Failed to decrypt API key:', decryptError);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to decrypt API key. Please re-enter your API key in settings.'
       });
     }
 
@@ -79,22 +188,22 @@ export default async function handler(req: any, res: any) {
       }
     ]`;
 
-    // Initialize OpenAI
+    // Initialize OpenAI with the decrypted key
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY || ''
+      apiKey: apiKey
     });
 
     const startTime = Date.now();
 
     // Generate ideas using OpenAI
     const completion = await openai.chat.completions.create({
-      model: model || 'gpt-4o',
+      model: settings.defaultModel || model || 'gpt-4o',
       messages: [
         { role: 'system', content: 'You are a creative content strategist. Always return valid JSON arrays.' },
         { role: 'user', content: prompt }
       ],
-      temperature: 0.8,
-      max_tokens: 2000,
+      temperature: settings.settings?.temperature || 0.8,
+      max_tokens: settings.settings?.maxTokens || 2000,
       response_format: { type: 'json_object' }
     });
 
@@ -102,7 +211,7 @@ export default async function handler(req: any, res: any) {
     const content = completion.choices[0]?.message?.content || '[]';
 
     // Parse the generated ideas
-    let ideas = [];
+    let ideas: any[] = [];
     try {
       // Try to parse the response
       const parsed = JSON.parse(content);
@@ -150,16 +259,25 @@ export default async function handler(req: any, res: any) {
       }];
     }
 
+    // Update usage tracking (optional)
+    const tokensUsed = completion.usage?.total_tokens || 0;
+    const estimatedCost = tokensUsed * 0.00002; // Approximate cost per token
+
+    // Close database connection
+    if (sql) {
+      await sql.end();
+    }
+
     return res.status(200).json({
       success: true,
       ideas,
       generation: ideas, // For backward compatibility
-      tokensUsed: completion.usage?.total_tokens || 0,
-      cost: (completion.usage?.total_tokens || 0) * 0.00002, // Approximate cost
+      tokensUsed,
+      cost: estimatedCost,
       durationMs: responseTime,
       metadata: {
-        provider: 'openai',
-        model: model || 'gpt-4o',
+        provider: provider,
+        model: settings.defaultModel || model || 'gpt-4o',
         topic,
         count: ideas.length,
         vertical,
@@ -169,6 +287,31 @@ export default async function handler(req: any, res: any) {
     });
   } catch (error: any) {
     console.error('Brainstorming error:', error);
+    
+    // Close database connection on error
+    if (sql) {
+      try {
+        await sql.end();
+      } catch {}
+    }
+
+    // Check for specific OpenAI errors
+    if (error.status === 401) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid API key. Please check your OpenAI API key in settings.',
+        details: 'The API key stored in the database appears to be invalid or expired.'
+      });
+    }
+
+    if (error.status === 429) {
+      return res.status(429).json({
+        success: false,
+        error: 'Rate limit exceeded. Please try again later.',
+        details: 'You have exceeded the OpenAI API rate limits.'
+      });
+    }
+
     return res.status(500).json({
       success: false,
       error: error.message || 'Failed to generate ideas',
