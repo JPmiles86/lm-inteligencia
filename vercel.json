@@ -2,7 +2,7 @@
   "functions": {
     "api/index.ts": {
       "maxDuration": 30,
-      "includeFiles": "api/**"
+      "includeFiles": "{api,server,src/db}/**"
     }
   },
   "rewrites": [
