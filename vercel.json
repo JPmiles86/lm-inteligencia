@@ -5,12 +5,19 @@
     },
     "api/test.ts": {
       "maxDuration": 10
+    },
+    "api/brainstorm.ts": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
     {
       "source": "/api/test",
       "destination": "/api/test"
+    },
+    {
+      "source": "/api/ai/brainstorm",
+      "destination": "/api/brainstorm"
     },
     {
       "source": "/api/(.*)",
