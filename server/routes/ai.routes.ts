@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { selectProvider } from '../services/providerSelector';
 import { asyncHandler, ValidationError, ProviderError } from '../middleware/error.middleware';
 import { generateWithProvider } from '../services/aiGenerationService';
@@ -10,7 +10,7 @@ import { perplexityAPIHandler } from '../services/providers/perplexity';
 const router = Router();
 
 // Generate blog content
-router.post('/generate/blog', asyncHandler(async (req, res) => {
+router.post('/generate/blog', asyncHandler(async (req: Request, res: Response) => {
   const { 
     prompt, 
     context = {}, 
@@ -82,7 +82,7 @@ router.post('/generate/blog', asyncHandler(async (req, res) => {
 }));
 
 // Generate image content
-router.post('/generate/image', asyncHandler(async (req, res) => {
+router.post('/generate/image', asyncHandler(async (req: Request, res: Response) => {
   const {
     prompt,
     preferredProvider,
@@ -152,7 +152,7 @@ router.post('/generate/image', asyncHandler(async (req, res) => {
 }));
 
 // Generate research content
-router.post('/generate/research', asyncHandler(async (req, res) => {
+router.post('/generate/research', asyncHandler(async (req: Request, res: Response) => {
   const {
     query,
     context = {},
@@ -218,7 +218,7 @@ router.post('/generate/research', asyncHandler(async (req, res) => {
 }));
 
 // Generate creative content (brainstorming, ideation)
-router.post('/generate/creative', asyncHandler(async (req, res) => {
+router.post('/generate/creative', asyncHandler(async (req: Request, res: Response) => {
   const {
     prompt,
     context = {},
@@ -288,7 +288,7 @@ router.post('/generate/creative', asyncHandler(async (req, res) => {
 }));
 
 // Analyze content
-router.post('/analyze', asyncHandler(async (req, res) => {
+router.post('/analyze', asyncHandler(async (req: Request, res: Response) => {
   const {
     content,
     analysisType = 'general',
@@ -359,7 +359,7 @@ router.post('/analyze', asyncHandler(async (req, res) => {
 }));
 
 // Get provider capabilities
-router.get('/providers/capabilities', asyncHandler(async (req, res) => {
+router.get('/providers/capabilities', asyncHandler(async (req: Request, res: Response) => {
   const { listSupportedProviders, getProviderUsageStats } = await import('../services/providerSelector');
   
   try {
@@ -392,7 +392,7 @@ router.get('/providers/capabilities', asyncHandler(async (req, res) => {
 }));
 
 // Test AI generation endpoint
-router.post('/test', asyncHandler(async (req, res) => {
+router.post('/test', asyncHandler(async (req: Request, res: Response) => {
   const { provider, model, prompt = 'Test generation. Please respond with "OK".' } = req.body;
 
   if (!provider) {
@@ -442,130 +442,130 @@ router.post('/test', asyncHandler(async (req, res) => {
 }));
 
 // OpenAI specific routes
-router.post('/openai/text', asyncHandler(async (req, res) => {
+router.post('/openai/text', asyncHandler(async (req: Request, res: Response) => {
   await openAIAPIHandler.handleTextGeneration(req, res);
 }));
 
-router.post('/openai/image', asyncHandler(async (req, res) => {
+router.post('/openai/image', asyncHandler(async (req: Request, res: Response) => {
   await openAIAPIHandler.handleImageGeneration(req, res);
 }));
 
-router.post('/openai/blog', asyncHandler(async (req, res) => {
+router.post('/openai/blog', asyncHandler(async (req: Request, res: Response) => {
   await openAIAPIHandler.handleBlogGeneration(req, res);
 }));
 
-router.post('/openai/embedding', asyncHandler(async (req, res) => {
+router.post('/openai/embedding', asyncHandler(async (req: Request, res: Response) => {
   await openAIAPIHandler.handleEmbedding(req, res);
 }));
 
-router.get('/openai/test', asyncHandler(async (req, res) => {
+router.get('/openai/test', asyncHandler(async (req: Request, res: Response) => {
   await openAIAPIHandler.handleConnectionTest(req, res);
 }));
 
 // Anthropic specific routes
-router.post('/anthropic/text', asyncHandler(async (req, res) => {
+router.post('/anthropic/text', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleTextGeneration(req, res);
 }));
 
-router.post('/anthropic/blog', asyncHandler(async (req, res) => {
+router.post('/anthropic/blog', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleBlogGeneration(req, res);
 }));
 
-router.post('/anthropic/improve', asyncHandler(async (req, res) => {
+router.post('/anthropic/improve', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleWritingImprovement(req, res);
 }));
 
-router.post('/anthropic/analyze', asyncHandler(async (req, res) => {
+router.post('/anthropic/analyze', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleContentAnalysis(req, res);
 }));
 
-router.post('/anthropic/long-form', asyncHandler(async (req, res) => {
+router.post('/anthropic/long-form', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleLongFormGeneration(req, res);
 }));
 
-router.post('/anthropic/constitutional', asyncHandler(async (req, res) => {
+router.post('/anthropic/constitutional', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleConstitutionalGeneration(req, res);
 }));
 
-router.get('/anthropic/test', asyncHandler(async (req, res) => {
+router.get('/anthropic/test', asyncHandler(async (req: Request, res: Response) => {
   await anthropicAPIHandler.handleConnectionTest(req, res);
 }));
 
 // Google AI specific routes
-router.post('/google/text', asyncHandler(async (req, res) => {
+router.post('/google/text', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleTextGeneration(req, res);
 }));
 
-router.post('/google/multimodal', asyncHandler(async (req, res) => {
+router.post('/google/multimodal', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleMultimodal(req, res);
 }));
 
-router.post('/google/chat', asyncHandler(async (req, res) => {
+router.post('/google/chat', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleChat(req, res);
 }));
 
-router.post('/google/blog', asyncHandler(async (req, res) => {
+router.post('/google/blog', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleBlogGeneration(req, res);
 }));
 
-router.post('/google/image', asyncHandler(async (req, res) => {
+router.post('/google/image', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleImageGeneration(req, res);
 }));
 
-router.post('/google/analyze-image', asyncHandler(async (req, res) => {
+router.post('/google/analyze-image', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleImageAnalysis(req, res);
 }));
 
-router.post('/google/blog-images', asyncHandler(async (req, res) => {
+router.post('/google/blog-images', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleBlogImageGeneration(req, res);
 }));
 
-router.post('/google/image-variations', asyncHandler(async (req, res) => {
+router.post('/google/image-variations', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleImageVariations(req, res);
 }));
 
-router.post('/google/tokens', asyncHandler(async (req, res) => {
+router.post('/google/tokens', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleTokenCount(req, res);
 }));
 
-router.post('/google/embedding', asyncHandler(async (req, res) => {
+router.post('/google/embedding', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleEmbedding(req, res);
 }));
 
-router.get('/google/test', asyncHandler(async (req, res) => {
+router.get('/google/test', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleConnectionTest(req, res);
 }));
 
-router.get('/google/usage', asyncHandler(async (req, res) => {
+router.get('/google/usage', asyncHandler(async (req: Request, res: Response) => {
   await googleAPIHandler.handleUsageStats(req, res);
 }));
 
 // Perplexity specific routes
-router.post('/perplexity/text', asyncHandler(async (req, res) => {
+router.post('/perplexity/text', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleTextGeneration(req, res);
 }));
 
-router.post('/perplexity/research', asyncHandler(async (req, res) => {
+router.post('/perplexity/research', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleResearch(req, res);
 }));
 
-router.post('/perplexity/fact-check', asyncHandler(async (req, res) => {
+router.post('/perplexity/fact-check', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleFactCheck(req, res);
 }));
 
-router.post('/perplexity/blog', asyncHandler(async (req, res) => {
+router.post('/perplexity/blog', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleBlogGeneration(req, res);
 }));
 
-router.post('/perplexity/compare', asyncHandler(async (req, res) => {
+router.post('/perplexity/compare', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleComparison(req, res);
 }));
 
-router.get('/perplexity/test', asyncHandler(async (req, res) => {
+router.get('/perplexity/test', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleConnectionTest(req, res);
 }));
 
-router.get('/perplexity/models', asyncHandler(async (req, res) => {
+router.get('/perplexity/models', asyncHandler(async (req: Request, res: Response) => {
   await perplexityAPIHandler.handleGetModels(req, res);
 }));
 

@@ -9,7 +9,7 @@
  */
 
 import { eq, and, gte, sql } from 'drizzle-orm';
-import { db } from '../index';
+import { db } from '../../api/index';
 import { providerSettings } from '../../src/db/schema';
 import { intelligentProviderSelector } from './intelligentProviderSelector';
 

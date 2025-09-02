@@ -1,13 +1,13 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { eq, desc, asc, sql, and, or } from 'drizzle-orm';
-import { db } from '../index';
+import { db } from '../../api/index';
 import { blogPosts, blogRevisions } from '../../src/db/schema';
 import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
 
 const router = Router();
 
 // Get all blog posts with filtering and pagination
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const {
     page = 1,
     limit = 10,
@@ -124,7 +124,7 @@ router.get('/', asyncHandler(async (req, res) => {
 }));
 
 // Get single blog post by ID
-router.get('/:id', asyncHandler(async (req, res) => {
+router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { includeRevisions = false } = req.query;
 
@@ -163,7 +163,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
 }));
 
 // Get blog post by slug
-router.get('/slug/:slug', asyncHandler(async (req, res) => {
+router.get('/slug/:slug', asyncHandler(async (req: Request, res: Response) => {
   const { slug } = req.params;
 
   if (!slug) {
@@ -188,7 +188,7 @@ router.get('/slug/:slug', asyncHandler(async (req, res) => {
 }));
 
 // Get blog categories
-router.get('/meta/categories', asyncHandler(async (req, res) => {
+router.get('/meta/categories', asyncHandler(async (req: Request, res: Response) => {
   try {
     const categories = await db.select({ 
       category: blogPosts.category,
@@ -205,7 +205,7 @@ router.get('/meta/categories', asyncHandler(async (req, res) => {
 }));
 
 // Get all tags
-router.get('/meta/tags', asyncHandler(async (req, res) => {
+router.get('/meta/tags', asyncHandler(async (req: Request, res: Response) => {
   try {
     const posts = await db.select({ tags: blogPosts.tags }).from(blogPosts);
     
@@ -232,7 +232,7 @@ router.get('/meta/tags', asyncHandler(async (req, res) => {
 }));
 
 // Get blog statistics
-router.get('/meta/stats', asyncHandler(async (req, res) => {
+router.get('/meta/stats', asyncHandler(async (req: Request, res: Response) => {
   try {
     const [
       totalPosts,
@@ -281,7 +281,7 @@ router.get('/meta/stats', asyncHandler(async (req, res) => {
 }));
 
 // Search blog posts
-router.get('/search/:query', asyncHandler(async (req, res) => {
+router.get('/search/:query', asyncHandler(async (req: Request, res: Response) => {
   const { query } = req.params;
   const { limit = 10, category, published } = req.query;
 
@@ -342,7 +342,7 @@ router.get('/search/:query', asyncHandler(async (req, res) => {
 }));
 
 // Get related posts
-router.get('/:id/related', asyncHandler(async (req, res) => {
+router.get('/:id/related', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
   const { limit = 5 } = req.query;
 

@@ -5,24 +5,21 @@
 
 import express from 'express';
 import cors from 'cors';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 import path from 'path';
 
 // Import all route modules
-import aiRoutes from './routes/ai.routes';
-import blogRoutes from './routes/blog.routes';
-import generationRoutes from './routes/generation.routes';
-import imageRoutes from './routes/image.routes';
-import providerRoutes from './routes/provider.routes';
+import aiRoutes from '../server/routes/ai.routes';
+import blogRoutes from '../server/routes/blog.routes';
+import generationRoutes from '../server/routes/generation.routes';
+import imageRoutes from '../server/routes/image.routes';
+import providerRoutes from '../server/routes/provider.routes';
 
-// Initialize database
-const sqlite = new Database('lm.db');
-export const db = drizzle(sqlite);
-
-// Run migrations
-migrate(db, { migrationsFolder: path.join(__dirname, '../src/db/migrations') });
+// Initialize PostgreSQL database
+const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/lm_inteligencia';
+const sql = postgres(connectionString);
+export const db = drizzle(sql);
 
 // Create Express app
 const app = express();

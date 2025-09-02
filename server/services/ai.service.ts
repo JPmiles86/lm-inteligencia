@@ -6,7 +6,7 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { db } from '../index';
+import { db } from '../../api/index';
 import { providerSettings } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
 import { encryptionService } from './encryption.service';

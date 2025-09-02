@@ -6,7 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { aiService } from '../services/ai.service';
 import { encryptionService } from '../services/encryption.service';
-import { db } from '../index';
+import { db } from '../../api/index';
 import { providerSettings } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
 

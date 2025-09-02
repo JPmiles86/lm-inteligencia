@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { eq, desc, sql } from 'drizzle-orm';
-import { db } from '../index';
+import { db } from '../../api/index';
 import { referenceImages, characters, imagePrompts } from '../../src/db/schema';
 import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
 import { selectProvider } from '../services/providerSelector';
@@ -9,7 +9,7 @@ import { generateWithProvider } from '../services/aiGenerationService';
 const router = Router();
 
 // Get all reference images
-router.get('/reference', asyncHandler(async (req, res) => {
+router.get('/reference', asyncHandler(async (req: Request, res: Response) => {
   const { type, vertical, limit = 50 } = req.query;
 
   try {
@@ -43,7 +43,7 @@ router.get('/reference', asyncHandler(async (req, res) => {
 }));
 
 // Get reference image by ID
-router.get('/reference/:id', asyncHandler(async (req, res) => {
+router.get('/reference/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -64,7 +64,7 @@ router.get('/reference/:id', asyncHandler(async (req, res) => {
 }));
 
 // Get all characters
-router.get('/characters', asyncHandler(async (req, res) => {
+router.get('/characters', asyncHandler(async (req: Request, res: Response) => {
   const { active = true, limit = 50 } = req.query;
 
   try {
@@ -88,7 +88,7 @@ router.get('/characters', asyncHandler(async (req, res) => {
 }));
 
 // Get character by ID
-router.get('/characters/:id', asyncHandler(async (req, res) => {
+router.get('/characters/:id', asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -115,7 +115,7 @@ router.get('/characters/:id', asyncHandler(async (req, res) => {
 }));
 
 // Generate image using AI
-router.post('/generate', asyncHandler(async (req, res) => {
+router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
   const {
     prompt,
     count = 1,
@@ -251,7 +251,7 @@ router.post('/generate', asyncHandler(async (req, res) => {
 }));
 
 // Enhance image prompt with character consistency
-router.post('/enhance-prompt', asyncHandler(async (req, res) => {
+router.post('/enhance-prompt', asyncHandler(async (req: Request, res: Response) => {
   const {
     prompt,
     characterIds = [],
@@ -331,7 +331,7 @@ router.post('/enhance-prompt', asyncHandler(async (req, res) => {
 }));
 
 // Get image generation history
-router.get('/history', asyncHandler(async (req, res) => {
+router.get('/history', asyncHandler(async (req: Request, res: Response) => {
   const { 
     generationNodeId,
     limit = 20,
@@ -369,7 +369,7 @@ router.get('/history', asyncHandler(async (req, res) => {
 }));
 
 // Get image generation statistics
-router.get('/stats', asyncHandler(async (req, res) => {
+router.get('/stats', asyncHandler(async (req: Request, res: Response) => {
   try {
     // This would typically involve more complex queries
     // For now, return basic statistics
