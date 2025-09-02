@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { providerSettings } from '@/db/schema';
+import { db } from '../../../db';
+import { providerSettings } from '../../../db/schema';
 // TODO: Frontend should not decrypt - get decrypted keys from backend API
 // import { decrypt } from '../../../../api/utils/encryption';
 import { eq } from 'drizzle-orm';
