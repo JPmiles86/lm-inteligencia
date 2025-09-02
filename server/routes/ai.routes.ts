@@ -287,6 +287,174 @@ router.post('/generate/creative', asyncHandler(async (req: Request, res: Respons
   }
 }));
 
+// Brainstorm endpoint - Generate multiple blog ideas from a topic
+router.post('/brainstorm', asyncHandler(async (req: Request, res: Response) => {
+  const {
+    topic,
+    count = 10,
+    vertical = 'all',
+    tone = 'professional',
+    contentTypes = [],
+    prompt: customPrompt,
+    provider = 'openai',
+    model = 'gpt-4o',
+    customContext = ''
+  } = req.body;
+
+  // Validate required fields
+  if (!topic || typeof topic !== 'string') {
+    throw new ValidationError('Topic is required and must be a string');
+  }
+
+  // Limit count to reasonable values
+  if (count > 30) {
+    throw new ValidationError('Count cannot exceed 30 ideas');
+  }
+
+  try {
+    // Build brainstorming prompt
+    let prompt = customPrompt || `Generate ${count} unique and creative blog post ideas about "${topic}".
+    
+    Requirements:
+    - Industry/Vertical: ${vertical === 'all' ? 'General audience' : vertical}
+    - Tone: ${tone}
+    ${contentTypes.length > 0 ? `- Content types to include: ${contentTypes.join(', ')}` : ''}
+    ${customContext ? `- Additional context: ${customContext}` : ''}
+    
+    For each idea, provide:
+    1. A catchy, SEO-friendly title
+    2. A unique angle or perspective
+    3. A brief description (2-3 sentences)
+    4. 3-5 relevant tags
+    5. Difficulty level (Beginner/Intermediate/Advanced)
+    6. Estimated word count (500-3000 words)
+    
+    Format the response as a JSON array of objects with these fields:
+    - title: string
+    - angle: string
+    - description: string
+    - tags: string[]
+    - difficulty: "Beginner" | "Intermediate" | "Advanced"
+    - estimatedWordCount: number
+    
+    Be creative and provide diverse ideas that would appeal to different audiences.`;
+
+    // Select provider configuration
+    const providerConfig = await selectProvider(
+      'creative',
+      provider,
+      ['text'],
+      []
+    );
+
+    if (model) {
+      providerConfig.model = model;
+    }
+
+    const startTime = Date.now();
+
+    // Generate ideas using the provider
+    const results = await generateWithProvider(providerConfig, {
+      type: 'creative',
+      prompt,
+      context: { topic, vertical, tone, contentTypes },
+      outputCount: 1,
+      settings: {
+        ...providerConfig.settings,
+        temperature: 0.8,
+        top_p: 0.9,
+        response_format: { type: 'json_object' }
+      }
+    });
+
+    const responseTime = Date.now() - startTime;
+
+    // Parse the generated ideas
+    let ideas: any[] = [];
+    try {
+      const result = results[0];
+      const content = result.content || '';
+      
+      // Try to parse as JSON
+      if (content.includes('[') && content.includes(']')) {
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          ideas = JSON.parse(jsonMatch[0]);
+        }
+      } else if (content.includes('{')) {
+        // Sometimes the AI returns a single object or wrapped response
+        const parsed = JSON.parse(content);
+        ideas = Array.isArray(parsed) ? parsed : (parsed.ideas || [parsed]);
+      }
+
+      // Add metadata to each idea
+      ideas = ideas.map((idea: any, index: number) => ({
+        id: `${Date.now()}-${index}`,
+        title: idea.title || `Idea ${index + 1}`,
+        angle: idea.angle || '',
+        description: idea.description || '',
+        tags: Array.isArray(idea.tags) ? idea.tags : [],
+        difficulty: idea.difficulty || 'Intermediate',
+        estimatedWordCount: idea.estimatedWordCount || 1000,
+        isFavorited: false,
+        createdAt: new Date().toISOString(),
+        score: Math.random() * 100,
+        metadata: {
+          generatedFromTopic: topic,
+          generationIndex: index,
+          vertical,
+          tone,
+          contentTypes
+        }
+      }));
+    } catch (parseError) {
+      console.error('Failed to parse ideas:', parseError);
+      // Return a fallback idea if parsing fails
+      ideas = [{
+        id: `${Date.now()}-0`,
+        title: `Blog Post About ${topic}`,
+        angle: 'Expert perspective',
+        description: `An in-depth exploration of ${topic} with practical insights and actionable advice.`,
+        tags: [topic.toLowerCase(), tone, vertical].filter(Boolean),
+        difficulty: 'Intermediate',
+        estimatedWordCount: 1500,
+        isFavorited: false,
+        createdAt: new Date().toISOString(),
+        score: 75,
+        metadata: {
+          generatedFromTopic: topic,
+          generationIndex: 0,
+          fallback: true
+        }
+      }];
+    }
+
+    res.json({
+      success: true,
+      ideas,
+      generation: ideas, // For backward compatibility
+      tokensUsed: results[0].tokens || 0,
+      cost: results[0].cost || 0,
+      durationMs: responseTime,
+      metadata: {
+        provider: providerConfig.provider,
+        model: providerConfig.model,
+        topic,
+        count: ideas.length,
+        vertical,
+        tone,
+        contentTypes
+      }
+    });
+  } catch (error) {
+    console.error('Brainstorming error:', error);
+    if (error instanceof ProviderError) {
+      throw error;
+    }
+    throw new Error(`Brainstorming failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}));
+
 // Analyze content
 router.post('/analyze', asyncHandler(async (req: Request, res: Response) => {
   const {
