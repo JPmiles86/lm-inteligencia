@@ -1,14 +1,20 @@
 {
   "functions": {
     "api/index.ts": {
-      "maxDuration": 30,
-      "includeFiles": "{api,server,src/db}/**"
+      "maxDuration": 30
+    },
+    "api/test.ts": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
     {
+      "source": "/api/test",
+      "destination": "/api/test"
+    },
+    {
       "source": "/api/(.*)",
-      "destination": "/api"
+      "destination": "/api/index"
     },
     {
       "source": "/((?!api).*)",
