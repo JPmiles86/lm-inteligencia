@@ -7,7 +7,6 @@ import express from 'express';
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import path from 'path';
 
 // Import all route modules
 import aiRoutes from '../server/routes/ai.routes';
@@ -17,9 +16,20 @@ import imageRoutes from '../server/routes/image.routes';
 import providerRoutes from '../server/routes/provider.routes';
 
 // Initialize PostgreSQL database
-const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/lm_inteligencia';
-const sql = postgres(connectionString);
-export const db = drizzle(sql);
+export let db: any;
+try {
+  const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/lm_inteligencia';
+  const sql = postgres(connectionString, {
+    ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+    max: 1, // Serverless functions should use single connections
+    idle_timeout: 20,
+    connect_timeout: 10
+  });
+  db = drizzle(sql);
+} catch (error) {
+  console.error('Database initialization error:', error);
+  // Continue without database for now
+}
 
 // Create Express app
 const app = express();
@@ -30,7 +40,13 @@ app.use(express.json({ limit: '50mb' }));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    hasDb: !!db,
+    hasDatabaseUrl: !!process.env.DATABASE_URL
+  });
 });
 
 // Mount all routes under /api
