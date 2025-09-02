@@ -81,7 +81,7 @@ async function generateWithOpenAI(
       style: request.style as any
     });
 
-    return response.data.map((image, index) => ({
+    return (response.data || []).map((image, index) => ({
       url: image.url || '',
       metadata: {
         revised_prompt: image.revised_prompt,

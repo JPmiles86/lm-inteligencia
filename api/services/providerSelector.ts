@@ -64,9 +64,9 @@ export async function selectProvider(
     const availableProviders = await getAvailableProviders();
     
     // Filter out excluded providers
-    const filteredProviders = Object.entries(availableProviders)
+    const filteredProviders: Record<string, any> = Object.entries(availableProviders)
       .filter(([name]) => !excludeProviders.includes(name))
-      .reduce((acc, [name, config]) => ({ ...acc, [name]: config }), {});
+      .reduce((acc, [name, config]) => ({ ...acc, [name]: config }), {} as Record<string, any>);
 
     // Check if preferred provider is available and meets requirements
     if (preferredProvider && filteredProviders[preferredProvider]) {
@@ -88,8 +88,8 @@ export async function selectProvider(
       if (filteredProviders[providerName] && meetsRequirements(providerName, requiredCapabilities)) {
         const provider = filteredProviders[providerName];
         return {
-          ...provider,
-          model: provider.model || getDefaultModelForTask(providerName, taskType)
+          ...(provider as any),
+          model: (provider as any).model || getDefaultModelForTask(providerName, taskType)
         };
       }
     }
@@ -98,8 +98,8 @@ export async function selectProvider(
     for (const [providerName, provider] of Object.entries(filteredProviders)) {
       if (meetsRequirements(providerName, requiredCapabilities)) {
         return {
-          ...provider,
-          model: provider.model || getDefaultModelForTask(providerName, taskType)
+          ...(provider as any),
+          model: (provider as any).model || getDefaultModelForTask(providerName, taskType)
         };
       }
     }
