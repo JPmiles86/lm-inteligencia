@@ -56,7 +56,7 @@ class EncryptionService {
       ]);
       
       // Get the auth tag
-      const tag = cipher.getAuthTag();
+      const tag = (cipher as any).getAuthTag();
       
       // Combine IV + tag + encrypted data
       const combined = Buffer.concat([iv, tag, encrypted]);
@@ -84,7 +84,7 @@ class EncryptionService {
       
       // Create decipher
       const decipher = crypto.createDecipheriv(this.algorithm, this.masterKey, iv);
-      decipher.setAuthTag(tag);
+      (decipher as any).setAuthTag(tag);
       
       // Decrypt
       const decrypted = Buffer.concat([

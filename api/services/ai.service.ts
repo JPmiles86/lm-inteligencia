@@ -45,17 +45,17 @@ class AIService {
   private async getProviderConfig(providerName: string) {
     const result = await db
       .select()
-      .from(providers)
-      .where(eq(providers.name, providerName))
+      .from(providerSettings)
+      .where(eq(providerSettings.provider, providerName as any))
       .limit(1);
 
-    if (!result.length || !result[0].apiKey) {
+    if (!result.length || !result[0].apiKeyEncrypted) {
       throw new Error(`Provider ${providerName} not configured`);
     }
 
     const provider = result[0];
     // Decrypt the API key on the backend only!
-    const decryptedKey = encryptionService.decrypt(provider.apiKey);
+    const decryptedKey = encryptionService.decrypt(provider.apiKeyEncrypted);
 
     return {
       ...provider,
@@ -157,7 +157,7 @@ class AIService {
 
       return {
         success: true,
-        imageUrl: response.data[0]?.url,
+        imageUrl: response.data?.[0]?.url,
         provider: 'openai',
         model: 'dall-e-3',
       };

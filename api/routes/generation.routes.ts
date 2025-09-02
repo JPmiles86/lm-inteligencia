@@ -98,30 +98,24 @@ router.post('/providers/configure', async (req: Request, res: Response) => {
     // Check if provider exists
     const existing = await db
       .select()
-      .from(providers)
-      .where(eq(providers.name, provider))
+      .from(providerSettings)
+      .where(eq(providerSettings.provider, provider))
       .limit(1);
 
     if (existing.length > 0) {
       // Update existing
       await db
-        .update(providers)
+        .update(providerSettings)
         .set({
-          apiKey: encryptedKey,
-          models: models || existing[0].models,
-          settings: settings || existing[0].settings,
-          active: true,
+          apiKeyEncrypted: encryptedKey,
           updatedAt: new Date(),
         })
-        .where(eq(providers.name, provider));
+        .where(eq(providerSettings.provider, provider));
     } else {
       // Insert new
-      await db.insert(providers).values({
-        name: provider,
-        apiKey: encryptedKey,
-        models: models || [],
-        settings: settings || {},
-        active: true,
+      await db.insert(providerSettings).values({
+        provider: provider as any,
+        apiKeyEncrypted: encryptedKey,
       });
     }
 
@@ -176,14 +170,14 @@ router.post('/providers/test', async (req: Request, res: Response) => {
 router.get('/providers', async (req: Request, res: Response) => {
   try {
     const result = await db.select({
-      id: providers.id,
-      name: providers.name,
-      active: providers.active,
-      models: providers.models,
-      settings: providers.settings,
-      createdAt: providers.createdAt,
-      updatedAt: providers.updatedAt,
-    }).from(providers);
+      id: providerSettings.id,
+      provider: providerSettings.provider,
+      isActive: providerSettings.isActive,
+      defaultModel: providerSettings.defaultModel,
+      taskDefaults: providerSettings.taskDefaults,
+      createdAt: providerSettings.createdAt,
+      updatedAt: providerSettings.updatedAt,
+    }).from(providerSettings);
 
     res.json({
       success: true,
