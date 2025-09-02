@@ -11,6 +11,9 @@
     },
     "api/test-db.ts": {
       "maxDuration": 10
+    },
+    "api/blog.ts": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
@@ -21,6 +24,14 @@
     {
       "source": "/api/ai/brainstorm",
       "destination": "/api/brainstorm"
+    },
+    {
+      "source": "/api/blog",
+      "destination": "/api/blog"
+    },
+    {
+      "source": "/api/blog/(.*)",
+      "destination": "/api/blog"
     },
     {
       "source": "/api/(.*)",
