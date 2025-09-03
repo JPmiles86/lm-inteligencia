@@ -92,7 +92,7 @@ export default async function handler(req: any, res: any) {
         const posts = await query.orderBy(desc(blogPosts.createdAt)).limit(limit);
 
         await sql.end();
-        return res.status(200).json(posts);
+        return res.status(200).json({ data: posts });
       }
 
       case 'POST': {
@@ -110,7 +110,7 @@ export default async function handler(req: any, res: any) {
         const [created] = await db.insert(blogPosts).values(newPost).returning();
         
         await sql.end();
-        return res.status(201).json(created);
+        return res.status(201).json({ data: created });
       }
 
       case 'PUT': {
@@ -129,7 +129,7 @@ export default async function handler(req: any, res: any) {
           .returning();
 
         await sql.end();
-        return res.status(200).json(updated);
+        return res.status(200).json({ data: updated });
       }
 
       case 'DELETE': {
