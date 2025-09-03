@@ -5,7 +5,12 @@
 
 export class BrainstormingService {
   constructor() {
-    this.baseUrl = '/api/ai';
+    // Use the same logic as other services - check if we're in production or development
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiBase = isDevelopment 
+      ? (import.meta.env?.VITE_API_BASE_URL || 'http://localhost:4000/api')
+      : '/api';
+    this.baseUrl = `${apiBase}/ai`;
   }
 
   /**
