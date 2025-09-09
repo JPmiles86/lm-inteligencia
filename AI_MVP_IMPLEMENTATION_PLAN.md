@@ -24,7 +24,7 @@
 
 3. **Basic Context System**
    - "Include previous blogs" checkbox
-   - "Include style guide" checkbox (hardcoded initially)
+   - "Include style guide" checkbox (hardcoded initially - no nothing hard coded)
    - Simple token counter
 
 ### Technical Tasks:
@@ -357,10 +357,8 @@ CREATE TABLE style_guides (
 
 ### Nice to Have (Future):
 - Advanced personas
-- Video scripts
+- Video scripts/generation
 - A/B testing
-- Analytics dashboard
-- Collaboration features
 
 ---
 

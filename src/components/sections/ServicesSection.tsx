@@ -329,7 +329,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           viewport={{ once: true }}
           className="text-center mt-24"
         >
-          <div className="bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 rounded-3xl p-12 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540] rounded-3xl p-12 max-w-4xl mx-auto">
             <h3 className="text-3xl font-bold mb-6 text-white">
               Ready to Get Started?
             </h3>

@@ -178,15 +178,43 @@ const AnimatedNumber: React.FC<{ value: string }> = ({ value }) => {
   const [displayValue, setDisplayValue] = useState('0');
   
   useEffect(() => {
-    // Extract numeric part from value (e.g., "68%" -> 68)
-    const numericMatch = value.match(/\d+/);
-    if (!numericMatch) {
+    // Handle different number formats (e.g., "$13.7M", "55", "$79", "68%")
+    const dollarMatch = value.match(/^\$?([\d.]+)(.*)$/);
+    const percentMatch = value.match(/^(\d+)%$/);
+    
+    if (!dollarMatch && !percentMatch) {
       setDisplayValue(value);
       return;
     }
     
-    const targetNumber = parseInt(numericMatch[0]);
-    const suffix = value.replace(numericMatch[0], '');
+    let prefix = '';
+    let targetNumber = 0;
+    let suffix = '';
+    let isDecimal = false;
+    
+    if (value.startsWith('$')) {
+      // Handle dollar values like "$13.7M" or "$79"
+      prefix = '$';
+      const numberPart = value.substring(1).match(/^([\d.]+)(.*)$/);
+      if (numberPart) {
+        targetNumber = parseFloat(numberPart[1]);
+        isDecimal = numberPart[1].includes('.');
+        suffix = numberPart[2] || '';
+      }
+    } else if (percentMatch) {
+      // Handle percentages
+      targetNumber = parseInt(percentMatch[1]);
+      suffix = '%';
+    } else {
+      // Handle plain numbers like "55"
+      const numberMatch = value.match(/^([\d.]+)(.*)$/);
+      if (numberMatch) {
+        targetNumber = parseFloat(numberMatch[1]);
+        isDecimal = numberMatch[1].includes('.');
+        suffix = numberMatch[2] || '';
+      }
+    }
+    
     const duration = 2000; // 2 seconds
     const steps = 60;
     const increment = targetNumber / steps;
@@ -196,9 +224,11 @@ const AnimatedNumber: React.FC<{ value: string }> = ({ value }) => {
       current += increment;
       if (current >= targetNumber) {
         clearInterval(timer);
-        setDisplayValue(targetNumber + suffix);
+        const finalValue = isDecimal ? targetNumber.toFixed(1) : Math.floor(targetNumber);
+        setDisplayValue(prefix + finalValue + suffix);
       } else {
-        setDisplayValue(Math.floor(current) + suffix);
+        const currentValue = isDecimal ? current.toFixed(1) : Math.floor(current);
+        setDisplayValue(prefix + currentValue + suffix);
       }
     }, duration / steps);
     

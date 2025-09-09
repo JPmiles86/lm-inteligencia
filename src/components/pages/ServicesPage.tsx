@@ -204,7 +204,7 @@ export const ServicesPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540] text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -275,7 +275,7 @@ export const ServicesPage: React.FC = () => {
 
 
       {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 text-white">
+      <section className="py-20 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

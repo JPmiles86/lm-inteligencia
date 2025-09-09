@@ -64,8 +64,8 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
             <div className="absolute inset-0 bg-black bg-opacity-60" />
           </>
         ) : (
-          /* Purple gradient background when no video */
-          <div className="absolute inset-0 bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900" />
+          /* Dark blue gradient background when no video */
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540]" />
         )}
       </div>
 

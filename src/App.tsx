@@ -105,7 +105,7 @@ const AdminRoutes: React.FC = () => {
  * This approach maintains the header during all transitions
  */
 const App: React.FC = () => {
-  // Check for redirect on app load but don't block rendering
+  // Log hostname and pathname for debugging
   useEffect(() => {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
@@ -116,21 +116,6 @@ const App: React.FC = () => {
       fullURL: window.location.href,
       timestamp: new Date().toISOString()
     });
-    
-    // Skip redirect for admin route
-    if (pathname === '/admin') {
-      console.log('[App.tsx] Admin route detected - skipping redirect');
-      return;
-    }
-    
-    // Direct check - if on main domain, redirect to hospitality
-    if (hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com') {
-      console.log('[App.tsx] On main domain, redirecting to hospitality...');
-      // Small delay to let meta refresh work first
-      setTimeout(() => {
-        window.location.href = 'https://hospitality.inteligenciadm.com' + window.location.pathname + window.location.search;
-      }, 100);
-    }
   }, []);
 
   const [landingAreaLoaded, setLandingAreaLoaded] = useState(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { BlogListingPage } from '../pages/BlogListingPage';
 import { BlogPostPage } from '../pages/BlogPostPage';
 
@@ -24,38 +24,8 @@ export const BlogRedirect: React.FC<BlogRedirectProps> = ({ isPostPage = false }
     fullPath: window.location.pathname
   });
   
-  // Check if blog is enabled
-  const adminSettings = localStorage.getItem('admin_settings');
-  let showBlog = false; // Default to false
-  
-  if (adminSettings) {
-    try {
-      const settings = JSON.parse(adminSettings);
-      showBlog = settings.showBlog || false;
-    } catch (e) {
-      showBlog = false;
-    }
-  }
-  
-  console.log('[BlogRedirect] Blog settings:', {
-    showBlog,
-    adminSettings: !!adminSettings
-  });
-  
-  // If blog is disabled, redirect to homepage
-  if (!showBlog) {
-    // Get the current subdomain to determine redirect path
-    const hostname = window.location.hostname;
-    const isHospitalitySubdomain = hostname.startsWith('hospitality.');
-    
-    // On hospitality subdomain, redirect to root, otherwise to industry path
-    const redirectPath = isHospitalitySubdomain ? '/' : window.location.pathname.split('/')[1] ? `/${window.location.pathname.split('/')[1]}` : '/';
-    
-    console.log('[BlogRedirect] Blog disabled, redirecting to:', redirectPath);
-    return <Navigate to={redirectPath} replace />;
-  }
-  
-  // If blog is enabled, show the appropriate page
+  // Simply show the blog page - no redirects
+  // The navbar will handle hiding/showing the blog link based on vertical settings
   if (isPostPage && slug) {
     console.log('[BlogRedirect] → Rendering BlogPostPage with slug:', slug);
     // Pass the slug as a prop since useParams won't work

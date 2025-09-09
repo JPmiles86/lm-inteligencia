@@ -10,6 +10,8 @@ import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
 import { useAdminSettings } from '../../hooks/useAdminSettings';
+import { isSectionVisible } from '../../utils/verticalVisibility';
+import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility
@@ -41,6 +43,10 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   // Determine the current industry and name from context or props
   const industry = contextIndustry || industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
+  
+  // Get enabled verticals configuration
+  const enabledVerticals = getEnabledVerticals();
+  const enabledVerticalCount = getEnabledVerticalCount();
 
   // Get subdomain helper
   const getCurrentSubdomain = () => {
@@ -61,9 +67,9 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
-  const industryKey = subdomain === 'hospitality' ? '' : (contextIndustryKey || params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
+  const industryKey = (subdomain === 'hospitality' || subdomain === 'healthcare') ? '' : (contextIndustryKey || params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
   const isSeamlessPage = (pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null) || 
-                         (subdomain === 'hospitality' && location.pathname === '/');
+                         ((subdomain === 'hospitality' || subdomain === 'healthcare') && location.pathname === '/');
 
   // Click outside handler for industry dropdown
   useEffect(() => {
@@ -138,12 +144,12 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                   </span>
                 </motion.div>
               </Link>
-              <div className="relative industry-dropdown-container hidden">
+              <div className={`relative industry-dropdown-container ml-2 ${enabledVerticalCount > 1 ? 'block' : 'hidden'}`}>
                 
-                {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
+                {/* Industry switcher - show when multiple verticals are enabled */}
                 <button
                   onClick={() => setIsIndustryDropdownOpen(!isIndustryDropdownOpen)}
-                  className="hidden flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
+                  className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
                 >
                   {industryName}
                   <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -151,11 +157,12 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                   </svg>
                 </button>
                 
-                {/* Industry Dropdown - Temporarily hidden for single vertical launch */}
-                {false && isIndustryDropdownOpen && (
+                {/* Industry Dropdown - show enabled verticals only */}
+                {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
-                      if (ind === 'main' || ind === industry || !urlPath) return null;
+                      // Only show enabled verticals, skip main and current industry
+                      if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
                       // Preserve current sub-page when switching industries
                       const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
                       return (
@@ -195,16 +202,18 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 {navItems.about}
               </Link>
 
-              {/* Case Studies - always navigate to subpage */}
-              <Link
-                to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
-                className="font-medium transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.caseStudies}
-              </Link>
+              {/* Case Studies - conditionally show based on vertical settings */}
+              {isSectionVisible(industry, 'showCaseStudies') && (
+                <Link
+                  to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
+                  className="font-medium transition-colors hover:text-primary text-gray-700"
+                >
+                  {navItems.caseStudies}
+                </Link>
+              )}
 
-              {/* Blog - always navigate to subpage */}
-              {adminSettings.showBlog && (
+              {/* Blog - conditionally show based on vertical settings */}
+              {isSectionVisible(industry, 'showBlog') && (
                 <Link
                   to={industryKey ? `/${industryKey}/blog` : '/blog'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
@@ -332,6 +341,10 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   // Determine the current industry and name from props only
   const industry = industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
+  
+  // Get enabled verticals configuration
+  const enabledVerticals = getEnabledVerticals();
+  const enabledVerticalCount = getEnabledVerticalCount();
 
   // Get subdomain helper
   const getCurrentSubdomain = () => {
@@ -352,9 +365,9 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
 
   // Determine industry key for navigation
   const pathSegments = location.pathname.split('/').filter(Boolean);
-  const industryKey = subdomain === 'hospitality' ? '' : (params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
+  const industryKey = (subdomain === 'hospitality' || subdomain === 'healthcare') ? '' : (params.industry || pathSegments[0] || 'hotels'); // Empty prefix on subdomain
   const isSeamlessPage = (pathSegments.length === 1 && getIndustryFromPath(location.pathname) !== null) || 
-                         (subdomain === 'hospitality' && location.pathname === '/');
+                         ((subdomain === 'hospitality' || subdomain === 'healthcare') && location.pathname === '/');
 
   // Click outside handler for industry dropdown
   useEffect(() => {
@@ -429,12 +442,12 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                   </span>
                 </motion.div>
               </Link>
-              <div className="relative industry-dropdown-container hidden">
+              <div className={`relative industry-dropdown-container ml-2 ${enabledVerticalCount > 1 ? 'block' : 'hidden'}`}>
                 
-                {/* Temporarily hidden dropdown - keep for future multi-vertical launch */}
+                {/* Industry switcher - show when multiple verticals are enabled */}
                 <button
                   onClick={() => setIsIndustryDropdownOpen(!isIndustryDropdownOpen)}
-                  className="hidden flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
+                  className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors mt-1"
                 >
                   {industryName}
                   <svg className="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -442,11 +455,12 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                   </svg>
                 </button>
                 
-                {/* Industry Dropdown - Temporarily hidden for single vertical launch */}
-                {false && isIndustryDropdownOpen && (
+                {/* Industry Dropdown - show enabled verticals only */}
+                {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
-                      if (ind === 'main' || ind === industry || !urlPath) return null;
+                      // Only show enabled verticals, skip main and current industry
+                      if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
                       // Preserve current sub-page when switching industries
                       const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
                       return (
@@ -486,16 +500,18 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 {navItems.about}
               </Link>
 
-              {/* Case Studies - always navigate to subpage */}
-              <Link
-                to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
-                className="font-medium transition-colors hover:text-primary text-gray-700"
-              >
-                {navItems.caseStudies}
-              </Link>
+              {/* Case Studies - conditionally show based on vertical settings */}
+              {isSectionVisible(industry, 'showCaseStudies') && (
+                <Link
+                  to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
+                  className="font-medium transition-colors hover:text-primary text-gray-700"
+                >
+                  {navItems.caseStudies}
+                </Link>
+              )}
 
-              {/* Blog - always navigate to subpage */}
-              {adminSettings.showBlog && (
+              {/* Blog - conditionally show based on vertical settings */}
+              {isSectionVisible(industry, 'showBlog') && (
                 <Link
                   to={industryKey ? `/${industryKey}/blog` : '/blog'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"

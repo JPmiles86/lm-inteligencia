@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import type { IndustryType } from '../../types/Industry';
 import { useNavigationStore } from '../../store/navigationStore';
+import { getEnabledVerticals } from '../../config/enabled-verticals';
+import { industryToSubdomain } from '../../config/subdomain-mapping';
 
 interface Industry {
   industry: IndustryType;
@@ -57,6 +59,12 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
 
   const [showScrollHint, setShowScrollHint] = useState(false);
   const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
+  
+  // Get enabled verticals and filter industries accordingly
+  const enabledVerticals = getEnabledVerticals();
+  const enabledIndustries = industries.filter(industry => 
+    industry.industry !== 'main' && enabledVerticals.includes(industry.industry as any)
+  );
   
   // Check if we're on a subdomain
   const getCurrentSubdomain = () => {
@@ -118,17 +126,28 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
     setSelectedIndustry(industry);
     setLandingAreaState('decided');
     
-    // Don't update URL on subdomains, only on main domain
+    // On main domain, redirect to appropriate subdomain
     if (!subdomain || subdomain === 'main') {
-      // Update URL without navigation
-      const pathMap: Record<IndustryType, string> = {
-        'hospitality': '/hospitality',
-        'healthcare': '/health',
-        'tech': '/tech',
-        'athletics': '/sports',
-        'main': '/'
-      };
-      window.history.pushState({}, '', pathMap[industry]);
+      // In production, redirect to subdomain
+      if (process.env.NODE_ENV === 'production') {
+        const targetSubdomain = industryToSubdomain[industry];
+        const currentDomain = window.location.hostname;
+        const baseDomain = currentDomain.includes('inteligenciadm.com') ? 'inteligenciadm.com' : currentDomain;
+        const targetUrl = `https://${targetSubdomain}.${baseDomain}`;
+        
+        // Redirect to subdomain
+        window.location.href = targetUrl;
+      } else {
+        // In development, just update URL path for testing
+        const pathMap: Record<IndustryType, string> = {
+          'hospitality': '/hospitality',
+          'healthcare': '/healthcare',
+          'tech': '/tech',
+          'athletics': '/sports',
+          'main': '/'
+        };
+        window.history.pushState({}, '', pathMap[industry]);
+      }
     }
   };
 
@@ -212,21 +231,24 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
         
         {/* Industry Selector */}
         <motion.div 
-          className="flex flex-row gap-20 justify-center items-start relative"
+          className="flex flex-row justify-center items-start relative"
           animate={{
-            gap: landingAreaState === 'decided' ? '10px' : '80px'
+            gap: landingAreaState === 'decided' ? '10px' : (enabledIndustries.length === 2 ? '60px' : '80px')
           }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
           style={{ minHeight: '100px' }}
         >
-          {industries.map((industry, index) => {
+          {enabledIndustries.map((industry, index) => {
             const isSelected = selectedIndustry === industry.industry;
             const shouldHide = landingAreaState === 'decided' && !isSelected;
             const centeringAnimation = getCenteringAnimation(index, isSelected && landingAreaState === 'decided');
             
             // On subdomain, only show the relevant industry
             const isOnSubdomain = subdomain && subdomain !== 'main';
-            const isSubdomainIndustry = subdomain === 'hospitality' && industry.industry === 'hospitality';
+            const isSubdomainIndustry = (
+              (subdomain === 'hospitality' && industry.industry === 'hospitality') ||
+              (subdomain === 'healthcare' && industry.industry === 'healthcare')
+            );
             
             if (isOnSubdomain && !isSubdomainIndustry) {
               return null;

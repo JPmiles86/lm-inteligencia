@@ -1,11 +1,12 @@
 // Simplified Settings Page Component - Content Visibility and AI Configuration
 import React, { useState } from 'react';
 import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
+import { VerticalVisibilitySettings } from './shared/VerticalVisibilitySettings';
 import { ProviderSettings } from './ProviderSettings';
 import { APIKeySetup } from '../setup/APIKeySetup';
-import { Settings as SettingsIcon, Brain, Eye, Key } from 'lucide-react';
+import { Settings as SettingsIcon, Brain, Eye, Key, Layers } from 'lucide-react';
 
-type SettingsTab = 'content' | 'ai' | 'apikeys';
+type SettingsTab = 'content' | 'verticals' | 'ai' | 'apikeys';
 
 export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('apikeys');
@@ -41,10 +42,16 @@ export const Settings: React.FC = () => {
       description: 'Configure AI provider preferences and fallback'
     },
     {
+      id: 'verticals' as SettingsTab,
+      label: 'Vertical Visibility',
+      icon: Layers,
+      description: 'Control section visibility for each industry vertical'
+    },
+    {
       id: 'content' as SettingsTab,
-      label: 'Content Visibility',
+      label: 'Global Visibility',
       icon: Eye,
-      description: 'Manage what content appears on your website'
+      description: 'Legacy global content visibility settings'
     }
   ];
 
@@ -97,6 +104,12 @@ export const Settings: React.FC = () => {
           {activeTab === 'apikeys' && (
             <div className="p-6">
               <APIKeySetup />
+            </div>
+          )}
+          
+          {activeTab === 'verticals' && (
+            <div className="p-6">
+              <VerticalVisibilitySettings />
             </div>
           )}
           

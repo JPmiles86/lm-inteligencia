@@ -29,7 +29,7 @@ export const subdomainMapping: Record<string, IndustryType> = {
 export const industryToSubdomain: Record<IndustryType, string> = {
   main: 'inteligenciadm',
   hospitality: 'hospitality',
-  healthcare: 'health', 
+  healthcare: 'healthcare', 
   tech: 'tech',
   athletics: 'sports',
 };
