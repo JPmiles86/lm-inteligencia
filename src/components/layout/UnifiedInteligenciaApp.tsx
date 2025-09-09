@@ -7,7 +7,7 @@ import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
 import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
 import { getCurrentSubdomain } from '../../utils/domainRedirect';
-import { isSectionVisible } from '../../utils/verticalVisibility';
+import { isSectionVisible, preloadVerticalSettings } from '../../utils/verticalVisibility';
 
 // Removed unused type IndustryTypeWithoutMain
 
@@ -91,6 +91,11 @@ export const UnifiedInteligenciaApp: React.FC = () => {
 
   // Local state for content display
   const [showContent, setShowContent] = useState(false);
+
+  // Preload vertical visibility settings on app initialization
+  useEffect(() => {
+    preloadVerticalSettings();
+  }, []);
 
   // Always call the hook, but with a null check inside
   const { config, loading, error } = useIndustryConfig(selectedIndustry);

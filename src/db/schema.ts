@@ -526,6 +526,25 @@ export const usageLogs = pgTable('usage_logs', {
   generationNodeIdx: index('usage_logs_generation_node_idx').on(table.generationNodeId),
 }));
 
+// Vertical Visibility Settings - Control which sections show for each vertical
+export const verticalVisibilitySettings = pgTable('vertical_visibility_settings', {
+  id: serial('id').primaryKey(),
+  vertical: verticalEnum('vertical').notNull().unique(),
+  
+  // Section visibility flags
+  showStaffSection: boolean('show_staff_section').default(true),
+  showBlog: boolean('show_blog').default(true),
+  showTestimonials: boolean('show_testimonials').default(true),
+  showCaseStudies: boolean('show_case_studies').default(true),
+  showOptionalAddOns: boolean('show_optional_add_ons').default(true),
+  
+  // Timestamps
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+}, (table) => ({
+  verticalIdx: uniqueIndex('vertical_visibility_settings_vertical_idx').on(table.vertical),
+}));
+
 // Type exports
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type NewBlogPost = typeof blogPosts.$inferInsert;
@@ -553,6 +572,8 @@ export type GeneratedImage = typeof generatedImages.$inferSelect;
 export type NewGeneratedImage = typeof generatedImages.$inferInsert;
 export type UsageLog = typeof usageLogs.$inferSelect;
 export type NewUsageLog = typeof usageLogs.$inferInsert;
+export type VerticalVisibilitySettings = typeof verticalVisibilitySettings.$inferSelect;
+export type NewVerticalVisibilitySettings = typeof verticalVisibilitySettings.$inferInsert;
 
 // Extended types for frontend use
 export interface BlogPostWithRevisions extends BlogPost {

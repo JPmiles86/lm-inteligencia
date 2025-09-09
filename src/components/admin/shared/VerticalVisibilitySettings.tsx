@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Eye, EyeOff, Users, BookOpen, Star, FileText, Gift, ChevronDown, ChevronUp } from 'lucide-react';
+import { Save, Eye, EyeOff, Users, BookOpen, Star, FileText, Gift, ChevronDown, ChevronUp, RefreshCw, AlertCircle } from 'lucide-react';
 
 export interface VerticalSettings {
   showStaffSection: boolean;
@@ -104,16 +104,51 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
   const [settings, setSettings] = useState<AllVerticalSettings>(defaultAllSettings);
   const [expandedVertical, setExpandedVertical] = useState<string | null>('healthcare');
   const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load settings from localStorage on mount
+  // Load settings from API on mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem('vertical_visibility_settings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
+    loadSettings();
   }, []);
 
-  const handleToggle = (vertical: keyof AllVerticalSettings, key: keyof VerticalSettings) => {
+  const loadSettings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/vertical-visibility');
+      
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+      
+      const result = await response.json();
+      
+      if (result.data) {
+        setSettings(result.data);
+      }
+    } catch (error: any) {
+      console.error('Failed to load vertical visibility settings:', error);
+      setError(error.message || 'Failed to load settings');
+      
+      // Fallback to localStorage for backward compatibility
+      const savedSettings = localStorage.getItem('vertical_visibility_settings');
+      if (savedSettings) {
+        try {
+          setSettings(JSON.parse(savedSettings));
+        } catch {
+          // If localStorage is also corrupted, use defaults
+          setSettings(defaultAllSettings);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggle = async (vertical: keyof AllVerticalSettings, key: keyof VerticalSettings) => {
     const newSettings = {
       ...settings,
       [vertical]: {
@@ -123,7 +158,10 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
     };
     setSettings(newSettings);
     
-    // Auto-save immediately
+    // Save to database
+    await saveSettings(vertical, newSettings[vertical]);
+    
+    // Also update localStorage for backward compatibility
     localStorage.setItem('vertical_visibility_settings', JSON.stringify(newSettings));
     
     // Also update the legacy admin_settings for backward compatibility if it's hospitality
@@ -138,10 +176,39 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
     if (onSave) {
       onSave(newSettings);
     }
-    
-    // Show saved indicator briefly
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
+  };
+
+  const saveSettings = async (vertical: keyof AllVerticalSettings, verticalSettings: VerticalSettings) => {
+    try {
+      setSaving(true);
+      setError(null);
+      
+      const response = await fetch('/api/vertical-visibility', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_ADMIN_API_TOKEN || 'inteligencia-admin-2025'}`
+        },
+        body: JSON.stringify({
+          vertical,
+          ...verticalSettings
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+      
+      // Show saved indicator briefly
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+      
+    } catch (error: any) {
+      console.error('Failed to save vertical visibility settings:', error);
+      setError(error.message || 'Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
   };
 
 
@@ -159,8 +226,33 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
     return colorMap[color] || colorMap.purple;
   };
 
+  if (loading) {
+    return (
+      <div className={`${className} flex items-center justify-center py-12`}>
+        <div className="flex items-center gap-3 text-gray-600">
+          <RefreshCw className="w-5 h-5 animate-spin" />
+          Loading visibility settings...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${className}`}>
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center gap-2 text-red-800">
+            <AlertCircle className="w-4 h-4" />
+            <strong>Error:</strong> {error}
+          </div>
+          <button
+            onClick={loadSettings}
+            className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+          >
+            Try loading again
+          </button>
+        </div>
+      )}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Vertical-Specific Visibility Settings</h2>
         <p className="text-gray-600">Control which sections appear for each industry vertical</p>
@@ -263,11 +355,17 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
       </div>
 
       {/* Auto-Save Indicator */}
-      {saved && (
+      {(saved || saving) && (
         <div className="flex justify-end mt-8">
-          <div className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-green-600 text-white">
-            <Save className="w-4 h-4" />
-            Saved!
+          <div className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium ${
+            saving ? 'bg-blue-600' : 'bg-green-600'
+          } text-white`}>
+            {saving ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            {saving ? 'Saving...' : 'Saved!'}
           </div>
         </div>
       )}
@@ -276,7 +374,7 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
           <strong>Note:</strong> These settings control which sections are visible on the public website for each vertical. 
-          Changes are saved automatically and take effect immediately.
+          Changes are saved automatically to the database and take effect immediately for all visitors.
         </p>
       </div>
     </div>
