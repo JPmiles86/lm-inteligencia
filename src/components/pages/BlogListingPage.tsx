@@ -210,7 +210,7 @@ export const BlogListingPage: React.FC = () => {
               <img
                 src={post.author?.image || '/images/team/Laurie Meiring/laurie ai face 1x1.jpg'}
                 alt={post.author?.name || 'Author'}
-                className="w-10 h-10 rounded-full object-cover bg-gray-200"
+                className="w-10 h-10 rounded-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNFNUU3RUIiLz4KPHBhdGggZD0iTTIwIDIwQzIyLjIwOTEgMjAgMjQgMTguMjA5MSAyNCAxNkMyNCAxMy43OTA5IDIyLjIwOTEgMTIgMjAgMTJDMTcuNzkwOSAxMiAxNiAxMy43OTA5IDE2IDE2QzE2IDE4LjIwOTEgMTcuNzkwOSAyMCAyMCAyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHBhdGggZD0iTTI4IDMwQzI4IDI2LjY4NjMgMjQuNDE4MyAyNCAxOS45OTk5IDI0QzE1LjU4MTYgMjQgMTIgMjYuNjg2MyAxMiAzMEgxNkMxNiAyOC44OTU0IDE3Ljc5MDggMjggMTkuOTk5OSAyOEMyMi4yMDkxIDI4IDI0IDI4Ljg5NTQgMjQgMzBIMjhaIiBmaWxsPSIjOUNBM0FGIi8+Cjwvc3ZnPg==';
                 }}

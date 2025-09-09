@@ -172,8 +172,7 @@ class BlogDatabaseService {
       if (filters.sortBy) queryParams.append('sortBy', filters.sortBy);
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
 
-      queryParams.append('action', 'posts');
-      const endpoint = `/admin${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<any>(endpoint);
       
       // Check if response already has the correct structure
@@ -252,7 +251,7 @@ class BlogDatabaseService {
     });
     
     try {
-      const post = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}`);
+      const post = await this.apiCall<BlogPost>(`/blog?id=${id}`);
       console.log('[blogService] getPostById SUCCESS:', {
         id: id,
         post: post,
@@ -280,7 +279,7 @@ class BlogDatabaseService {
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      const post = await this.apiCall<BlogPost>(`/admin?action=post&slug=${slug}`);
+      const post = await this.apiCall<BlogPost>(`/blog?slug=${slug}`);
       return post;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
@@ -362,7 +361,7 @@ class BlogDatabaseService {
         postData.publishedAt = null;
       }
 
-      const newPost = await this.apiCall<BlogPost>('/admin?action=posts', {
+      const newPost = await this.apiCall<BlogPost>('/blog', {
         method: 'POST',
         body: JSON.stringify(postData),
       });
@@ -385,9 +384,9 @@ class BlogDatabaseService {
         postData.publishedAt = null;
       }
 
-      const updatedPost = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}`, {
+      const updatedPost = await this.apiCall<BlogPost>(`/blog`, {
         method: 'PUT',
-        body: JSON.stringify(postData),
+        body: JSON.stringify({ id, ...postData }),
       });
 
       return updatedPost;
@@ -403,7 +402,7 @@ class BlogDatabaseService {
   // Delete a blog post
   async deletePost(id: number): Promise<boolean> {
     try {
-      await this.apiCall(`/admin?action=post&id=${id}`, {
+      await this.apiCall(`/blog?id=${id}`, {
         method: 'DELETE',
       });
       return true;
@@ -419,7 +418,7 @@ class BlogDatabaseService {
   // Toggle published status
   async togglePublished(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=publish`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog?id=${id}`, {
         method: 'PATCH',
       });
       return response.post || response.data;
@@ -435,7 +434,7 @@ class BlogDatabaseService {
   // Toggle featured status
   async toggleFeatured(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/admin?action=post&id=${id}&operation=feature`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog?id=${id}`, {
         method: 'PATCH',
       });
       return response.post || response.data;
@@ -456,7 +455,44 @@ class BlogDatabaseService {
   // Get blog statistics
   async getStats(): Promise<BlogStats> {
     try {
-      const stats = await this.apiCall<BlogStats>('/admin?action=stats');
+      // For now, calculate stats from fetching all posts
+      const allPosts = await this.getAllPosts();
+      
+      // Calculate category and tag counts
+      const categoryCounts: Record<string, number> = {};
+      const tagCounts: Record<string, number> = {};
+      const monthlyPublications: Record<string, number> = {};
+      
+      allPosts.posts.forEach(post => {
+        // Count categories
+        if (post.category) {
+          categoryCounts[post.category] = (categoryCounts[post.category] || 0) + 1;
+        }
+        
+        // Count tags
+        if (post.tags && Array.isArray(post.tags)) {
+          post.tags.forEach(tag => {
+            tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+          });
+        }
+        
+        // Count monthly publications
+        if (post.publishedDate) {
+          const month = post.publishedDate.substring(0, 7); // YYYY-MM
+          monthlyPublications[month] = (monthlyPublications[month] || 0) + 1;
+        }
+      });
+      
+      const stats: BlogStats = {
+        totalPosts: allPosts.posts.length,
+        publishedPosts: allPosts.posts.filter(p => p.published).length,
+        draftPosts: allPosts.posts.filter(p => !p.published).length,
+        featuredPosts: allPosts.posts.filter(p => p.featured).length,
+        scheduledPosts: allPosts.posts.filter(p => p.status === 'scheduled').length,
+        categoryCounts,
+        tagCounts,
+        monthlyPublications
+      };
       return stats;
     } catch (error) {
       console.error('Error fetching blog stats:', error);
@@ -467,7 +503,8 @@ class BlogDatabaseService {
   // Get available categories
   async getCategories(): Promise<string[]> {
     try {
-      const categories = await this.apiCall<string[]>('/admin?action=categories');
+      // For now, return static categories
+      const categories = ['Digital Marketing', 'Hospitality Marketing', 'Health & Wellness Marketing', 'Tech & AI Marketing', 'Sports & Media Marketing'];
       return categories;
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -478,7 +515,15 @@ class BlogDatabaseService {
   // Get available tags
   async getTags(): Promise<string[]> {
     try {
-      const tags = await this.apiCall<string[]>('/admin?action=tags');
+      // For now, extract tags from all posts
+      const allPosts = await this.getAllPosts();
+      const tagsSet = new Set<string>();
+      allPosts.posts.forEach(post => {
+        if (post.tags && Array.isArray(post.tags)) {
+          post.tags.forEach(tag => tagsSet.add(tag));
+        }
+      });
+      const tags = Array.from(tagsSet).sort();
       return tags;
     } catch (error) {
       console.error('Error fetching tags:', error);
@@ -628,7 +673,11 @@ class BlogDatabaseService {
   // Duplicate a blog post
   async duplicatePost(id: number): Promise<BlogPost | null> {
     try {
-      const duplicatedPost = await this.apiCall<BlogPost>(`/admin?action=post&id=${id}&operation=duplicate`, {
+      // Get the original post and create a copy
+      const original = await this.getPostById(id);
+      if (!original) throw new Error('Post not found');
+      
+      const duplicatedPost = await this.apiCall<BlogPost>('/blog', {
         method: 'POST',
       });
       return duplicatedPost;
@@ -679,10 +728,10 @@ class BlogDatabaseService {
   // Autosave a draft
   async autosavePost(id: number, content: string): Promise<boolean> {
     try {
-      const endpoint = USE_ENHANCED_API ? '/admin?action=enhanced' : '/admin?action=posts';
-      await this.apiCall(`${endpoint}?id=${id}`, {
+      await this.apiCall('/blog', {
         method: 'PUT',
         body: JSON.stringify({
+          id,
           draftContent: content,
           autosave: true
         }),
