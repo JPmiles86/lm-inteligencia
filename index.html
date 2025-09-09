@@ -7,49 +7,10 @@
     <title>Inteligencia - Specialized Marketing Solutions</title>
     <meta name="description" content="Professional marketing services tailored for hotels, restaurants, healthcare, and sports industries." />
     
-    <!-- IMMEDIATE REDIRECT SCRIPT - RUNS FIRST -->
+    <!-- REDIRECT DISABLED - Main domain now shows landing page -->
     <script>
-      // This runs before ANYTHING else loads
-      (function() {
-        var host = window.location.hostname;
-        var path = window.location.pathname;
-        var search = window.location.search;
-        
-        // Enhanced logging
-        console.log('[REDIRECT CHECK] === INDEX.HTML REDIRECT SCRIPT ===');
-        console.log('[REDIRECT CHECK] Current hostname:', host);
-        console.log('[REDIRECT CHECK] Current path:', path);
-        console.log('[REDIRECT CHECK] Current search:', search);
-        console.log('[REDIRECT CHECK] Full URL:', window.location.href);
-        
-        // Skip redirect for admin path
-        if (path === '/admin') {
-          console.log('[REDIRECT] ✅ ADMIN PATH DETECTED - Skipping redirect');
-          console.log('[REDIRECT] === END INDEX.HTML REDIRECT SCRIPT ===');
-          return;
-        }
-        
-        // Check for main domain (case insensitive)
-        if (host.toLowerCase() === 'inteligenciadm.com' || host.toLowerCase() === 'www.inteligenciadm.com') {
-          console.log('[REDIRECT] ⚠️  Main domain detected - should redirect to hospitality');
-          console.log('[REDIRECT] Redirecting from', host, 'to hospitality.inteligenciadm.com');
-          
-          // Do the redirect immediately
-          var redirectUrl = 'https://hospitality.inteligenciadm.com' + path + search;
-          console.log('[REDIRECT] Redirect URL:', redirectUrl);
-          
-          // Try multiple redirect methods
-          window.location.replace(redirectUrl);
-          window.location.href = redirectUrl;
-          window.location = redirectUrl;
-          
-          // Stop all further execution
-          throw new Error('Redirecting...');
-        } else {
-          console.log('[REDIRECT] Not on main domain, no redirect needed');
-          console.log('[REDIRECT] === END INDEX.HTML REDIRECT SCRIPT ===');
-        }
-      })();
+      // Redirect has been disabled to allow main domain to show landing page
+      console.log('[REDIRECT] Redirect disabled - main domain will show landing page');
     </script>
     
     <!-- Industry-specific styling will be injected here -->
