@@ -19,10 +19,9 @@ export const subdomainMapping: Record<string, IndustryType> = {
   'restaurants': 'hospitality', 
   'hospitality': 'hospitality',
   'healthcare': 'healthcare',
-  'health': 'healthcare',
   'dental': 'healthcare',
   'tech': 'tech',
-  'sports': 'athletics',
+  'athletics': 'athletics',
 };
 
 // Reverse mapping for generating URLs
@@ -31,7 +30,7 @@ export const industryToSubdomain: Record<IndustryType, string> = {
   hospitality: 'hospitality',
   healthcare: 'healthcare', 
   tech: 'tech',
-  athletics: 'sports',
+  athletics: 'athletics',
 };
 
 // Environment configuration

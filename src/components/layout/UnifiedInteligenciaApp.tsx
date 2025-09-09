@@ -138,20 +138,30 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   });
   console.log('[UnifiedApp] === END ROUTE ANALYSIS ===');
   
-  // On subdomain, adjust path interpretation
-  if (subdomain === 'hospitality') {
-    console.log('[UnifiedApp] On hospitality subdomain - adjusting path interpretation');
-    // On hospitality subdomain, root should be hospitality
+  // On any subdomain, adjust path interpretation
+  // Map subdomain names to industry keys
+  const subdomainToIndustry: Record<string, IndustryType> = {
+    'hospitality': 'hospitality',
+    'healthcare': 'healthcare',
+    'tech': 'tech',
+    'athletics': 'athletics'
+  };
+  
+  if (subdomain && subdomainToIndustry[subdomain]) {
+    const subdomainIndustry = subdomainToIndustry[subdomain];
+    console.log(`[UnifiedApp] On ${subdomain} subdomain - adjusting path interpretation to ${subdomainIndustry}`);
+    
+    // On subdomain, root should be the subdomain's industry
     if (location.pathname === '/') {
-      industryKey = 'hospitality';
-      console.log('[UnifiedApp] Root path on hospitality subdomain, setting industryKey to hospitality');
+      industryKey = subdomainIndustry;
+      console.log(`[UnifiedApp] Root path on ${subdomain} subdomain, setting industryKey to ${subdomainIndustry}`);
     }
     // On subdomain, first segment is the subpage (not industry)
     // BUT skip this logic for admin route
-    if (pathSegments.length >= 1 && pathSegments[0] !== 'hospitality' && !isAdminRoute) {
+    if (pathSegments.length >= 1 && pathSegments[0] !== subdomainIndustry && !isAdminRoute) {
       subPage = pathSegments[0];
-      industryKey = 'hospitality';
-      console.log('[UnifiedApp] Subdomain logic: set subPage to', subPage, 'and industryKey to hospitality');
+      industryKey = subdomainIndustry;
+      console.log(`[UnifiedApp] Subdomain logic: set subPage to ${subPage} and industryKey to ${subdomainIndustry}`);
     }
   }
   
@@ -163,25 +173,34 @@ export const UnifiedInteligenciaApp: React.FC = () => {
   });
   
   // Use centralized mapping
-  const currentIndustry = subdomain === 'hospitality' && location.pathname === '/' 
-    ? 'hospitality' 
+  const currentIndustry = subdomain && subdomainToIndustry[subdomain] && location.pathname === '/' 
+    ? subdomainToIndustry[subdomain] 
     : getIndustryFromPath(location.pathname);
   const isIndustryHomepage = (pathSegments.length === 1 && currentIndustry !== null) || 
-                             (subdomain === 'hospitality' && location.pathname === '/');
+                             (subdomain && subdomainToIndustry[subdomain] && location.pathname === '/');
   const isHomepage = isRootPage || isIndustryHomepage; // Both root and industry homepages show landing area
   
   // Fix isSubpage calculation - admin route should ALWAYS be a subpage
   const isSubpage = isAdminRoute || 
                     (pathSegments.length > 1) || 
-                    (subdomain === 'hospitality' && pathSegments.length >= 1 && pathSegments[0] !== 'hospitality');
+                    (subdomain && subdomainToIndustry[subdomain] && pathSegments.length >= 1 && pathSegments[0] !== subdomainToIndustry[subdomain]);
   
   // Handle subdomain detection and auto-selection
   useEffect(() => {
     const hostname = window.location.hostname;
     
-    // If on hospitality subdomain, ALWAYS select hospitality industry
-    if (hostname === 'hospitality.inteligenciadm.com') {
-      setSelectedIndustry('hospitality');
+    // Check if on any known subdomain
+    const subdomainMappings: Record<string, IndustryType> = {
+      'hospitality.inteligenciadm.com': 'hospitality',
+      'healthcare.inteligenciadm.com': 'healthcare',
+      'tech.inteligenciadm.com': 'tech',
+      'athletics.inteligenciadm.com': 'athletics'
+    };
+    
+    const mappedIndustry = subdomainMappings[hostname];
+    
+    if (mappedIndustry) {
+      setSelectedIndustry(mappedIndustry);
       
       // Only set landing area state for homepage
       if (location.pathname === '/') {
@@ -198,8 +217,8 @@ export const UnifiedInteligenciaApp: React.FC = () => {
 
   // Handle invalid industry paths (but not on subdomains)
   useEffect(() => {
-    // Skip this check if we're on a subdomain
-    if (subdomain === 'hospitality') {
+    // Skip this check if we're on any known subdomain
+    if (subdomain && subdomainToIndustry[subdomain]) {
       return;
     }
     
