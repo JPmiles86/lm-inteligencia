@@ -223,25 +223,31 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
                             <div>
                               <p className="font-medium text-gray-900">{section.label}</p>
                               <p className="text-sm text-gray-600">{section.description}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs font-medium">Status:</span>
+                                <span className={`text-xs font-semibold ${isVisible ? 'text-green-600' : 'text-red-600'}`}>
+                                  {isVisible ? '✓ Visible' : '✗ Hidden'}
+                                </span>
+                              </div>
                             </div>
                           </div>
                           <button
                             onClick={() => handleToggle(vertical, section.key)}
                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm ${
                               isVisible
-                                ? 'bg-red-500 hover:bg-red-600 text-white'
-                                : 'bg-green-500 hover:bg-green-600 text-white'
+                                ? 'bg-gray-600 hover:bg-gray-700 text-white'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
                             }`}
                           >
                             {isVisible ? (
                               <>
                                 <EyeOff className="w-4 h-4" />
-                                Hide
+                                Hide Section
                               </>
                             ) : (
                               <>
                                 <Eye className="w-4 h-4" />
-                                Show
+                                Show Section
                               </>
                             )}
                           </button>

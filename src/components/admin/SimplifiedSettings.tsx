@@ -1,33 +1,15 @@
 // Simplified Settings Page Component - Content Visibility and AI Configuration
 import React, { useState } from 'react';
-import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
 import { VerticalVisibilitySettings } from './shared/VerticalVisibilitySettings';
 import { ProviderSettings } from './ProviderSettings';
 import { APIKeySetup } from '../setup/APIKeySetup';
-import { Settings as SettingsIcon, Brain, Eye, Key, Layers } from 'lucide-react';
+import { Settings as SettingsIcon, Brain, Key, Layers } from 'lucide-react';
 
-type SettingsTab = 'content' | 'verticals' | 'ai' | 'apikeys';
+type SettingsTab = 'verticals' | 'ai' | 'apikeys';
 
 export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('apikeys');
   
-  const handleSettingsSave = (newSettings: AdminSettings) => {
-    localStorage.setItem('admin_settings', JSON.stringify(newSettings));
-    console.log('[Settings] Settings saved:', newSettings);
-    
-    // Show success notification
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center gap-2';
-    notification.innerHTML = `
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-      </svg>
-      Settings saved successfully!
-    `;
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
-  };
-
   const tabs = [
     {
       id: 'apikeys' as SettingsTab,
@@ -46,12 +28,6 @@ export const Settings: React.FC = () => {
       label: 'Vertical Visibility',
       icon: Layers,
       description: 'Control section visibility for each industry vertical'
-    },
-    {
-      id: 'content' as SettingsTab,
-      label: 'Global Visibility',
-      icon: Eye,
-      description: 'Legacy global content visibility settings'
     }
   ];
 
@@ -110,16 +86,6 @@ export const Settings: React.FC = () => {
           {activeTab === 'verticals' && (
             <div className="p-6">
               <VerticalVisibilitySettings />
-            </div>
-          )}
-          
-          {activeTab === 'content' && (
-            <div className="p-6">
-              <ContentVisibilitySettings 
-                onSave={handleSettingsSave}
-                showSaveButton={true}
-                showTitle={true}
-              />
             </div>
           )}
           

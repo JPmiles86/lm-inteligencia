@@ -85,13 +85,13 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center justify-center px-4">
+      <div className="relative z-10 h-full flex items-center justify-center px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center text-white max-w-4xl mx-auto"
+          className="text-center text-white max-w-4xl mx-auto py-8"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 leading-tight" style={{ letterSpacing: '-0.02em' }}>
             {headline}

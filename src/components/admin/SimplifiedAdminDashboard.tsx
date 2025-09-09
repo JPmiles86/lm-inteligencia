@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ContentVisibilitySettings } from './shared/ContentVisibilitySettings';
 import { blogService } from '../../services/blogService';
 import { BlogPost } from '../../data/blogData';
 
@@ -196,14 +195,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = () => {
             </button>
           </div>
         )}
-      </div>
-
-      {/* Content Visibility Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <ContentVisibilitySettings 
-          showSaveButton={true}
-          showTitle={true}
-        />
       </div>
     </div>
   );
