@@ -7,6 +7,7 @@ import { useIndustryConfig } from '../../hooks/useIndustryConfig';
 import { useNavigationStore } from '../../store/navigationStore';
 import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
 import { getCurrentSubdomain } from '../../utils/domainRedirect';
+import { isSectionVisible } from '../../utils/verticalVisibility';
 
 // Removed unused type IndustryTypeWithoutMain
 
@@ -637,7 +638,7 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                 </div>
                 
                 {/* Testimonials Section */}
-                {config.content.testimonials && (
+                {config.content.testimonials && isSectionVisible(config.industry, 'showTestimonials') && (
                   <div id="testimonials">
                     <TestimonialsSection 
                       testimonials={config.content.testimonials}
