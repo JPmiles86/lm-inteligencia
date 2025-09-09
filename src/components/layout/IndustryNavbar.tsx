@@ -9,7 +9,6 @@ import { IndustryNames } from '../../types/Industry';
 import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
-import { useAdminSettings } from '../../hooks/useAdminSettings';
 import { isSectionVisible } from '../../utils/verticalVisibility';
 import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals';
 
@@ -33,7 +32,6 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ industry: string }>();
-  const adminSettings = useAdminSettings();
 
   // Always call the hook - this component is only rendered when context is available
   const context = useIndustryContext();
@@ -290,7 +288,8 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               {navItems.caseStudies}
             </Link>
 
-            {adminSettings.showBlog && (
+            {/* Blog - conditionally show based on vertical settings */}
+            {isSectionVisible(industry, 'showBlog') && (
               <Link
                 to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -336,7 +335,6 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const params = useParams<{ industry: string }>();
-  const adminSettings = useAdminSettings();
 
   // Determine the current industry and name from props only
   const industry = industryProp || config?.industry || currentIndustry || 'main';
@@ -588,7 +586,8 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               {navItems.caseStudies}
             </Link>
 
-            {adminSettings.showBlog && (
+            {/* Blog - conditionally show based on vertical settings */}
+            {isSectionVisible(industry, 'showBlog') && (
               <Link
                 to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 onClick={() => setIsMobileMenuOpen(false)}

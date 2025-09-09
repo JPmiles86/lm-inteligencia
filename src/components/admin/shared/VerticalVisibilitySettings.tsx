@@ -122,25 +122,28 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
       }
     };
     setSettings(newSettings);
-  };
-
-  const handleSave = () => {
-    localStorage.setItem('vertical_visibility_settings', JSON.stringify(settings));
     
-    // Also update the legacy admin_settings for backward compatibility
-    const adminSettings = {
-      showStaffSection: settings.hospitality.showStaffSection,
-      showBlog: settings.hospitality.showBlog,
-    };
-    localStorage.setItem('admin_settings', JSON.stringify(adminSettings));
+    // Auto-save immediately
+    localStorage.setItem('vertical_visibility_settings', JSON.stringify(newSettings));
     
-    if (onSave) {
-      onSave(settings);
+    // Also update the legacy admin_settings for backward compatibility if it's hospitality
+    if (vertical === 'hospitality') {
+      const adminSettings = {
+        showStaffSection: newSettings.hospitality.showStaffSection,
+        showBlog: newSettings.hospitality.showBlog,
+      };
+      localStorage.setItem('admin_settings', JSON.stringify(adminSettings));
     }
     
+    if (onSave) {
+      onSave(newSettings);
+    }
+    
+    // Show saved indicator briefly
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => setSaved(false), 1500);
   };
+
 
   const toggleVertical = (vertical: string) => {
     setExpandedVertical(expandedVertical === vertical ? null : vertical);
@@ -253,26 +256,21 @@ export const VerticalVisibilitySettings: React.FC<VerticalVisibilitySettingsProp
         })}
       </div>
 
-      {/* Save Button */}
-      <div className="flex justify-end mt-8">
-        <button
-          onClick={handleSave}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
-            saved
-              ? 'bg-green-600 text-white'
-              : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700'
-          }`}
-        >
-          <Save className="w-4 h-4" />
-          {saved ? 'Saved!' : 'Save All Settings'}
-        </button>
-      </div>
+      {/* Auto-Save Indicator */}
+      {saved && (
+        <div className="flex justify-end mt-8">
+          <div className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-green-600 text-white">
+            <Save className="w-4 h-4" />
+            Saved!
+          </div>
+        </div>
+      )}
 
       {/* Info Box */}
       <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
           <strong>Note:</strong> These settings control which sections are visible on the public website for each vertical. 
-          Changes will take effect immediately after saving.
+          Changes are saved automatically and take effect immediately.
         </p>
       </div>
     </div>
