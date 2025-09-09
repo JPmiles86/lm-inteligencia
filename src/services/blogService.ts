@@ -180,14 +180,17 @@ class BlogDatabaseService {
         return response;
       }
       
-      // Otherwise, handle the API response format
+      // Handle the API response format - response is already the array from data
+      // because handleApiResponse returns data.data || data
+      const posts = Array.isArray(response) ? response : (response.data || []);
+      
       return {
-        posts: response.data || [],
-        pagination: response.pagination || {
+        posts: posts,
+        pagination: {
           currentPage: 1,
           totalPages: 1,
-          totalItems: 0,
-          itemsPerPage: 10
+          totalItems: posts.length,
+          itemsPerPage: posts.length || 10
         }
       };
     } catch (error) {
