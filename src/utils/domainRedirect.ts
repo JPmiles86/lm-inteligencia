@@ -4,37 +4,10 @@
 import { getCurrentEnvironment } from '../config/subdomain-mapping';
 
 export const handleDomainRedirect = (): void => {
-  // Only run in production environment
-  if (getCurrentEnvironment() === 'development') {
-    console.log('Skipping redirect in development environment');
-    return;
-  }
-
-  const hostname = window.location.hostname;
-  const pathname = window.location.pathname;
-  const search = window.location.search;
-  
-  console.log('Current hostname:', hostname);
-  
-  // Check if we're on the main domain (inteligenciadm.com or www.inteligenciadm.com)
-  const isMainDomain = hostname === 'inteligenciadm.com' || hostname === 'www.inteligenciadm.com';
-  
-  // Check if we're already on a subdomain
-  const isSubdomain = hostname.includes('.inteligenciadm.com') && hostname !== 'www.inteligenciadm.com';
-  
-  // TEMPORARY: Redirect main domain to hospitality subdomain
-  // Once all verticals are ready, remove this redirect to show all 4 verticals on main domain
-  if (isMainDomain && !isSubdomain) {
-    // Redirect to hospitality subdomain while preserving the path and query params
-    const redirectUrl = `https://hospitality.inteligenciadm.com${pathname}${search}`;
-    
-    console.log(`Redirecting from ${hostname} to hospitality.inteligenciadm.com`);
-    console.log('Redirect URL:', redirectUrl);
-    
-    // Perform the redirect with both methods for reliability
-    window.location.href = redirectUrl;
-    window.location.replace(redirectUrl);
-  }
+  // DISABLED: No longer redirecting to hospitality
+  // Main domain now shows the landing page with vertical selection
+  console.log('Domain redirect disabled - showing main landing page');
+  return;
 };
 
 // Function to check if redirect should be enabled (can be toggled off later)
@@ -52,8 +25,8 @@ export const getBaseUrl = (): string => {
     return 'http://localhost:3001';
   }
   
-  // In production, return the hospitality subdomain for now
-  return 'https://hospitality.inteligenciadm.com';
+  // In production, return the main domain
+  return 'https://inteligenciadm.com';
 };
 
 // Get the current subdomain from hostname
