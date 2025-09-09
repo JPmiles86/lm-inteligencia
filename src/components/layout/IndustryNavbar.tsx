@@ -161,20 +161,37 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       // Only show enabled verticals, skip main and current industry
                       if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
+                      
+                      // Map to subdomain URLs
+                      const subdomainMap: Record<string, string> = {
+                        'hospitality': 'hospitality.inteligenciadm.com',
+                        'healthcare': 'healthcare.inteligenciadm.com',
+                        'tech': 'tech.inteligenciadm.com',
+                        'athletics': 'athletics.inteligenciadm.com'
+                      };
+                      
+                      const targetSubdomain = subdomainMap[ind];
+                      if (!targetSubdomain) return null;
+                      
                       // Preserve current sub-page when switching industries
-                      const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
+                      const currentPath = window.location.pathname;
+                      const subPage = currentPath === '/' ? '' : currentPath;
+                      const targetUrl = `https://${targetSubdomain}${subPage}`;
+                      
                       return (
-                        <Link
+                        <a
                           key={ind}
-                          to={`/${urlPath}${currentSubPage}`}
-                          onClick={() => {
+                          href={targetUrl}
+                          onClick={(e) => {
+                            e.preventDefault();
                             setIsIndustryDropdownOpen(false);
-                            // Let the URL be the single source of truth - UnifiedInteligenciaApp will handle store updates
+                            // Use window.location for full page navigation to subdomain
+                            window.location.href = targetUrl;
                           }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
                           {IndustryNames[ind as IndustryType]}
-                        </Link>
+                        </a>
                       );
                     })}
                   </div>
@@ -459,20 +476,37 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       // Only show enabled verticals, skip main and current industry
                       if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
+                      
+                      // Map to subdomain URLs
+                      const subdomainMap: Record<string, string> = {
+                        'hospitality': 'hospitality.inteligenciadm.com',
+                        'healthcare': 'healthcare.inteligenciadm.com',
+                        'tech': 'tech.inteligenciadm.com',
+                        'athletics': 'athletics.inteligenciadm.com'
+                      };
+                      
+                      const targetSubdomain = subdomainMap[ind];
+                      if (!targetSubdomain) return null;
+                      
                       // Preserve current sub-page when switching industries
-                      const currentSubPage = pathSegments.length > 1 ? `/${pathSegments.slice(1).join('/')}` : '';
+                      const currentPath = window.location.pathname;
+                      const subPage = currentPath === '/' ? '' : currentPath;
+                      const targetUrl = `https://${targetSubdomain}${subPage}`;
+                      
                       return (
-                        <Link
+                        <a
                           key={ind}
-                          to={`/${urlPath}${currentSubPage}`}
-                          onClick={() => {
+                          href={targetUrl}
+                          onClick={(e) => {
+                            e.preventDefault();
                             setIsIndustryDropdownOpen(false);
-                            // Let the URL be the single source of truth - UnifiedInteligenciaApp will handle store updates
+                            // Use window.location for full page navigation to subdomain
+                            window.location.href = targetUrl;
                           }}
                           className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors first:rounded-t-lg last:rounded-b-lg"
                         >
                           {IndustryNames[ind as IndustryType]}
-                        </Link>
+                        </a>
                       );
                     })}
                   </div>

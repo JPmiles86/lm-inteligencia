@@ -33,6 +33,10 @@ export const AdminAuth: React.FC<AdminAuthProps> = ({ children }) => {
     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_authenticated', 'true');
+      // Store auth token for API calls
+      const adminToken = 'inteligencia-admin-2025'; // This should match the token in api/blog.ts
+      sessionStorage.setItem('admin_token', adminToken);
+      localStorage.setItem('admin_token', adminToken);
       setError('');
     } else {
       setError('Invalid email or password');

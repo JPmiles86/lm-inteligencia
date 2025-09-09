@@ -62,6 +62,29 @@ export default async function handler(req: any, res: any) {
     });
     db = drizzle(sql);
 
+    // Check for authentication on write operations
+    const requiresAuth = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method || '');
+    
+    if (requiresAuth) {
+      // Check for admin authentication
+      const authHeader = req.headers.authorization;
+      
+      // Simple token-based auth - in production, use proper JWT or session auth
+      const adminToken = process.env.ADMIN_API_TOKEN || 'inteligencia-admin-2025';
+      
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        await sql?.end();
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      
+      if (token !== adminToken) {
+        await sql?.end();
+        return res.status(403).json({ error: 'Invalid authentication token' });
+      }
+    }
+    
     // Handle different HTTP methods
     switch (req.method) {
       case 'GET': {
