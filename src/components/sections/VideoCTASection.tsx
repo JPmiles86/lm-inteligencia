@@ -45,23 +45,38 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
   ];
 
   return (
-    <section className="relative h-[600px] overflow-hidden">
-      {/* Background - Video or Gradient */}
+    <section className="relative min-h-[600px] overflow-hidden">
+      {/* Background - Video or Gradient with aspect ratio container */}
       <div className="absolute inset-0 z-0">
         {videoUrl ? (
           <>
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-            >
-              <source src={videoUrl} type="video/mp4" />
-              <div className="w-full h-full bg-gray-900" />
-            </video>
-            {/* Semi-transparent overlay for video */}
-            <div className="absolute inset-0 bg-black bg-opacity-60" />
+            {/* Aspect ratio container to prevent layout shift */}
+            <div className="relative w-full h-full">
+              {/* Placeholder background while video loads */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540]" />
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ minHeight: '600px' }}
+                onLoadedData={(e) => {
+                  // Ensure smooth transition when video loads
+                  (e.target as HTMLVideoElement).style.opacity = '1';
+                }}
+                onLoadStart={(e) => {
+                  // Start with hidden video to prevent flash
+                  (e.target as HTMLVideoElement).style.opacity = '0';
+                  (e.target as HTMLVideoElement).style.transition = 'opacity 0.5s ease-in-out';
+                }}
+              >
+                <source src={videoUrl} type="video/mp4" />
+                <div className="w-full h-full bg-gray-900" />
+              </video>
+              {/* Semi-transparent overlay for video */}
+              <div className="absolute inset-0 bg-black bg-opacity-60" />
+            </div>
           </>
         ) : (
           /* Dark blue gradient background when no video */
