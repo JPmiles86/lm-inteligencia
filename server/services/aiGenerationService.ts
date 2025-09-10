@@ -1,5 +1,5 @@
-import { ProviderConfig } from './providerSelector';
-import { ProviderError } from '../middleware/error.middleware';
+import { ProviderConfig } from './providerSelector.js';
+import { ProviderError } from '../middleware/error.middleware.js';
 
 // Generation request interface
 export interface GenerationRequest {

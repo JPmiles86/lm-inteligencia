@@ -5,9 +5,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
-import { SECURITY_HEADERS, getCSPHeader, SECURITY_EVENTS } from '../../src/config/security';
-import { validateSchema } from '../../src/utils/validation';
-import { sanitizeText, sanitizeJSON } from '../../src/utils/sanitization';
+import { SECURITY_HEADERS, getCSPHeader, SECURITY_EVENTS } from '../../src/config/security.js';
+import { validateSchema } from '../../src/utils/validation.js';
+import { sanitizeText, sanitizeJSON } from '../../src/utils/sanitization.js';
 
 /**
  * Apply security headers

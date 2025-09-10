@@ -8,9 +8,9 @@
  * - Integration testing
  */
 
-import { intelligentProviderSelector } from '../services/intelligentProviderSelector';
-import { retryHandler } from '../services/retryHandler';
-import { usageTracker } from '../services/usageTracker';
+import { intelligentProviderSelector } from '../services/intelligentProviderSelector.js';
+import { retryHandler } from '../services/retryHandler.js';
+import { usageTracker } from '../services/usageTracker.js';
 
 interface FallbackTestResult {
   provider: string;

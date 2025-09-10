@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { selectProvider } from '../services/providerSelector';
-import { asyncHandler, ValidationError, ProviderError } from '../middleware/error.middleware';
-import { generateWithProvider } from '../services/aiGenerationService';
-import { openAIAPIHandler } from '../services/providers/openai';
-import { anthropicAPIHandler } from '../services/providers/anthropic';
-import { googleAPIHandler } from '../services/providers/google';
-import { perplexityAPIHandler } from '../services/providers/perplexity';
+import { selectProvider } from '../services/providerSelector.js';
+import { asyncHandler, ValidationError, ProviderError } from '../middleware/error.middleware.js';
+import { generateWithProvider } from '../services/aiGenerationService.js';
+import { openAIAPIHandler } from '../services/providers/openai.js';
+import { anthropicAPIHandler } from '../services/providers/anthropic.js';
+import { googleAPIHandler } from '../services/providers/google.js';
+import { perplexityAPIHandler } from '../services/providers/perplexity.js';
 
 const router = Router();
 

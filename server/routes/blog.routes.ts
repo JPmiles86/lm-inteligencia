@@ -1,8 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { eq, desc, asc, sql, and, or } from 'drizzle-orm';
-import { db } from '../../api/index';
-import { blogPosts, blogRevisions } from '../../src/db/schema';
-import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
+import { db } from '../../api/index.js';
+import { blogPosts, blogRevisions } from '../../src/db/schema.js';
+import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware.js';
 
 const router = Router();
 

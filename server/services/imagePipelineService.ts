@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { imageGenerationPipeline } from '../../src/services/ai/ImageGenerationPipeline';
-import { imageRepository } from '../../src/services/database/ImageRepository';
-import { ImagePrompt } from '../../src/services/ai/ImagePromptExtractor';
+import { imageGenerationPipeline } from '../../src/services/ai/ImageGenerationPipeline.js';
+import { imageRepository } from '../../src/services/database/ImageRepository.js';
+import { ImagePrompt } from '../../src/services/ai/ImagePromptExtractor.js';
 
 export class ImagePipelineAPIHandler {
   /**

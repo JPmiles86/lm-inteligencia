@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express';
 import { eq, desc, sql } from 'drizzle-orm';
-import { db } from '../../api/index';
-import { referenceImages, characters, imagePrompts } from '../../src/db/schema';
-import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
-import { selectProvider } from '../services/providerSelector';
-import { generateWithProvider } from '../services/aiGenerationService';
+import { db } from '../../api/index.js';
+import { referenceImages, characters, imagePrompts } from '../../src/db/schema.js';
+import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware.js';
+import { selectProvider } from '../services/providerSelector.js';
+import { generateWithProvider } from '../services/aiGenerationService.js';
 
 const router = Router();
 

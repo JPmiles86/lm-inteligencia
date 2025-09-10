@@ -4,10 +4,10 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { aiService } from '../services/ai.service';
-import { encryptionService } from '../services/encryption.service';
-import { db } from '../../api/index';
-import { providerSettings } from '../../src/db/schema';
+import { aiService } from '../services/ai.service.js';
+import { encryptionService } from '../services/encryption.service.js';
+import { db } from '../../api/index.js';
+import { providerSettings } from '../../src/db/schema.js';
 import { eq } from 'drizzle-orm';
 
 const router = Router();

@@ -9,9 +9,9 @@
  */
 
 import { eq, and, gte, sql } from 'drizzle-orm';
-import { db } from '../../api/index';
-import { providerSettings } from '../../src/db/schema';
-import { intelligentProviderSelector } from './intelligentProviderSelector';
+import { db } from '../../api/index.js';
+import { providerSettings } from '../../src/db/schema.js';
+import { intelligentProviderSelector } from './intelligentProviderSelector.js';
 
 interface UsageRecord {
   provider: string;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { perplexityService } from '../../../src/services/ai/providers/PerplexityService';
+import { perplexityService } from '../../../src/services/ai/providers/PerplexityService.js';
 
 // Define usage tracking interface to match existing system
 interface UsageRecord {

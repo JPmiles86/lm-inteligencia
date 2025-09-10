@@ -6,10 +6,10 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { db } from '../../api/index';
-import { providerSettings } from '../../src/db/schema';
+import { db } from '../../api/index.js';
+import { providerSettings } from '../../src/db/schema.js';
 import { eq } from 'drizzle-orm';
-import { encryptionService } from './encryption.service';
+import { encryptionService } from './encryption.service.js';
 
 export interface GenerationRequest {
   prompt: string;

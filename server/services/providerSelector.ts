@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
-import { db } from '../../api/index';
-import { providerSettings } from '../../src/db/schema';
-import { decrypt } from '../utils/encryption';
-import { ProviderError } from '../middleware/error.middleware';
+import { db } from '../../api/index.js';
+import { providerSettings } from '../../src/db/schema.js';
+import { decrypt } from '../utils/encryption.js';
+import { ProviderError } from '../middleware/error.middleware.js';
 
 // Provider capabilities mapping
 interface ProviderCapabilities {

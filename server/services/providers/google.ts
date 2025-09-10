@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { googleAIService } from '../../../src/services/ai/providers/GoogleAIService';
-import { googleImageService } from '../../../src/services/ai/providers/GoogleImageService';
-import { usageTracker } from '../usageTracker';
+import { googleAIService } from '../../../src/services/ai/providers/GoogleAIService.js';
+import { googleImageService } from '../../../src/services/ai/providers/GoogleImageService.js';
+import { usageTracker } from '../usageTracker.js';
 
 export class GoogleAPIHandler {
   async handleTextGeneration(req: Request, res: Response) {

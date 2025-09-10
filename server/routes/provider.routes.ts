@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
 import { eq } from 'drizzle-orm';
-import { db } from '../../api/index';
-import { providerSettings } from '../../src/db/schema';
-import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware';
-import { encrypt, decrypt } from '../utils/encryption';
-import { intelligentProviderSelector } from '../services/intelligentProviderSelector';
-import { usageTracker } from '../services/usageTracker';
+import { db } from '../../api/index.js';
+import { providerSettings } from '../../src/db/schema.js';
+import { asyncHandler, ValidationError, NotFoundError } from '../middleware/error.middleware.js';
+import { encrypt, decrypt } from '../utils/encryption.js';
+import { intelligentProviderSelector } from '../services/intelligentProviderSelector.js';
+import { usageTracker } from '../services/usageTracker.js';
 
 const router = Router();
 

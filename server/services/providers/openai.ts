@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { openAIService } from '../../../src/services/ai/providers/OpenAIService';
-import { openAIImageService } from '../../../src/services/ai/providers/OpenAIImageService';
-import { openAIEmbeddingService } from '../../../src/services/ai/providers/OpenAIEmbeddingService';
+import { openAIService } from '../../../src/services/ai/providers/OpenAIService.js';
+import { openAIImageService } from '../../../src/services/ai/providers/OpenAIImageService.js';
+import { openAIEmbeddingService } from '../../../src/services/ai/providers/OpenAIEmbeddingService.js';
 
 // Define usage tracking interface to match existing system
 interface UsageRecord {

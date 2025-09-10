@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { anthropicService } from '../../../src/services/ai/providers/AnthropicService';
-import { usageTracker } from '../usageTracker';
+import { anthropicService } from '../../../src/services/ai/providers/AnthropicService.js';
+import { usageTracker } from '../usageTracker.js';
 
 export class AnthropicAPIHandler {
   async handleTextGeneration(req: Request, res: Response) {
