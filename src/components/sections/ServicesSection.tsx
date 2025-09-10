@@ -47,6 +47,8 @@ const serviceIcons: Record<string, React.ReactNode> = {
   'Email Marketing & Funnels': <Mail className="w-12 h-12" />,
   'Marketing Strategy Consulting': <TrendingUp className="w-12 h-12" />,
   'Event/Launch Campaigns': <Calendar className="w-12 h-12" />,
+  'Hotels Ad Management': <Hotel className="w-12 h-12" />,
+  'Meta (Facebook & Instagram) Ads': <Smartphone className="w-12 h-12" />,
   
   // Old service names (for backward compatibility)
   'Smart Booking System That Beats OTAs': <Hotel className="w-12 h-12" />,
@@ -136,7 +138,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           viewport={{ once: true }}
           className="text-center mb-24"
         >
-          <h2 className="text-5xl sm:text-6xl font-bold mb-8" style={{ color: '#000', letterSpacing: '-0.02em' }}>
+          <h2 className="text-5xl sm:text-6xl font-bold mb-8" style={{ color: '#371657', letterSpacing: '-0.02em' }}>
             {title.split('The Metrics That Matter').map((part, index) => (
               <span key={index}>
                 {part}
@@ -328,7 +330,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               {/* CTA Button */}
               <Link
                 to={services[hoveredIndex]?.learnMoreLink || `/contact?service=${encodeURIComponent(services[hoveredIndex]?.title || '')}`}
-                className="w-full py-4 rounded-xl font-medium text-white text-center block transition-all duration-300 hover:scale-[1.02] transform bg-secondary hover:opacity-90"
+                className="w-full py-4 rounded-xl font-medium text-white text-center block transition-all duration-300 hover:scale-[1.02] transform bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
               >
                 {services[hoveredIndex]?.learnMoreLink ? 'Learn More' : 'Get Started'}
               </Link>
@@ -354,9 +356,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             <div className="flex justify-center">
               <Link
                 to="/contact"
-                className="px-10 py-4 rounded-xl font-medium text-white transition-all duration-300 hover:scale-[1.02] transform text-center bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
+                className="px-10 py-4 rounded-xl font-medium text-gray-900 transition-all duration-300 hover:scale-[1.02] transform text-center bg-white hover:bg-gray-100"
               >
-                Schedule Free Consultation
+                Learn More
               </Link>
               {/* Case Studies button hidden for now - can be restored later
               <Link

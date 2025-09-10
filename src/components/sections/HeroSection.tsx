@@ -96,7 +96,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight" style={{ letterSpacing: '-0.02em' }}>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight" style={{ letterSpacing: '-0.02em', color: useMinimalBackground ? '#371657' : undefined }}>
             {content.title}
           </h1>
           
@@ -117,7 +117,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           >
             <Link 
               to={`${industryPath}/contact`}
-              className={`inline-block px-10 py-5 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md ${useMinimalBackground ? 'bg-secondary text-white hover:opacity-90' : 'bg-white text-gray-900 hover:bg-gray-100'}`}
+              className={`inline-block px-10 py-5 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] shadow-md ${useMinimalBackground ? 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white' : 'bg-white text-gray-900 hover:bg-gray-100'}`}
             >
               {content.ctaText}
             </Link>

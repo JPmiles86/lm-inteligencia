@@ -661,31 +661,8 @@ export const UnifiedInteligenciaApp: React.FC = () => {
                   />
                 )}
                 
-                {/* Contact Section */}
-                <section id="contact" className="py-20 bg-gray-50">
-                  <div className="max-w-7xl mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold mb-8 text-primary">
-                      Ready to Transform Your {industries.find(i => i.industry === selectedIndustry)?.title} Marketing?
-                    </h2>
-                    <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                      Let's discuss how we can help you achieve your goals with our proven strategies and industry expertise.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <a 
-                        href={subdomain === 'hospitality' ? '/contact' : (selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/contact` : '#')}
-                        className="inline-block px-8 py-4 text-white rounded-lg font-semibold transition-all hover:scale-105 transform bg-secondary hover:opacity-90"
-                      >
-                        Schedule Free Consultation
-                      </a>
-                      <a 
-                        href={subdomain === 'hospitality' ? '/services' : (selectedIndustry ? `/${getPathFromIndustry(selectedIndustry)}/services` : '#')}
-                        className="inline-block px-8 py-4 border-2 rounded-lg font-semibold transition-all hover:scale-105 transform border-secondary text-secondary hover:bg-secondary hover:text-white"
-                      >
-                        View Our Services
-                      </a>
-                    </div>
-                  </div>
-                </section>
+                {/* Contact Section - REMOVED per client request */}
+                {/* Duplicate CTA section removed - "Ready to Transform Your Marketing" */}
                 
                 {/* Footer */}
                 {selectedIndustry && <Footer selectedIndustry={selectedIndustry as IndustryType} />}

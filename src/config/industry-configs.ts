@@ -100,22 +100,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           image: '/images/RestaurantMarketing.png',
           learnMoreLink: '/services#restaurant-marketing',
         },
-        {
-          title: 'Alternative Channel Marketing',
-          description: 'Expand your reach beyond the major platforms with targeted campaigns on alternative channels that fit your audience.',
-          keyBenefit: 'Access new audiences with 20-30% lower costs',
-          icon: 'globe',
-          image: '/images/EmailMarketing.png', // Reusing email marketing image
-          learnMoreLink: '/services#alternative-channel-marketing',
-        },
-        {
-          title: 'Conversion Rate Optimization (CRO)',
-          description: 'Turn more clicks into customers with data-driven website and funnel optimization.',
-          keyBenefit: '25-40% increase in booking conversion rates',
-          icon: 'trending-up',
-          image: '/images/MarketingStrategy.png', // Reusing marketing strategy image
-          learnMoreLink: '/services#conversion-rate-optimization',
-        },
+        // Alternative Channel Marketing and CRO cards removed per client request
       ],
       // NOTE: About page content moved to universal-content.ts for consistency across all industries
       team: [
