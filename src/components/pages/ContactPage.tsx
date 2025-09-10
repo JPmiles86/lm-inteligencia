@@ -310,7 +310,7 @@ export const ContactPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold py-4 rounded-lg text-lg transition-all transform hover:scale-105"
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 rounded-lg text-lg transition-all transform hover:scale-105"
                 >
                   {config.content.contact.formLabels?.submitButton || 'Send Message & Get Free Consultation'}
                 </button>

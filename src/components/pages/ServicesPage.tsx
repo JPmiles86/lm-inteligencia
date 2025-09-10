@@ -293,7 +293,7 @@ export const ServicesPage: React.FC = () => {
             <div className="flex justify-center">
               <Link
                 to="/contact"
-                className="bg-white text-primary hover:bg-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block"
+                className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-lg font-bold text-lg transition-colors inline-block"
               >
                 Get Your Free Consultation
               </Link>
