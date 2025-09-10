@@ -7,8 +7,7 @@ interface VideoBackgroundSectionProps {
   mobileVideoUrl?: string;
 }
 
-// Global flag to prevent multiple video instances from loading simultaneously
-let isVideoLoading = false;
+// Component-level loading state instead of global to fix cross-page navigation issues
 
 export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({ 
   desktopVideoUrl = 'https://player.vimeo.com/video/1100417251',
@@ -18,6 +17,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isDesktopReady, setIsDesktopReady] = useState(false);
   const [isMobileReady, setIsMobileReady] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const desktopIframeRef = useRef<HTMLIFrameElement>(null);
   const mobileIframeRef = useRef<HTMLIFrameElement>(null);
@@ -41,15 +41,15 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && !isVideoLoading) {
-            isVideoLoading = true;
+            setIsVideoLoading(true);
             // Load immediately - video should already be preloaded
             setShouldLoadVideo(true);
           }
         });
       },
       { 
-        threshold: 0.01, // Trigger earlier when just 1% is visible
-        rootMargin: '200px' // Start loading 200px before the section comes into view
+        threshold: 0, // Trigger as soon as any part is visible
+        rootMargin: '500px' // Start loading 500px before the section comes into view for smoother experience
       }
     );
 
@@ -62,7 +62,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
         observer.unobserve(currentSection);
       }
     };
-  }, []);
+  }, [isVideoLoading]);
 
   // Listen for Vimeo player events to detect when video is actually playing
   useEffect(() => {
@@ -79,7 +79,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
           } else if (data.player_id === 'mobile-video') {
             setIsMobileReady(true);
           }
-          isVideoLoading = false;
+          setIsVideoLoading(false);
         }
       } catch (e) {
         // Ignore parsing errors
@@ -151,7 +151,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
                 if (!isDesktopReady) {
                   setIsDesktopReady(true);
                 }
-              }, 1500);
+              }, 800); // Reduced from 1500ms for faster fallback
             }}
           />
           
@@ -187,7 +187,7 @@ export const VideoBackgroundSection: React.FC<VideoBackgroundSectionProps> = ({
                 if (!isMobileReady) {
                   setIsMobileReady(true);
                 }
-              }, 1500);
+              }, 800); // Reduced from 1500ms for faster fallback
             }}
           />
         </div>
