@@ -9,11 +9,11 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 // Import all route modules
-import aiRoutes from '../server/routes/ai.routes';
-import blogRoutes from '../server/routes/blog.routes';
-import generationRoutes from '../server/routes/generation.routes';
-import imageRoutes from '../server/routes/image.routes';
-import providerRoutes from '../server/routes/provider.routes';
+import aiRoutes from '../server/routes/ai.routes.js';
+import blogRoutes from '../server/routes/blog.routes.js';
+import generationRoutes from '../server/routes/generation.routes.js';
+import imageRoutes from '../server/routes/image.routes.js';
+import providerRoutes from '../server/routes/provider.routes.js';
 
 // Initialize PostgreSQL database
 export let db: any;
