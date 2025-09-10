@@ -9,7 +9,7 @@ import { IndustryNames } from '../../types/Industry';
 import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
-import { isSectionVisible } from '../../utils/verticalVisibility';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals';
 
 interface IndustryNavbarProps {
@@ -218,7 +218,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               {/* Case Studies - conditionally show based on vertical settings */}
-              {isSectionVisible(industry, 'showCaseStudies') && (
+              {isSectionVisibleSync(industry, 'showCaseStudies') && (
                 <Link
                   to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
@@ -228,7 +228,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               )}
 
               {/* Blog - conditionally show based on vertical settings */}
-              {isSectionVisible(industry, 'showBlog') && (
+              {isSectionVisibleSync(industry, 'showBlog') && (
                 <Link
                   to={industryKey ? `/${industryKey}/blog` : '/blog'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
@@ -306,7 +306,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             {/* Blog - conditionally show based on vertical settings */}
-            {isSectionVisible(industry, 'showBlog') && (
+            {isSectionVisibleSync(industry, 'showBlog') && (
               <Link
                 to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -533,7 +533,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               {/* Case Studies - conditionally show based on vertical settings */}
-              {isSectionVisible(industry, 'showCaseStudies') && (
+              {isSectionVisibleSync(industry, 'showCaseStudies') && (
                 <Link
                   to={industryKey ? `/${industryKey}/case-studies` : '/case-studies'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
@@ -543,7 +543,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               )}
 
               {/* Blog - conditionally show based on vertical settings */}
-              {isSectionVisible(industry, 'showBlog') && (
+              {isSectionVisibleSync(industry, 'showBlog') && (
                 <Link
                   to={industryKey ? `/${industryKey}/blog` : '/blog'}
                   className="font-medium transition-colors hover:text-primary text-gray-700"
@@ -621,7 +621,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             </Link>
 
             {/* Blog - conditionally show based on vertical settings */}
-            {isSectionVisible(industry, 'showBlog') && (
+            {isSectionVisibleSync(industry, 'showBlog') && (
               <Link
                 to={industryKey ? `/${industryKey}/blog` : '/blog'}
                 onClick={() => setIsMobileMenuOpen(false)}

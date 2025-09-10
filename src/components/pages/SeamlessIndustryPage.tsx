@@ -14,7 +14,7 @@ import { AboutTeaserSection } from '../sections/AboutTeaserSection';
 import { BlogSection } from '../sections/BlogSection';
 import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
 import { getIndustryName } from '../../types/Industry';
-import { isSectionVisible } from '../../utils/verticalVisibility';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 
 export const SeamlessIndustryPage: React.FC = () => {
   const { config, industryKey } = useIndustryContext();
@@ -73,7 +73,7 @@ export const SeamlessIndustryPage: React.FC = () => {
         ))}
 
         {/* Testimonials Section */}
-        {isSectionVisible(config.industry, 'showTestimonials') && (
+        {isSectionVisibleSync(config.industry, 'showTestimonials') && (
           <TestimonialsSection 
             testimonials={config.content.testimonials} 
             industryTheme={config.industry}

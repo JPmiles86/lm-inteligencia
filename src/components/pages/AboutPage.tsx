@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 // Removed unused imports
 import { universalContent } from '../../config/universal-content';
 import { useIndustryContext } from '../../contexts/IndustryContext';
-import { isSectionVisible } from '../../utils/verticalVisibility';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 
 export const AboutPage: React.FC = () => {
   // Get industry context if available
@@ -177,7 +177,7 @@ export const AboutPage: React.FC = () => {
       </section>
 
       {/* Team Section - Visibility controlled by vertical settings */}
-      {isSectionVisible(industry, 'showStaffSection') && (
+      {isSectionVisibleSync(industry, 'showStaffSection') && (
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div

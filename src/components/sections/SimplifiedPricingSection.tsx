@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useIndustryContext } from '../../contexts/IndustryContext';
 import type { PricingContent } from '../../types/Industry';
-import { isSectionVisible } from '../../utils/verticalVisibility';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 
 export const SimplifiedPricingSection: React.FC = () => {
   const { config } = useIndustryContext();
@@ -136,7 +136,7 @@ export const SimplifiedPricingSection: React.FC = () => {
 
         {/* Optional Add-Ons - Only show if addOns exist and visibility setting allows */}
         {pricing.addOns && Array.isArray(pricing.addOns) && pricing.addOns.length > 0 && 
-         isSectionVisible(config.industry, 'showOptionalAddOns') && (
+         isSectionVisibleSync(config.industry, 'showOptionalAddOns') && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
