@@ -2,37 +2,9 @@
   "functions": {
     "api/index.ts": {
       "maxDuration": 30
-    },
-    "api/test.ts": {
-      "maxDuration": 10
-    },
-    "api/brainstorm.ts": {
-      "maxDuration": 30
-    },
-    "api/test-db.ts": {
-      "maxDuration": 10
-    },
-    "api/blog.ts": {
-      "maxDuration": 30
     }
   },
   "rewrites": [
-    {
-      "source": "/api/test",
-      "destination": "/api/test"
-    },
-    {
-      "source": "/api/ai/brainstorm",
-      "destination": "/api/brainstorm"
-    },
-    {
-      "source": "/api/blog",
-      "destination": "/api/blog"
-    },
-    {
-      "source": "/api/blog/(.*)",
-      "destination": "/api/blog"
-    },
     {
       "source": "/api/(.*)",
       "destination": "/api/index"
