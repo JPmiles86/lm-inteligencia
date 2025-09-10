@@ -24,7 +24,9 @@ import {
   Check,
   Smile,
   Heart,
-  Activity
+  Activity,
+  Utensils,
+  Share2
 } from 'lucide-react';
 import type { ServiceContent } from '../../types/Industry';
 
@@ -69,6 +71,12 @@ const serviceIcons: Record<string, React.ReactNode> = {
   'Tournament & Event Promotion': <Trophy className="w-12 h-12" />,
   'Membership Growth Marketing': <Users className="w-12 h-12" />,
   'Sports Facility Management': <Calendar className="w-12 h-12" />,
+  
+  // Hospitality additional services
+  'OTA Optimization & Demand Generation': <Globe className="w-12 h-12" />,
+  'Restaurant Marketing': <Utensils className="w-12 h-12" />,
+  'Alternative Channel Marketing': <Share2 className="w-12 h-12" />,
+  'Conversion Rate Optimization (CRO)': <TrendingUp className="w-12 h-12" />,
   
   // Default
   'default': <Briefcase className="w-12 h-12" />

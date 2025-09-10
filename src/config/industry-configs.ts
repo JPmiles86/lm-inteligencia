@@ -105,7 +105,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           description: 'Expand your reach beyond the major platforms with targeted campaigns on alternative channels that fit your audience.',
           keyBenefit: 'Access new audiences with 20-30% lower costs',
           icon: 'globe',
-          image: '/images/AlternativeChannelMarketing.png',
+          image: '/images/EmailMarketing.png', // Reusing email marketing image
           learnMoreLink: '/services#alternative-channel-marketing',
         },
         {
@@ -113,7 +113,7 @@ export const defaultIndustryConfigs: Record<IndustryType, IndustryConfig> = {
           description: 'Turn more clicks into customers with data-driven website and funnel optimization.',
           keyBenefit: '25-40% increase in booking conversion rates',
           icon: 'trending-up',
-          image: '/images/ConversionRateOptimization.png',
+          image: '/images/MarketingStrategy.png', // Reusing marketing strategy image
           learnMoreLink: '/services#conversion-rate-optimization',
         },
       ],
