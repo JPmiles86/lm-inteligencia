@@ -173,10 +173,8 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                       const targetSubdomain = subdomainMap[ind];
                       if (!targetSubdomain) return null;
                       
-                      // Preserve current sub-page when switching industries
-                      const currentPath = window.location.pathname;
-                      const subPage = currentPath === '/' ? '' : currentPath;
-                      const targetUrl = `https://${targetSubdomain}${subPage}`;
+                      // Always go to homepage when switching industries
+                      const targetUrl = `https://${targetSubdomain}`;
                       
                       return (
                         <a
@@ -488,10 +486,8 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                       const targetSubdomain = subdomainMap[ind];
                       if (!targetSubdomain) return null;
                       
-                      // Preserve current sub-page when switching industries
-                      const currentPath = window.location.pathname;
-                      const subPage = currentPath === '/' ? '' : currentPath;
-                      const targetUrl = `https://${targetSubdomain}${subPage}`;
+                      // Always go to homepage when switching industries
+                      const targetUrl = `https://${targetSubdomain}`;
                       
                       return (
                         <a

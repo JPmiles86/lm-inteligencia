@@ -22,8 +22,10 @@ export const ENABLED_VERTICALS: EnabledVerticalsConfig = {
  * Get the enabled verticals based on current environment
  */
 export function getEnabledVerticals(): VerticalType[] {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  return isDevelopment ? ENABLED_VERTICALS.development : ENABLED_VERTICALS.production;
+  // Always use production config for now to ensure only hospitality and healthcare show
+  // const isDevelopment = process.env.NODE_ENV === 'development';
+  // return isDevelopment ? ENABLED_VERTICALS.development : ENABLED_VERTICALS.production;
+  return ENABLED_VERTICALS.production;
 }
 
 /**

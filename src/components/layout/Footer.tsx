@@ -128,9 +128,9 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
             <ul className="space-y-2 text-gray-400">
               {industries.map((ind) => (
                 <li key={ind.industry}>
-                  {ind.industry === 'hospitality' ? (
+                  {ind.industry === 'hospitality' || ind.industry === 'healthcare' ? (
                     <a
-                      href={isOnSubdomain ? '/' : `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`}
+                      href={ind.industry === 'healthcare' ? 'https://healthcare.inteligenciadm.com' : (isOnSubdomain ? '/' : `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === ind.industry)}`)}
                       className="hover:text-white transition-colors text-left block capitalize"
                     >
                       {ind.title}

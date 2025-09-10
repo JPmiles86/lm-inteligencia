@@ -95,7 +95,7 @@ export const ContactPage: React.FC = () => {
       {/* Navigation */}
 
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
+      <section className="relative pt-32 pb-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white -mt-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -380,7 +380,7 @@ export const ContactPage: React.FC = () => {
               </div>
 
               {/* Calendly Section */}
-              <div className="bg-gradient-to-br from-[#371657] via-[#9123d1] to-gray-900 rounded-xl p-8 text-white">
+              <div className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 rounded-xl p-8 text-white">
                 <h3 className="text-2xl font-bold mb-4">
                   {config.content.contact.calendlyText || 'Schedule a Free Consultation'}
                 </h3>
