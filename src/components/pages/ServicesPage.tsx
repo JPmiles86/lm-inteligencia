@@ -204,7 +204,7 @@ export const ServicesPage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white overflow-hidden -mt-20">
+      <section className="relative pt-36 pb-20 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white overflow-hidden -mt-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div

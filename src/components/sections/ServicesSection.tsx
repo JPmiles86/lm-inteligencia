@@ -21,7 +21,10 @@ import {
   Smartphone,
   Target,
   BarChart,
-  Check
+  Check,
+  Smile,
+  Heart,
+  Activity
 } from 'lucide-react';
 import type { ServiceContent } from '../../types/Industry';
 
@@ -57,6 +60,10 @@ const serviceIcons: Record<string, React.ReactNode> = {
   'HIPAA-Compliant Digital Marketing': <Shield className="w-12 h-12" />,
   'Local SEO for Healthcare': <Search className="w-12 h-12" />,
   'Patient Education Content': <BookOpen className="w-12 h-12" />,
+  'Healthcare Patient Acquisition': <Shield className="w-12 h-12" />,
+  'Dental Practice Marketing': <Smile className="w-12 h-12" />,
+  'Wellness & Retreat Marketing': <Heart className="w-12 h-12" />,
+  'Fitness & Gym Marketing': <Activity className="w-12 h-12" />,
   
   // Sports
   'Tournament & Event Promotion': <Trophy className="w-12 h-12" />,
@@ -329,11 +336,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           viewport={{ once: true }}
           className="text-center mt-24"
         >
-          <div className="bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540] rounded-3xl p-12 max-w-4xl mx-auto">
+          <div className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 rounded-3xl p-12 max-w-4xl mx-auto">
             <h3 className="text-3xl font-bold mb-6 text-white">
               Ready to Get Started?
             </h3>
-            <p className="text-gray-300 mb-10 text-lg">
+            <p className="text-white mb-10 text-lg">
               Let's discuss how these services can be customized for your specific business needs.
             </p>
             <div className="flex justify-center">

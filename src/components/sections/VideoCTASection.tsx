@@ -53,7 +53,7 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
             {/* Aspect ratio container to prevent layout shift */}
             <div className="relative w-full h-full">
               {/* Placeholder background while video loads */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540]" />
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" />
               <video
                 autoPlay
                 muted
@@ -80,7 +80,7 @@ export const VideoCTASection: React.FC<VideoCTASectionProps> = (props) => {
           </>
         ) : (
           /* Dark blue gradient background when no video */
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0a2540] via-[#1e4976] to-[#0a2540]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" />
         )}
       </div>
 
