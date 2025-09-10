@@ -174,13 +174,13 @@ export const SimplifiedPricingSection: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact"
-              className="btn-gradient px-8 py-4 rounded-lg font-medium inline-block text-center"
+              className="btn-gradient px-8 py-4 rounded-lg font-medium text-center"
             >
               Schedule Free Consultation
             </Link>
             <Link
               to="/pricing"
-              className="border-2 border-gray-700 text-gray-700 bg-white px-8 py-4 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-900 transition-all duration-300"
+              className="border-2 border-gray-700 text-gray-700 px-8 py-4 rounded-lg font-medium hover:bg-gray-100 hover:border-gray-900 transition-all duration-300"
             >
               View Detailed Pricing
             </Link>
