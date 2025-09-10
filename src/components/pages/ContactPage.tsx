@@ -387,7 +387,7 @@ export const ContactPage: React.FC = () => {
                 <p className="text-gray-200 mb-6">
                   Book a 30-minute strategy session to discuss your marketing goals and learn how we can help grow your business.
                 </p>
-                <button className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105">
+                <button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105">
                   Schedule Free Call
                 </button>
               </div>

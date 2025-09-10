@@ -176,7 +176,7 @@ export const SimplifiedPricingSection: React.FC = () => {
             </Link>
             <Link
               to="/pricing"
-              className="btn-gradient px-8 py-4 rounded-lg"
+              className="border-2 border-gray-700 text-gray-700 bg-white px-8 py-4 rounded-lg font-medium hover:bg-gray-50 hover:border-gray-900 transition-all duration-300"
             >
               View Detailed Pricing
             </Link>
