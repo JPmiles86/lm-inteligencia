@@ -121,7 +121,11 @@ export const SimplifiedPricingSection: React.FC = () => {
                 {/* CTA Button */}
                 <Link
                   to="/contact"
-                  className="block w-full py-4 rounded-lg font-bold text-center transition-all duration-300 btn-gradient transform hover:-translate-y-0.5"
+                  className={`block w-full py-4 rounded-lg font-bold text-center transition-all duration-300 ${
+                    plan.recommended
+                      ? 'btn-gradient transform hover:-translate-y-0.5'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}
                 >
                   Get Started
                 </Link>
@@ -170,7 +174,7 @@ export const SimplifiedPricingSection: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/contact"
-              className="btn-gradient px-8 py-4 rounded-lg"
+              className="btn-gradient px-8 py-4 rounded-lg font-medium inline-block text-center"
             >
               Schedule Free Consultation
             </Link>
