@@ -2,7 +2,7 @@
 // Provides topic input, generation triggers, and streaming controls
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   // Play, // Unused - preserved for future use
   Square, 

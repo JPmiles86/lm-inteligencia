@@ -1,7 +1,7 @@
 // Subdomain detection and industry routing logic
 
-import type { IndustryType } from '../types/Industry';
-import { IndustryMapping } from '../types/Industry';
+import type { IndustryType } from '../types/Industry.js';
+import { IndustryMapping } from '../types/Industry.js';
 
 /**
  * Detects the current industry based on URL path, subdomain, or URL parameters

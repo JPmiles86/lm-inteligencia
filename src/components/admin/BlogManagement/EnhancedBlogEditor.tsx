@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { blogService, BlogFormData } from '../../../services/blogService';
-import { BlogPost, SEOFields, BlogRevision } from '../../../data/blogData';
-import { QuillEditor } from './QuillEditor';
-import { SEOFieldsComponent } from './SEOFields';
-import { RevisionHistory } from './RevisionHistory';
-import { SchedulingFields } from './SchedulingFields';
-import { markdownToHtml, isMarkdown } from '../../../utils/markdownToHtml';
+import { blogService, BlogFormData } from '../../../services/blogService.js';
+import { BlogPost, SEOFields, BlogRevision } from '../../../data/blogData.js';
+import { QuillEditor } from './QuillEditor.js';
+import { SEOFieldsComponent } from './SEOFields.js';
+import { RevisionHistory } from './RevisionHistory.js';
+import { SchedulingFields } from './SchedulingFields.js';
+import { markdownToHtml, isMarkdown } from '../../../utils/markdownToHtml.js';
 
 interface EnhancedBlogEditorProps {
   postId?: number; // Use ID instead of full post object

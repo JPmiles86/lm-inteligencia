@@ -5,8 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Image, Sparkles, Download, CheckCircle } from 'lucide-react';
-import { ImageGenerator } from '../modules/ImageGenerator';
-import { useAIStore } from '../../../store/aiStore';
+import { ImageGenerator } from '../modules/ImageGenerator.js';
+import { useAIStore } from '../../../store/aiStore.js';
 
 interface ImageGenerationModalProps {
   isOpen: boolean;

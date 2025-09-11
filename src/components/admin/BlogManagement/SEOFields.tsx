@@ -1,7 +1,7 @@
 // SEO Fields Component - SEO metadata management for blog posts
 
 import React, { useState } from 'react';
-import { SEOFields } from '../../../data/blogData';
+import { SEOFields } from '../../../data/blogData.js';
 
 interface SEOFieldsProps {
   seoData: SEOFields;

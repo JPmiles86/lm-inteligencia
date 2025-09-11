@@ -1,8 +1,8 @@
 // Simplified Settings Page Component - Content Visibility and AI Configuration
 import React, { useState } from 'react';
-import { VerticalVisibilitySettings } from './shared/VerticalVisibilitySettings';
-import { ProviderSettings } from './ProviderSettings';
-import { APIKeySetup } from '../setup/APIKeySetup';
+import { VerticalVisibilitySettings } from './shared/VerticalVisibilitySettings.js';
+import { ProviderSettings } from './ProviderSettings.js';
+import { APIKeySetup } from '../setup/APIKeySetup.js';
 import { Settings as SettingsIcon, Brain, Key, Layers } from 'lucide-react';
 
 type SettingsTab = 'verticals' | 'ai' | 'apikeys';

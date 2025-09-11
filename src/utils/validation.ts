@@ -4,7 +4,7 @@
  */
 
 import { z, ZodError, ZodSchema } from 'zod';
-import { sanitizeText, sanitizeHTML, sanitizeMarkdown } from './sanitization';
+import { sanitizeText, sanitizeHTML, sanitizeMarkdown } from './sanitization.js';
 
 /**
  * Validation result type

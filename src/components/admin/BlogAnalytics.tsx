@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { blogService, BlogStats } from '../../services/blogService';
+import { blogService, BlogStats } from '../../services/blogService.js';
 
 interface AnalyticsData {
   stats: BlogStats;

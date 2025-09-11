@@ -2,7 +2,7 @@
 // Features: Multiple variations, length control, tone adjustment, hook emphasis
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   FileText, 
   Loader2, 

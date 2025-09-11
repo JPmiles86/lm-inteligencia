@@ -1,9 +1,9 @@
 // Provider Settings Main Component - Comprehensive AI Provider Management Interface
 import React, { useState, useEffect } from 'react';
 import { Shield, Loader2, Key, AlertCircle, Brain, RefreshCw, Settings as SettingsIcon } from 'lucide-react';
-import { ProviderCard } from './ProviderCard';
-import { FallbackConfiguration } from './FallbackConfiguration';
-import { useProviderStore } from '../../stores/providerStore';
+import { ProviderCard } from './ProviderCard.js';
+import { FallbackConfiguration } from './FallbackConfiguration.js';
+import { useProviderStore } from '../../stores/providerStore.js';
 
 interface Provider {
   id: string;

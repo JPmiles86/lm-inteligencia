@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useIndustryConfig } from '../../hooks/useIndustryConfig';
-import type { IndustryType } from '../../types/Industry';
-import { getCurrentSubdomain } from '../../utils/domainRedirect';
+import { useIndustryConfig } from '../../hooks/useIndustryConfig.js';
+import type { IndustryType } from '../../types/Industry.js';
+import { getCurrentSubdomain } from '../../utils/domainRedirect.js';
 
 interface FooterProps {
   selectedIndustry: IndustryType;

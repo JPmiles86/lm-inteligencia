@@ -1,4 +1,4 @@
-import type { IndustryType } from '../types/Industry';
+import type { IndustryType } from '../types/Industry.js';
 
 export interface VerticalSettings {
   showStaffSection: boolean;
@@ -41,7 +41,7 @@ const defaultAllSettings: AllVerticalSettings = {
   athletics: { ...defaultSettings },
 };
 
-import { verticalVisibilityCache } from './verticalVisibilityCache';
+import { verticalVisibilityCache } from './verticalVisibilityCache.js';
 
 /**
  * Get visibility settings for a specific vertical from API with fallback to localStorage

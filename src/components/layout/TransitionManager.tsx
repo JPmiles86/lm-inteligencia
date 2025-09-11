@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import type { IndustryType } from '../../types/Industry';
+import type { IndustryType } from '../../types/Industry.js';
 
 // Type for industries excluding 'main' which is used for specific industry UI elements
 type IndustryTypeWithoutMain = Exclude<IndustryType, 'main'>;

@@ -3,9 +3,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useIndustryContext } from '../../contexts/IndustryContext';
-import { blogCategories } from '../../data/blogData';
-import { getIndustryPath } from '../../utils/subdomainDetection';
+import { useIndustryContext } from '../../contexts/IndustryContext.js';
+import { blogCategories } from '../../data/blogData.js';
+import { getIndustryPath } from '../../utils/subdomainDetection.js';
 
 // Database blog post type
 interface DatabaseBlogPost {

@@ -1,5 +1,5 @@
-import { ImagePrompt } from './ImagePromptExtractor';
-import { imageStorageService, StoredImage } from '../storage/ImageStorageService';
+import { ImagePrompt } from './ImagePromptExtractor.js';
+import { imageStorageService, StoredImage } from '../storage/ImageStorageService.js';
 import { db } from '@/db';
 import { generatedImages } from '@/db/schema';
 import { eq } from 'drizzle-orm';

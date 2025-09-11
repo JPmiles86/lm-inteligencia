@@ -1,6 +1,6 @@
 // Blog Service - Handles blog data operations using database API
 
-import { BlogPost } from '../data/blogData';
+import { BlogPost } from '../data/blogData.js';
 
 // Use relative URL for Vercel deployment
 const API_BASE_URL = import.meta.env.NODE_ENV === 'production' ? '/api' : (import.meta.env.VITE_API_BASE_URL || '/api');

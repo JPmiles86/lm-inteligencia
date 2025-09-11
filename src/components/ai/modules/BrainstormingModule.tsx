@@ -2,8 +2,8 @@
 // Provides tools for creative ideation with AI assistance
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
-import { brainstormingService } from '../../../services/ai/BrainstormingService';
+import { useAIStore } from '../../../store/aiStore.js';
+import { brainstormingService } from '../../../services/ai/BrainstormingService.js';
 import { 
   Lightbulb, 
   Loader2, 

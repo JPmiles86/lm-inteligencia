@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { AlertTriangle, Zap, CreditCard, Key, ToggleLeft } from 'lucide-react';
-import { useAIStore } from '../../store/aiStore';
+import { useAIStore } from '../../store/aiStore.js';
 
 interface ProviderErrorProps {
   provider: string;

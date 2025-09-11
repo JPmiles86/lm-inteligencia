@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { BlogListingPage } from '../pages/BlogListingPage';
-import { BlogPostPage } from '../pages/BlogPostPage';
+import { BlogListingPage } from '../pages/BlogListingPage.js';
+import { BlogPostPage } from '../pages/BlogPostPage.js';
 
 interface BlogRedirectProps {
   isPostPage?: boolean;

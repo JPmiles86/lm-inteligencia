@@ -21,8 +21,8 @@ import {
   Info,
   Zap
 } from 'lucide-react';
-import { useAIStore } from '../../../store/aiStore';
-import { GeminiImageService } from '../../../services/ai/GeminiImageService';
+import { useAIStore } from '../../../store/aiStore.js';
+import { GeminiImageService } from '../../../services/ai/GeminiImageService.js';
 
 interface ImageGeneratorProps {
   blogContent?: string;

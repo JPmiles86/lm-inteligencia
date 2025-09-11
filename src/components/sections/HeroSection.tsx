@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 // Removed unused ChevronDown import
 import { Link } from 'react-router-dom';
-import type { HeroContent } from '../../types/Industry';
+import type { HeroContent } from '../../types/Industry.js';
 
 interface HeroSectionProps {
   content: HeroContent;

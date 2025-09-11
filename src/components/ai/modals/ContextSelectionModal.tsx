@@ -2,8 +2,8 @@
 // Allows users to select style guides, previous content, and additional context
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useAIStore } from '../../../store/aiStore';
-import { aiGenerationService } from '../../../services/ai/AIGenerationService';
+import { useAIStore } from '../../../store/aiStore.js';
+import { aiGenerationService } from '../../../services/ai/AIGenerationService.js';
 import { 
   X, 
   BookOpen, 

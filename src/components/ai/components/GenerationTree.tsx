@@ -2,7 +2,7 @@
 // Shows hierarchical structure of AI generations with branching and navigation
 
 import React, { useState } from 'react';
-import { useAIStore, selectRootNodes, selectNodeChildren } from '../../../store/aiStore';
+import { useAIStore, selectRootNodes, selectNodeChildren } from '../../../store/aiStore.js';
 import { 
   ChevronRight, 
   ChevronDown, 

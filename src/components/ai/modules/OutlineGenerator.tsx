@@ -2,7 +2,7 @@
 // Features: Section management, AI-generated outlines, drag-and-drop reordering
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   List, 
   Loader2, 

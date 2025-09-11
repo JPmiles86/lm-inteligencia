@@ -2,9 +2,9 @@
 // This provides the context that pages expect until we can update them properly
 
 import React from 'react';
-import { IndustryType } from '../types/Industry';
-import type { IndustryConfig } from '../types/Industry';
-import { IndustryContext } from '../contexts/IndustryContext';
+import { IndustryType } from '../types/Industry.js';
+import type { IndustryConfig } from '../types/Industry.js';
+import { IndustryContext } from '../contexts/IndustryContext.js';
 
 interface PageWrapperProps {
   config: IndustryConfig;

@@ -4,7 +4,7 @@ export {
   ImageGenerationResult,
   ImageGenerationOptions,
   BlogImageOptions 
-} from '../../types/image';
+} from '../../types/image.js';
 
 export class GeminiImageService {
   constructor(apiKey?: string | null);

@@ -2,7 +2,7 @@
 import React, { useMemo, useRef } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { blogService } from '../../../services/blogService';
+import { blogService } from '../../../services/blogService.js';
 
 interface QuillEditorProps {
   value: string;

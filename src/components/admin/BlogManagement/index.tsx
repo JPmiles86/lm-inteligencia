@@ -3,10 +3,10 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BlogList } from './BlogList';
-import { EnhancedBlogEditor } from './EnhancedBlogEditor';
-import { MediaUploader } from './MediaUploader';
-import { BlogPost } from '../../../data/blogData';
+import { BlogList } from './BlogList.js';
+import { EnhancedBlogEditor } from './EnhancedBlogEditor.js';
+import { MediaUploader } from './MediaUploader.js';
+import { BlogPost } from '../../../data/blogData.js';
 
 type BlogManagementView = 'list' | 'editor' | 'media';
 

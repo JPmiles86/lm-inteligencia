@@ -1,1 +1,1 @@
-export { LandingArea } from './LandingArea';
+export { LandingArea } from './LandingArea.js';

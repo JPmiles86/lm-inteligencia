@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
-import type { IndustryType } from '../../types/Industry';
-import { useNavigationStore } from '../../store/navigationStore';
-import { getEnabledVerticals } from '../../config/enabled-verticals';
-import { industryToSubdomain } from '../../config/subdomain-mapping';
+import type { IndustryType } from '../../types/Industry.js';
+import { useNavigationStore } from '../../store/navigationStore.js';
+import { getEnabledVerticals } from '../../config/enabled-verticals.js';
+import { industryToSubdomain } from '../../config/subdomain-mapping.js';
 
 interface Industry {
   industry: IndustryType;

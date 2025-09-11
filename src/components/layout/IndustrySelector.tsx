@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import type { IndustryType } from '../../types/Industry';
-import { getIndustryUrl } from '../../utils/subdomainDetection';
+import type { IndustryType } from '../../types/Industry.js';
+import { getIndustryUrl } from '../../utils/subdomainDetection.js';
 
 interface Industry {
   industry: IndustryType;

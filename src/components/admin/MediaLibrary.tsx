@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { blogService } from '../../services/blogService';
+import { blogService } from '../../services/blogService.js';
 
 interface MediaItem {
   id: string;

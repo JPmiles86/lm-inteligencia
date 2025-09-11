@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, Loader2, Eye, EyeOff, TestTube, Save } from 'lucide-react';
-import { generationService } from '../../services/api/generation.service';
+import { generationService } from '../../services/api/generation.service.js';
 
 interface ProviderSetup {
   name: string;

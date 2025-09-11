@@ -2,7 +2,7 @@
 // Provides interface for generating, editing, and managing social media content
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   X, 
   Share2, 

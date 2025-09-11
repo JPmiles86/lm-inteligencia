@@ -2,39 +2,39 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 // Removed unused ChevronDown import
 import { useLocation, useNavigate } from 'react-router-dom';
-import type { IndustryType } from '../../types/Industry';
-import { useIndustryConfig } from '../../hooks/useIndustryConfig';
-import { useNavigationStore } from '../../store/navigationStore';
-import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping';
-import { getCurrentSubdomain } from '../../utils/domainRedirect';
-import { isSectionVisibleSync, preloadVerticalSettings } from '../../utils/verticalVisibility';
+import type { IndustryType } from '../../types/Industry.js';
+import { useIndustryConfig } from '../../hooks/useIndustryConfig.js';
+import { useNavigationStore } from '../../store/navigationStore.js';
+import { getIndustryFromPath, getPathFromIndustry } from '../../utils/industryMapping.js';
+import { getCurrentSubdomain } from '../../utils/domainRedirect.js';
+import { isSectionVisibleSync, preloadVerticalSettings } from '../../utils/verticalVisibility.js';
 
 // Removed unused type IndustryTypeWithoutMain
 
 // Landing Area Component
-import { LandingArea } from '../LandingArea';
-import { Footer } from './Footer';
+import { LandingArea } from '../LandingArea.js';
+import { Footer } from './Footer.js';
 
 // Section Components
-import { HeroSection } from '../sections/HeroSection';
-import { ServicesSection } from '../sections/ServicesSection';
-import { TestimonialsSection } from '../sections/TestimonialsSection';
-import { VideoCTASection } from '../sections/VideoCTASection';
-import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
-import { IndustryNavbar } from './IndustryNavbar';
-import { PageLoadingSpinner } from './LoadingSpinner';
+import { HeroSection } from '../sections/HeroSection.js';
+import { ServicesSection } from '../sections/ServicesSection.js';
+import { TestimonialsSection } from '../sections/TestimonialsSection.js';
+import { VideoCTASection } from '../sections/VideoCTASection.js';
+import { VideoBackgroundSection } from '../sections/VideoBackgroundSection.js';
+import { IndustryNavbar } from './IndustryNavbar.js';
+import { PageLoadingSpinner } from './LoadingSpinner.js';
 
 // Page Components and Wrapper
-import { IndustryContext } from '../../contexts/IndustryContext';
-import { ServicesPage } from '../pages/ServicesPage';
-import { AboutPage } from '../pages/AboutPage';
-import { CaseStudiesPage } from '../pages/CaseStudiesPage';
-import { ContactPage } from '../pages/ContactPage';
-import { BlogRedirect } from '../routing/BlogRedirect';
-import { AdminPanel } from '../admin/AdminPanel';
-import { AdminAuth } from '../admin/AdminAuth';
-import { BlogManagement } from '../admin/BlogManagement';
-import { EnhancedBlogEditor } from '../admin/BlogManagement/EnhancedBlogEditor';
+import { IndustryContext } from '../../contexts/IndustryContext.js';
+import { ServicesPage } from '../pages/ServicesPage.js';
+import { AboutPage } from '../pages/AboutPage.js';
+import { CaseStudiesPage } from '../pages/CaseStudiesPage.js';
+import { ContactPage } from '../pages/ContactPage.js';
+import { BlogRedirect } from '../routing/BlogRedirect.js';
+import { AdminPanel } from '../admin/AdminPanel.js';
+import { AdminAuth } from '../admin/AdminAuth.js';
+import { BlogManagement } from '../admin/BlogManagement.js';
+import { EnhancedBlogEditor } from '../admin/BlogManagement/EnhancedBlogEditor.js';
 
 interface Industry {
   industry: IndustryType;

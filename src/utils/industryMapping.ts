@@ -1,4 +1,4 @@
-import { IndustryType } from '../types/Industry';
+import { IndustryType } from '../types/Industry.js';
 
 // Centralized URL path to industry type mapping
 // This handles both singular and plural forms for flexibility

@@ -1,6 +1,6 @@
 import React from 'react';
 import { LogOut, BookOpen } from 'lucide-react';
-import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings';
+import { ContentVisibilitySettings, AdminSettings } from './shared/ContentVisibilitySettings.js';
 
 export const AdminPanel: React.FC = () => {
   console.log('[AdminPanel] AdminPanel component mounting/rendering');

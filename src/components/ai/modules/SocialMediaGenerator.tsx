@@ -2,7 +2,7 @@
 // Provides tools for content transformation across multiple platforms
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   Share2, 
   Loader2, 

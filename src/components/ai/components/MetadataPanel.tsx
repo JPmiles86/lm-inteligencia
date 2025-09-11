@@ -2,7 +2,7 @@
 // Shows generation details, SEO data, and content analytics
 
 import React, { useState } from 'react';
-import { useAIStore, GenerationNode } from '../../../store/aiStore';
+import { useAIStore, GenerationNode } from '../../../store/aiStore.js';
 import { 
   Info, 
   Tag, 

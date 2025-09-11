@@ -28,7 +28,7 @@ import {
   Utensils,
   Share2
 } from 'lucide-react';
-import type { ServiceContent } from '../../types/Industry';
+import type { ServiceContent } from '../../types/Industry.js';
 
 interface ServicesSectionProps {
   services: ServiceContent[];

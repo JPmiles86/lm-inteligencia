@@ -1,7 +1,7 @@
 // Revision History Component - View, compare, and restore blog post revisions
 
 import React, { useState } from 'react';
-import { BlogRevision, SEOFields } from '../../../data/blogData';
+import { BlogRevision, SEOFields } from '../../../data/blogData.js';
 
 interface RevisionHistoryProps {
   revisions: BlogRevision[];

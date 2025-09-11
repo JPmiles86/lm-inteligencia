@@ -2,17 +2,17 @@
 // Includes content editor, generation controls, tree navigation, and metadata panel
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { useAIStore } from '../../store/aiStore';
-import { aiGenerationService } from '../../services/ai/AIGenerationService';
-import { withErrorBoundary } from '../ErrorBoundary';
-import { ErrorFallback } from '../errors/ErrorFallback';
-import { ContentEditor } from './components/ContentEditor';
-import { GenerationTree } from './components/GenerationTree';
-import { MetadataPanel } from './components/MetadataPanel';
-import { GenerationControls } from './components/GenerationControls';
-import { StreamingDisplay } from './components/StreamingDisplay';
-import { StructuredWorkflow } from './modules/StructuredWorkflow';
-import { EditEnhancer } from './modules/EditEnhancer';
+import { useAIStore } from '../../store/aiStore.js';
+import { aiGenerationService } from '../../services/ai/AIGenerationService.js';
+import { withErrorBoundary } from '../ErrorBoundary.js';
+import { ErrorFallback } from '../errors/ErrorFallback.js';
+import { ContentEditor } from './components/ContentEditor.js';
+import { GenerationTree } from './components/GenerationTree.js';
+import { MetadataPanel } from './components/MetadataPanel.js';
+import { GenerationControls } from './components/GenerationControls.js';
+import { StreamingDisplay } from './components/StreamingDisplay.js';
+import { StructuredWorkflow } from './modules/StructuredWorkflow.js';
+import { EditEnhancer } from './modules/EditEnhancer.js';
 import { 
   FileText, 
   Eye,

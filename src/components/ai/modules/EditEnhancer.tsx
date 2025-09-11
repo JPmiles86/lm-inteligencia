@@ -2,7 +2,7 @@
 // Provides suggestions, track changes, grammar checking, and tone adjustment
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import {
   Edit,
   Wand2,

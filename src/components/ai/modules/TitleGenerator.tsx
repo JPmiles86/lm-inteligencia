@@ -2,7 +2,7 @@
 // Features: Multiple variations, SEO scoring, A/B testing, templates
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore';
+import { useAIStore } from '../../../store/aiStore.js';
 import { 
   Type, 
   Loader2, 

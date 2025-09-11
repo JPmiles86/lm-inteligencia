@@ -3,18 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext';
-import { HeroSection } from '../sections/HeroSection';
-import { ServicesSection } from '../sections/ServicesSection';
-import { TestimonialsSection } from '../sections/TestimonialsSection';
-import { VideoCTASection } from '../sections/VideoCTASection';
-import { PricingSection } from '../sections/PricingSection';
-import { HomepageSectionRenderer } from '../sections/HomepageSectionRenderer';
-import { AboutTeaserSection } from '../sections/AboutTeaserSection';
-import { BlogSection } from '../sections/BlogSection';
-import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
-import { getIndustryName } from '../../types/Industry';
-import { isSectionVisibleSync } from '../../utils/verticalVisibility';
+import { useIndustryContext } from '../../contexts/IndustryContext.js';
+import { HeroSection } from '../sections/HeroSection.js';
+import { ServicesSection } from '../sections/ServicesSection.js';
+import { TestimonialsSection } from '../sections/TestimonialsSection.js';
+import { VideoCTASection } from '../sections/VideoCTASection.js';
+import { PricingSection } from '../sections/PricingSection.js';
+import { HomepageSectionRenderer } from '../sections/HomepageSectionRenderer.js';
+import { AboutTeaserSection } from '../sections/AboutTeaserSection.js';
+import { BlogSection } from '../sections/BlogSection.js';
+import { VideoBackgroundSection } from '../sections/VideoBackgroundSection.js';
+import { getIndustryName } from '../../types/Industry.js';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility.js';
 
 export const SeamlessIndustryPage: React.FC = () => {
   const { config, industryKey } = useIndustryContext();

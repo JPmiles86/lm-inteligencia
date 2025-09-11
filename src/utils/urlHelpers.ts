@@ -1,7 +1,7 @@
 // URL helper utilities for subdomain-aware navigation
 // Ensures all URLs work correctly on both main domain and subdomains
 
-import { getCurrentSubdomain } from './domainRedirect';
+import { getCurrentSubdomain } from './domainRedirect.js';
 
 /**
  * Generates a subdomain-aware URL for navigation

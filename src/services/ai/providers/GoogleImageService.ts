@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { db } from '../../../db/index.js';
 import { providerSettings } from '../../../db/schema.js';
 // TODO: Frontend should not decrypt - get decrypted keys from backend API
-// import { decrypt } from '../../../../api/utils/encryption';
+// import { decrypt } from '../../../../api/utils/encryption.js';
 import { eq } from 'drizzle-orm';
 
 export interface GoogleImageConfig {

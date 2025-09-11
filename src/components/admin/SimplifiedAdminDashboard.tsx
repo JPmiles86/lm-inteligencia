@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { blogService } from '../../services/blogService';
-import { BlogPost } from '../../data/blogData';
+import { blogService } from '../../services/blogService.js';
+import { BlogPost } from '../../data/blogData.js';
 
 interface AdminDashboardProps {
   tenantId: string;

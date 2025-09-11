@@ -3,9 +3,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext';
-import { getIndustryName } from '../../types/Industry';
-import { SimplifiedPricingSection } from '../sections/SimplifiedPricingSection';
+import { useIndustryContext } from '../../contexts/IndustryContext.js';
+import { getIndustryName } from '../../types/Industry.js';
+import { SimplifiedPricingSection } from '../sections/SimplifiedPricingSection.js';
 
 export const ServicesPage: React.FC = () => {
   const { config, industryKey } = useIndustryContext();
