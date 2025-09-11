@@ -1,7 +1,7 @@
 // Provider Service - Unified abstraction layer for all AI providers
 // Handles provider selection, configuration, fallbacks, and usage tracking
 
-import { aiRepository } from '../../repositories/aiRepository.ts.js';
+import { aiRepository } from '../../repositories/aiRepository.ts';
 
 export class ProviderService {
   constructor() {

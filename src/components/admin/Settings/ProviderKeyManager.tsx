@@ -1,7 +1,7 @@
 // Provider Key Manager Component - Secure API key management interface
 import React, { useState } from 'react';
 import { Eye, EyeOff, Key, TestTube, CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
-import { ProviderInfo, TestConnectionResult } from '../../../services/aiProviderService.js';
+import { ProviderInfo, TestConnectionResult } from '../../../services/aiProviderService';
 
 interface ProviderKeyManagerProps {
   provider: ProviderInfo;

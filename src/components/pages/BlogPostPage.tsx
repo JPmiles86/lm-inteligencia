@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { getIndustryName } from '../../types/Industry.js';
-import { getIndustryPath } from '../../utils/subdomainDetection.js';
-import { isMarkdown, markdownToHtml } from '../../utils/markdownToHtml.js';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryName } from '../../types/Industry';
+import { getIndustryPath } from '../../utils/subdomainDetection';
+import { isMarkdown, markdownToHtml } from '../../utils/markdownToHtml';
 
 // Database blog post type
 interface DatabaseBlogPost {

@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 // TinyMCE removed - this file should be deprecated in favor of EnhancedBlogEditor
-import { blogService, BlogFormData } from '../../../services/blogService.js';
-import { BlogPost } from '../../../data/blogData.js';
-// import { RichTextEditor } from './RichTextEditor.js'; // REMOVED: TinyMCE-based editor
-import { ImageUploader } from '../ImageUploader.js';
+import { blogService, BlogFormData } from '../../../services/blogService';
+import { BlogPost } from '../../../data/blogData';
+// import { RichTextEditor } from './RichTextEditor'; // REMOVED: TinyMCE-based editor
+import { ImageUploader } from '../ImageUploader';
 
 interface BlogEditorProps {
   post?: BlogPost | null;

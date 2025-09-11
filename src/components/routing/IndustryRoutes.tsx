@@ -3,17 +3,17 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import type { IndustryType, IndustryConfig } from '../../types/Industry.js';
+import type { IndustryType, IndustryConfig } from '../../types/Industry';
 
 // Import page components
-import { IndustryPage } from '../pages/IndustryPage.js';
-import { ServicesPage } from '../pages/ServicesPage.js';
-import { AboutPage } from '../pages/AboutPage.js';
-import { ContactPage } from '../pages/ContactPage.js';
-import { CaseStudiesPage } from '../pages/CaseStudiesPage.js';
-import { BlogRedirect } from './BlogRedirect.js';
-import AdminDashboard from '../admin/SimplifiedAdminDashboard.js';
-import { NotFoundPage } from '../layout/ErrorPage.js';
+import { IndustryPage } from '../pages/IndustryPage';
+import { ServicesPage } from '../pages/ServicesPage';
+import { AboutPage } from '../pages/AboutPage';
+import { ContactPage } from '../pages/ContactPage';
+import { CaseStudiesPage } from '../pages/CaseStudiesPage';
+import { BlogRedirect } from './BlogRedirect';
+import AdminDashboard from '../admin/SimplifiedAdminDashboard';
+import { NotFoundPage } from '../layout/ErrorPage';
 
 interface IndustryRoutesProps {
   industry: IndustryType;

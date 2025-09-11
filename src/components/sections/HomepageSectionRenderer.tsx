@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Target, Calculator, ArrowRight } from 'lucide-react';
-import type { HomepageSection } from '../../types/Industry.js';
+import type { HomepageSection } from '../../types/Industry';
 
 interface HomepageSectionRendererProps {
   section: HomepageSection;

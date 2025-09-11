@@ -16,11 +16,11 @@ import {
   ArrowLeft,
   ArrowRight
 } from 'lucide-react';
-import { StructuredWorkflow } from '../modules/StructuredWorkflow.js';
-import { useAIStore } from '../../../store/aiStore.js';
-import { ModalTransition, ModalContent, ModalHeader, ModalFooter } from '../components/ModalTransition.js';
-import { withErrorBoundary } from '../../ErrorBoundary.js';
-import { ErrorFallback } from '../../errors/ErrorFallback.js';
+import { StructuredWorkflow } from '../modules/StructuredWorkflow';
+import { useAIStore } from '../../../store/aiStore';
+import { ModalTransition, ModalContent, ModalHeader, ModalFooter } from '../components/ModalTransition';
+import { withErrorBoundary } from '../../ErrorBoundary';
+import { ErrorFallback } from '../../errors/ErrorFallback';
 
 interface ContentPlanningModalProps {
   isOpen: boolean;

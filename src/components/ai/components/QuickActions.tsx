@@ -2,7 +2,7 @@
 // Provides one-click access to generation modes and settings
 
 import React from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
+import { useAIStore } from '../../../store/aiStore';
 import { 
   Zap, 
   FileText, 

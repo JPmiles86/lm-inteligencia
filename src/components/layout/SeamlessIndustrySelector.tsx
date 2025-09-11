@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import type { IndustryType } from '../../types/Industry.js';
+import type { IndustryType } from '../../types/Industry';
 
 interface Industry {
   industry: IndustryType;

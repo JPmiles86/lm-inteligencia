@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Trophy, Star, ChevronLeft, ChevronRight } from 'lucide-react';
-import type { TestimonialContent } from '../../types/Industry.js';
+import type { TestimonialContent } from '../../types/Industry';
 
 interface TestimonialsSectionProps {
   testimonials: TestimonialContent[];

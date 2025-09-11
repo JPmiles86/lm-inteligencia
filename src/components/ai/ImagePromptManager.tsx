@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ImagePromptCard } from './ImagePromptCard.js';
+import { ImagePromptCard } from './ImagePromptCard';
 import { imagePromptExtractor, ImagePrompt } from '@/services/ai/ImagePromptExtractor';
 import { Wand2, Download, Eye, Image as ImageIcon } from 'lucide-react';
 

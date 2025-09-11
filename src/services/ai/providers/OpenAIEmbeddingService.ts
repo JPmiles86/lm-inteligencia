@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { openAIService } from './OpenAIService.js';
+import { openAIService } from './OpenAIService';
 
 export class OpenAIEmbeddingService {
   private client: OpenAI | null = null;

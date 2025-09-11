@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import type { PricingContent } from '../../types/Industry.js';
+import type { PricingContent } from '../../types/Industry';
 
 interface PricingSectionProps {
   pricing: PricingContent;

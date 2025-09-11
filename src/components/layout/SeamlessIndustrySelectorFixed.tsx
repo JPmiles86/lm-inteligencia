@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import type { IndustryType } from '../../types/Industry.js';
+import type { IndustryType } from '../../types/Industry';
 
 // Type for industries excluding 'main' which is used for specific industry UI elements
 type IndustryTypeWithoutMain = Exclude<IndustryType, 'main'>;

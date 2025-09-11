@@ -4,13 +4,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import type { IndustryType, IndustryConfig } from '../../types/Industry.js';
-import { IndustryNames } from '../../types/Industry.js';
-import { universalContent } from '../../config/universal-content.js';
-import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext.js';
-import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping.js';
-import { isSectionVisibleSync } from '../../utils/verticalVisibility.js';
-import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals.js';
+import type { IndustryType, IndustryConfig } from '../../types/Industry';
+import { IndustryNames } from '../../types/Industry';
+import { universalContent } from '../../config/universal-content';
+import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
+import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility

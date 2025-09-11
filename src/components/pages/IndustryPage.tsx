@@ -2,15 +2,15 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { IndustryConfig } from '../../types/Industry.js';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { IndustryNavbar } from '../layout/IndustryNavbar.js';
-import { HeroSection } from '../sections/HeroSection.js';
-import { ServicesSection } from '../sections/ServicesSection.js';
-import { TestimonialsSection } from '../sections/TestimonialsSection.js';
-import { VideoCTASection } from '../sections/VideoCTASection.js';
-import { VideoBackgroundSection } from '../sections/VideoBackgroundSection.js';
-import { getIndustryName } from '../../types/Industry.js';
+import type { IndustryConfig } from '../../types/Industry';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { IndustryNavbar } from '../layout/IndustryNavbar';
+import { HeroSection } from '../sections/HeroSection';
+import { ServicesSection } from '../sections/ServicesSection';
+import { TestimonialsSection } from '../sections/TestimonialsSection';
+import { VideoCTASection } from '../sections/VideoCTASection';
+import { VideoBackgroundSection } from '../sections/VideoBackgroundSection';
+import { getIndustryName } from '../../types/Industry';
 
 interface IndustryPageProps {
   config: IndustryConfig;

@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useAIStore } from '../../../store/aiStore.js';
-import { aiGenerationService } from '../../../services/ai/AIGenerationService.js';
+import { useAIStore } from '../../../store/aiStore';
+import { aiGenerationService } from '../../../services/ai/AIGenerationService';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { 

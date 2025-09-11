@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { getIndustryName, IndustryType } from '../../types/Industry.js';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryName, IndustryType } from '../../types/Industry';
 // Removed unused universalContent import
 
 export const ContactPage: React.FC = () => {

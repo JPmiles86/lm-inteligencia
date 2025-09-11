@@ -1,12 +1,12 @@
 import React from 'react';
 import { Outlet, useParams } from 'react-router-dom';
-import { IndustryContext } from '../../contexts/IndustryContext.js';
-import { useIndustryConfig } from '../../hooks/useIndustryConfig.js';
-import { IndustryNavbar } from './IndustryNavbar.js';
-import { Footer } from './Footer.js';
-import { PageLoadingSpinner } from './LoadingSpinner.js';
-import { getCurrentSubdomain } from '../../utils/domainRedirect.js';
-import type { IndustryType } from '../../types/Industry.js';
+import { IndustryContext } from '../../contexts/IndustryContext';
+import { useIndustryConfig } from '../../hooks/useIndustryConfig';
+import { IndustryNavbar } from './IndustryNavbar';
+import { Footer } from './Footer';
+import { PageLoadingSpinner } from './LoadingSpinner';
+import { getCurrentSubdomain } from '../../utils/domainRedirect';
+import type { IndustryType } from '../../types/Industry';
 
 const industryPathMap: Record<string, IndustryType> = {
   hospitality: 'hospitality',

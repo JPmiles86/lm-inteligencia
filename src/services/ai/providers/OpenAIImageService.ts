@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { openAIService } from './OpenAIService.js';
+import { openAIService } from './OpenAIService';
 
 export interface ImageGenerationConfig {
   model?: 'dall-e-3' | 'dall-e-2';

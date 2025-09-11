@@ -2,7 +2,7 @@
 // Handles success, error, warning, and info messages with auto-dismiss
 
 import React, { useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
+import { useAIStore } from '../../../store/aiStore';
 import { 
   CheckCircle, 
   XCircle, 

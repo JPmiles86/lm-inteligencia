@@ -2,8 +2,8 @@
 // Allows batch content generation with vertical-specific customizations
 
 import React, { useState, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
-import { aiGenerationService } from '../../../services/ai/AIGenerationService.js';
+import { useAIStore } from '../../../store/aiStore';
+import { aiGenerationService } from '../../../services/ai/AIGenerationService';
 import { 
   X, 
   Play, 

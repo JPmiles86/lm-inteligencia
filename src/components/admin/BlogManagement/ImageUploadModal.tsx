@@ -6,7 +6,7 @@ import {
   compressImage, 
   validateImageFile, 
   estimateStorageUsage
-} from '../../../utils/imageCompression.js';
+} from '../../../utils/imageCompression';
 
 interface ImageUploadModalProps {
   isOpen: boolean;

@@ -3,8 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { getIndustryName } from '../../types/Industry.js';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryName } from '../../types/Industry';
 // Removed unused universalContent import
 
 export const PricingPage: React.FC = () => {

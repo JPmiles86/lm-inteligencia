@@ -2,7 +2,7 @@
 // Displays current usage, model options, and provider status
 
 import React, { useState } from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
+import { useAIStore } from '../../../store/aiStore';
 import { 
   ChevronDown, 
   Check, 

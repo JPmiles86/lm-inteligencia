@@ -1,4 +1,4 @@
-import { imageConfig } from '../config/api-config.js';
+import { imageConfig } from '../config/api-config';
 
 export interface UploadedImage {
   fileName: string;

@@ -2,8 +2,8 @@
 // Displays current context settings and provides quick access to modify them
 
 import React, { useState, useEffect } from 'react';
-import { useAIStore, PreviousBlog } from '../../store/aiStore.js';
-import { aiGenerationService } from '../../services/ai/AIGenerationService.js';
+import { useAIStore, PreviousBlog } from '../../store/aiStore';
+import { aiGenerationService } from '../../services/ai/AIGenerationService';
 import { 
   BookOpen, 
   FileText, 

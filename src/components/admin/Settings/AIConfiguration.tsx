@@ -1,8 +1,8 @@
 // AI Configuration Component - Main interface for managing AI providers
 import React, { useState, useEffect } from 'react';
 import { Brain, RefreshCw, AlertCircle, Settings as SettingsIcon } from 'lucide-react';
-import { ProviderKeyManager } from './ProviderKeyManager.js';
-import { aiProviderService, ProviderInfo, TestConnectionResult } from '../../../services/aiProviderService.js';
+import { ProviderKeyManager } from './ProviderKeyManager';
+import { aiProviderService, ProviderInfo, TestConnectionResult } from '../../../services/aiProviderService';
 
 export const AIConfiguration: React.FC = () => {
   const [providers, setProviders] = useState<ProviderInfo[]>([]);

@@ -3,9 +3,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import type { PricingContent } from '../../types/Industry.js';
-import { isSectionVisibleSync } from '../../utils/verticalVisibility.js';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import type { PricingContent } from '../../types/Industry';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 
 export const SimplifiedPricingSection: React.FC = () => {
   const { config } = useIndustryContext();

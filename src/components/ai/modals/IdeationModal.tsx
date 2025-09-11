@@ -2,8 +2,8 @@
 // Provides interface for brainstorming, selecting, and converting ideas to blog posts
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
-import { brainstormingService } from '../../../services/ai/BrainstormingService.js';
+import { useAIStore } from '../../../store/aiStore';
+import { brainstormingService } from '../../../services/ai/BrainstormingService';
 import { 
   X, 
   Lightbulb, 

@@ -4,9 +4,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 // Removed unused imports
-import { universalContent } from '../../config/universal-content.js';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { isSectionVisibleSync } from '../../utils/verticalVisibility.js';
+import { universalContent } from '../../config/universal-content';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { isSectionVisibleSync } from '../../utils/verticalVisibility';
 
 export const AboutPage: React.FC = () => {
   // Get industry context if available

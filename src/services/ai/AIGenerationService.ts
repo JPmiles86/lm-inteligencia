@@ -1,7 +1,7 @@
 // AI Generation Service - Interface layer for AI content generation APIs
 // Handles communication with backend AI services and real-time streaming
 
-import { GenerationConfig, GenerationNode, ContextSelection, StyleGuide, ImagePrompt } from '../../store/aiStore.js';
+import { GenerationConfig, GenerationNode, ContextSelection, StyleGuide, ImagePrompt } from '../../store/aiStore';
 
 export interface StreamingResponse {
   chunk: string;

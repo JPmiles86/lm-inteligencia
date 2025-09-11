@@ -2,7 +2,7 @@
 // Shows streaming content with typing animation and progress indicators
 
 import React, { useEffect, useState, useRef } from 'react';
-import { useAIStore } from '../../../store/aiStore.js';
+import { useAIStore } from '../../../store/aiStore';
 import { 
   Loader2, 
   Zap, 

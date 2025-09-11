@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useIndustryContext } from '../../contexts/IndustryContext.js';
-import { getIndustryName, CaseStudyContent, IndustryConfig } from '../../types/Industry.js';
-import { CaseStudyTimeline } from '../CaseStudyTimeline.js';
+import { useIndustryContext } from '../../contexts/IndustryContext';
+import { getIndustryName, CaseStudyContent, IndustryConfig } from '../../types/Industry';
+import { CaseStudyTimeline } from '../CaseStudyTimeline';
 // Removed unused universalContent import
-import { defaultIndustryConfigs } from '../../config/industry-configs.js';
+import { defaultIndustryConfigs } from '../../config/industry-configs';
 
 export const CaseStudiesPage: React.FC = () => {
   const { config } = useIndustryContext();

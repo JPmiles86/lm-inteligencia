@@ -2,13 +2,13 @@
 // Integrates BrainstormingModule, TitleGenerator, SynopsisGenerator, OutlineGenerator, and final content generation
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useAIStore, StructuredWorkflowState, WorkflowStep, GenerationConfig } from '../../../store/aiStore.js';
-import { StepProgress, defaultBlogWorkflowSteps } from '../components/StepProgress.js';
-import { BrainstormingModule } from './BrainstormingModule.js';
-import { TitleGenerator } from './TitleGenerator.js';
-import { SynopsisGenerator } from './SynopsisGenerator.js';
-import { OutlineGenerator } from './OutlineGenerator.js';
-import { aiGenerationService } from '../../../services/ai/AIGenerationService.js';
+import { useAIStore, StructuredWorkflowState, WorkflowStep, GenerationConfig } from '../../../store/aiStore';
+import { StepProgress, defaultBlogWorkflowSteps } from '../components/StepProgress';
+import { BrainstormingModule } from './BrainstormingModule';
+import { TitleGenerator } from './TitleGenerator';
+import { SynopsisGenerator } from './SynopsisGenerator';
+import { OutlineGenerator } from './OutlineGenerator';
+import { aiGenerationService } from '../../../services/ai/AIGenerationService';
 import { 
   ArrowLeft,
   ArrowRight,

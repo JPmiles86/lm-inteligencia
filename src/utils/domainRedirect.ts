@@ -1,7 +1,7 @@
 // Domain redirect utility for inteligenciadm.com
 // Handles the temporary redirect from main domain to hospitality subdomain
 
-import { getCurrentEnvironment } from '../config/subdomain-mapping.js';
+import { getCurrentEnvironment } from '../config/subdomain-mapping';
 
 export const handleDomainRedirect = (): void => {
   // DISABLED: No longer redirecting to hospitality

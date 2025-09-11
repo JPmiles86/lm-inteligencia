@@ -2,22 +2,22 @@
 // Provides provider selection, mode switching, and generation management
 
 import React, { useEffect, useState } from 'react';
-import { useAIStore } from '../../store/aiStore.js';
-import { aiGenerationService } from '../../services/ai/AIGenerationService.js';
-import { withErrorBoundary } from '../ErrorBoundary.js';
-import { ErrorFallback } from '../errors/ErrorFallback.js';
-import { ProviderSelector } from './components/ProviderSelector.js';
-import { QuickActions } from './components/QuickActions.js';
-import { GenerationWorkspace } from './GenerationWorkspace.js';
-import { NotificationCenter } from './components/NotificationCenter.js';
-import { ContextManager } from './ContextManager.js';
-import { ContextSelectionModal } from './modals/ContextSelectionModal.js';
-import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced.js';
-import { MultiVerticalModal } from './modals/MultiVerticalModal.js';
-import { SocialMediaModal } from './modals/SocialMediaModal.js';
-import { IdeationModal } from './modals/IdeationModal.js';
-import { ImageGenerationModal } from './modals/ImageGenerationModal.js';
-import { ContentPlanningModal } from './modals/ContentPlanningModal.js';
+import { useAIStore } from '../../store/aiStore';
+import { aiGenerationService } from '../../services/ai/AIGenerationService';
+import { withErrorBoundary } from '../ErrorBoundary';
+import { ErrorFallback } from '../errors/ErrorFallback';
+import { ProviderSelector } from './components/ProviderSelector';
+import { QuickActions } from './components/QuickActions';
+import { GenerationWorkspace } from './GenerationWorkspace';
+import { NotificationCenter } from './components/NotificationCenter';
+import { ContextManager } from './ContextManager';
+import { ContextSelectionModal } from './modals/ContextSelectionModal';
+import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
+import { MultiVerticalModal } from './modals/MultiVerticalModal';
+import { SocialMediaModal } from './modals/SocialMediaModal';
+import { IdeationModal } from './modals/IdeationModal';
+import { ImageGenerationModal } from './modals/ImageGenerationModal';
+import { ContentPlanningModal } from './modals/ContentPlanningModal';
 import { 
   Brain, 
   Settings, 

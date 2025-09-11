@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import type { IndustryType, IndustryConfig } from '../../types/Industry.js';
-import { IndustryNames } from '../../types/Industry.js';
+import type { IndustryType, IndustryConfig } from '../../types/Industry';
+import { IndustryNames } from '../../types/Industry';
 
 interface NavbarProps {
   config: IndustryConfig;

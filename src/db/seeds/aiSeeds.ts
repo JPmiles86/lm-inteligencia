@@ -1,8 +1,8 @@
 // AI Content Generation System - Seed Data
 // Creates initial style guides, characters, and reference data
 
-import { db } from '../index.js';
-import * as schema from '../schema.js';
+import { db } from '../index';
+import * as schema from '../schema';
 
 export async function seedAISystem() {
   console.log('🌱 Seeding AI Content Generation System...');

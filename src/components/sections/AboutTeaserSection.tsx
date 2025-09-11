@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Users, Award, Target, Heart } from 'lucide-react';
-import type { TeamContent } from '../../types/Industry.js';
+import type { TeamContent } from '../../types/Industry';
 
 interface AboutTeaserSectionProps {
   team: TeamContent[];
