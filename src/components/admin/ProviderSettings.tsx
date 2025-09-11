@@ -112,7 +112,7 @@ export const ProviderSettings: React.FC = () => {
 
       // Get configured providers from API
       try {
-        const response = await fetch('/api/routes/provider');
+        const response = await fetch('/api/providers-simple');
         const data = await response.json();
         
         if (response.ok && data.providers) {
@@ -149,7 +149,7 @@ export const ProviderSettings: React.FC = () => {
 
   const handleUpdateProvider = async (provider: string, apiKey: string) => {
     try {
-      const response = await fetch(`/api/routes/provider/${provider}`, {
+      const response = await fetch(`/api/provider-save?provider=${provider}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,8 +176,8 @@ export const ProviderSettings: React.FC = () => {
     setTestingProvider(provider);
     
     try {
-      const response = await fetch(`/api/routes/provider/${provider}/test`, {
-        method: 'POST'
+      const response = await fetch(`/api/provider-save?provider=${provider}&test=true`, {
+        method: 'GET'
       });
 
       const result = await response.json();
