@@ -88,6 +88,24 @@
     <h1>🧪 API Test Dashboard</h1>
     
     <div class="test-grid">
+        <!-- Simple Test (NEW) -->
+        <div class="test-section" style="border: 2px solid #28a745;">
+            <h3><span class="status-indicator" id="simple-status"></span>Simple Test (NEW)</h3>
+            <button class="test-button" onclick="testEndpoint('simple', '/api/test-simple', 'GET')">
+                Test Simple Endpoint
+            </button>
+            <div id="simple-result" class="result"></div>
+        </div>
+
+        <!-- Brainstorm Simple (NEW) -->
+        <div class="test-section" style="border: 2px solid #28a745;">
+            <h3><span class="status-indicator" id="brainstorm-simple-status"></span>Brainstorm Simple (NEW)</h3>
+            <button class="test-button" onclick="testBrainstormSimple()">
+                Test Simple Brainstorm
+            </button>
+            <div id="brainstorm-simple-result" class="result"></div>
+        </div>
+
         <!-- Health Check -->
         <div class="test-section">
             <h3><span class="status-indicator" id="health-status"></span>Health Check</h3>
@@ -207,6 +225,16 @@
             };
             
             await testEndpoint('brainstorm', '/api/ai/brainstorm', 'POST', body);
+        }
+
+        async function testBrainstormSimple() {
+            const body = {
+                topic: 'digital marketing trends',
+                count: 3,
+                prompt: 'Generate 3 blog post ideas about digital marketing trends'
+            };
+            
+            await testEndpoint('brainstorm-simple', '/api/brainstorm-simple', 'POST', body);
         }
 
         // Test all endpoints on load
