@@ -1,10 +1,11 @@
 /**
  * Simplified Brainstorm API endpoint
- * Direct implementation without complex imports
+ * Uses user-configured API keys from database only
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
+import { getOpenAIKey } from './lib/api-keys';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST
@@ -19,13 +20,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Topic is required' });
     }
 
-    // Use environment variable for API key
-    const apiKey = process.env.OPENAI_API_KEY;
-    
-    if (!apiKey) {
+    // Get API key from database only - no env fallback
+    let apiKey: string;
+    try {
+      apiKey = await getOpenAIKey();
+    } catch (error: any) {
       return res.status(500).json({ 
-        error: 'OpenAI API key not configured',
-        message: 'Please set OPENAI_API_KEY environment variable in Vercel'
+        error: 'OpenAI not configured',
+        message: 'Please add your OpenAI API key in Admin Settings',
+        details: error.message
       });
     }
 
