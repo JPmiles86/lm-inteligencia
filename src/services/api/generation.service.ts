@@ -93,12 +93,13 @@ class GenerationService {
    */
   async configureProvider(config: ProviderConfig): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/generation/providers/configure`, {
+      // Use the new provider-save endpoint
+      const response = await fetch(`/api/provider-save?provider=${config.provider}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(config),
+        body: JSON.stringify({ apiKey: config.apiKey }),
       });
 
       const data = await response.json();
@@ -117,16 +118,16 @@ class GenerationService {
    */
   async testProvider(provider: string): Promise<{ success: boolean; isValid: boolean; message?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/generation/providers/test`, {
-        method: 'POST',
+      // Use the new provider-save endpoint with test flag
+      const response = await fetch(`/api/provider-save?provider=${provider}&test=true`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ provider }),
       });
 
       const data = await response.json();
-      return data;
+      return { ...data, isValid: data.success };
     } catch (error: any) {
       console.error('Provider test failed:', error);
       return {
@@ -142,7 +143,8 @@ class GenerationService {
    */
   async getProviders(): Promise<{ success: boolean; providers?: any[]; error?: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/generation/providers`);
+      // Use the new providers-simple endpoint
+      const response = await fetch(`/api/providers-simple`);
       const data = await response.json();
       return data;
     } catch (error: any) {
