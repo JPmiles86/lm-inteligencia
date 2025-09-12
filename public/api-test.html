@@ -97,6 +97,15 @@
             <div id="simple-result" class="result"></div>
         </div>
 
+        <!-- OpenAI Direct Test (NEW) -->
+        <div class="test-section" style="border: 2px solid #ffc107;">
+            <h3><span class="status-indicator" id="openai-test-status"></span>OpenAI Direct Test (NEW)</h3>
+            <button class="test-button" onclick="testOpenAIDirect()">
+                Test OpenAI Key Directly
+            </button>
+            <div id="openai-test-result" class="result"></div>
+        </div>
+
         <!-- Brainstorm Simple (NEW) -->
         <div class="test-section" style="border: 2px solid #28a745;">
             <h3><span class="status-indicator" id="brainstorm-simple-status"></span>Brainstorm Simple (NEW - Uses DB Key)</h3>
@@ -253,6 +262,23 @@
             };
             
             await testEndpoint('brainstorm-simple', '/api/brainstorm-simple', 'POST', body);
+        }
+
+        async function testOpenAIDirect() {
+            // Prompt for API key
+            const apiKey = prompt('Enter your OpenAI API key to test:');
+            
+            if (!apiKey) {
+                document.getElementById('openai-test-result').className = 'result error';
+                document.getElementById('openai-test-result').textContent = 'No API key provided';
+                return;
+            }
+            
+            const body = {
+                apiKey: apiKey
+            };
+            
+            await testEndpoint('openai-test', '/api/test-openai', 'POST', body);
         }
 
         // Test all endpoints on load
