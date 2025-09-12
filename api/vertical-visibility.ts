@@ -126,7 +126,7 @@ export default async function handler(req: any, res: any) {
           const settings = await db
             .select()
             .from(verticalVisibilitySettings)
-            .where(eq(verticalVisibilitySettings.vertical, vertical))
+            .where(eq(verticalVisibilitySettings.vertical, vertical as any))
             .limit(1);
 
           if (settings.length === 0) {
@@ -155,7 +155,7 @@ export default async function handler(req: any, res: any) {
           
           // Create a map of existing settings
           const existingSettings: Record<string, any> = {};
-          allSettings.forEach(setting => {
+          allSettings.forEach((setting: any) => {
             existingSettings[setting.vertical] = setting;
           });
 
@@ -218,7 +218,7 @@ export default async function handler(req: any, res: any) {
           [result] = await db
             .update(verticalVisibilitySettings)
             .set(settingsToSave)
-            .where(eq(verticalVisibilitySettings.vertical, vertical))
+            .where(eq(verticalVisibilitySettings.vertical, vertical as any))
             .returning();
         } else {
           // Create new settings
@@ -264,7 +264,7 @@ export default async function handler(req: any, res: any) {
           const existing = await db
             .select()
             .from(verticalVisibilitySettings)
-            .where(eq(verticalVisibilitySettings.vertical, vertical))
+            .where(eq(verticalVisibilitySettings.vertical, vertical as any))
             .limit(1);
 
           let result;
@@ -273,7 +273,7 @@ export default async function handler(req: any, res: any) {
             [result] = await db
               .update(verticalVisibilitySettings)
               .set(settingsToSave)
-              .where(eq(verticalVisibilitySettings.vertical, vertical))
+              .where(eq(verticalVisibilitySettings.vertical, vertical as any))
               .returning();
           } else {
             // Create new settings

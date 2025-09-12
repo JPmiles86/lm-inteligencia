@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `;
 
     // Format the response
-    const formattedProviders = providers.map(p => ({
+    const formattedProviders = providers.map((p: any) => ({
       id: p.provider,
       name: p.provider,
       configured: true,
