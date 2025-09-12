@@ -93,8 +93,8 @@ class GenerationService {
    */
   async configureProvider(config: ProviderConfig): Promise<{ success: boolean; message?: string; error?: string }> {
     try {
-      // Use the new provider-save endpoint
-      const response = await fetch(`/api/provider-save?provider=${config.provider}`, {
+      // Use the new provider-save-simple endpoint
+      const response = await fetch(`/api/provider-save-simple?provider=${config.provider}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,8 +118,8 @@ class GenerationService {
    */
   async testProvider(provider: string): Promise<{ success: boolean; isValid: boolean; message?: string }> {
     try {
-      // Use the new provider-save endpoint with test flag
-      const response = await fetch(`/api/provider-save?provider=${provider}&test=true`, {
+      // Use the new provider-save-simple endpoint with test flag
+      const response = await fetch(`/api/provider-save-simple?provider=${provider}&test=true`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

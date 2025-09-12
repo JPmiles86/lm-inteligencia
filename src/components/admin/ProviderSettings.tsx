@@ -149,7 +149,7 @@ export const ProviderSettings: React.FC = () => {
 
   const handleUpdateProvider = async (provider: string, apiKey: string) => {
     try {
-      const response = await fetch(`/api/provider-save?provider=${provider}`, {
+      const response = await fetch(`/api/provider-save-simple?provider=${provider}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ export const ProviderSettings: React.FC = () => {
     setTestingProvider(provider);
     
     try {
-      const response = await fetch(`/api/provider-save?provider=${provider}&test=true`, {
+      const response = await fetch(`/api/provider-save-simple?provider=${provider}&test=true`, {
         method: 'GET'
       });
 
