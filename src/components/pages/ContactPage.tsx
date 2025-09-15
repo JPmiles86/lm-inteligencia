@@ -452,17 +452,17 @@ export const ContactPage: React.FC = () => {
                 })}
               </div>
 
-              {/* Calendly Section */}
+              {/* WhatsApp Call Section */}
               <div className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 rounded-xl p-8 text-white">
                 <h3 className="text-2xl font-bold mb-4">
-                  {config.content.contact.calendlyText || 'Schedule a Free Consultation'}
+                  Prefer to Schedule a Call?
                 </h3>
-                <p className="text-gray-200 mb-6">
+                <p className="text-gray-200 mb-4">
                   Book a 30-minute strategy session to discuss your marketing goals and learn how we can help grow your business.
                 </p>
-                <button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-bold transition-all transform hover:scale-105">
-                  Schedule Free Call
-                </button>
+                <p className="text-gray-200 text-lg">
+                  <span className="font-semibold">Reach out via WhatsApp</span> using the contact details above to schedule your free consultation at a time that works for you.
+                </p>
               </div>
 
               {/* Office Hours - Hidden per client request */}

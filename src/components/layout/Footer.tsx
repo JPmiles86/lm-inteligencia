@@ -51,8 +51,8 @@ const pathToIndustryMap: Record<string, IndustryType> = {
 export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
   const { config, loading } = useIndustryConfig(selectedIndustry);
   const subdomain = getCurrentSubdomain();
-  const isOnSubdomain = subdomain === 'hospitality';
-  
+  const isOnSubdomain = subdomain === 'hospitality' || subdomain === 'healthcare' || subdomain === 'tech' || subdomain === 'athletics';
+
   // Determine URL prefix - empty for subdomain, use industry path for main domain
   const urlPrefix = isOnSubdomain ? '' : `/${Object.keys(pathToIndustryMap).find(k => pathToIndustryMap[k] === selectedIndustry) || ''}`;
 
