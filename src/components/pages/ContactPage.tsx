@@ -396,6 +396,9 @@ export const ContactPage: React.FC = () => {
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
                     <p className="font-semibold">Thank you for your inquiry!</p>
                     <p className="text-sm mt-1">We've received your message and will be in touch soon.</p>
+                    <p className="text-sm mt-2">
+                      <span className="font-medium">Need immediate assistance?</span> Reach out via WhatsApp at +506 6200 2747 for a quicker response.
+                    </p>
                   </div>
                 )}
 
