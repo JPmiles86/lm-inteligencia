@@ -52,6 +52,7 @@ export const ContactPage: React.FC = () => {
         _replyto: formData.email,
         _subject: `New Contact Form Submission from ${formData.firstName} ${formData.lastName} - ${formData.company}`,
         _gotcha: '', // Honeypot field for spam prevention
+        _template: 'table', // Use table template for better formatting
       };
 
       // Submit to first endpoint
