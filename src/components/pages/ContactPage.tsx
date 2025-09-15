@@ -54,7 +54,7 @@ export const ContactPage: React.FC = () => {
         body: JSON.stringify({
           ...formData,
           industry: config.industry,
-          _cc: 'laurie.meiring@gmail.com,galliganshauna@gmail.com', // CC additional recipients
+          _replyto: formData.email,
           _subject: `New Contact Form Submission from ${formData.firstName} ${formData.lastName} - ${formData.company}`,
         }),
       });
