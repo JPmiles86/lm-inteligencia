@@ -31,10 +31,62 @@ export const ContactPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    alert('Thank you for your inquiry! We\'ll be in touch within 24 hours.');
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrorMessage('');
+
+    try {
+      // Formspree endpoint - uses environment variable or fallback
+      const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT || 'https://formspree.io/f/xkgvaqyl';
+
+      const response = await fetch(formspreeEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          industry: config.industry,
+          _cc: 'laurie.meiring@gmail.com,galliganshauna@gmail.com', // CC additional recipients
+          _subject: `New Contact Form Submission from ${formData.firstName} ${formData.lastName} - ${formData.company}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        // Reset form
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phone: '',
+          company: '',
+          businessType: '',
+          budget: '',
+          goals: '',
+          timeline: '',
+          message: '',
+        });
+      } else {
+        setSubmitStatus('error');
+        setErrorMessage(data.error || 'Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus('error');
+      setErrorMessage('Unable to send your message. Please try again later or contact us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Get data from config with fallbacks
@@ -310,10 +362,31 @@ export const ContactPage: React.FC = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold py-4 rounded-lg text-lg transition-all transform hover:scale-105"
+                  disabled={isSubmitting}
+                  className={`w-full font-bold py-4 rounded-lg text-lg transition-all transform ${
+                    isSubmitting
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 hover:scale-105 text-white'
+                  }`}
                 >
-                  {config.content.contact.formLabels?.submitButton || 'Send Message & Get Free Consultation'}
+                  {isSubmitting
+                    ? 'Sending...'
+                    : (config.content.contact.formLabels?.submitButton || 'Send Message & Get Free Consultation')}
                 </button>
+
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+                    <p className="font-semibold">Thank you for your inquiry!</p>
+                    <p className="text-sm mt-1">We've sent you a confirmation email and will be in touch within 24 hours.</p>
+                  </div>
+                )}
+
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                    <p className="font-semibold">Unable to send message</p>
+                    <p className="text-sm mt-1">{errorMessage}</p>
+                  </div>
+                )}
 
                 <p className="text-sm text-gray-500 text-center">
                   {config.content.contact.formLabels?.privacyText || 'We respect your privacy and will never share your information.'}
