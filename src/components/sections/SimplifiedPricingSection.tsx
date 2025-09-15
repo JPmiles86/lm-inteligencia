@@ -171,18 +171,12 @@ export const SimplifiedPricingSection: React.FC = () => {
           <p className="text-gray-600 mb-8 text-lg">
             Need a custom solution? We'll create a package tailored to your specific needs and budget.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Link
               to="/contact"
               className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-4 rounded-lg font-medium transition-all transform hover:scale-105 text-center"
             >
               Schedule Free Consultation
-            </Link>
-            <Link
-              to="/pricing"
-              className="border-2 border-gray-700 text-gray-700 px-8 py-4 rounded-lg font-medium hover:bg-gray-100 hover:border-gray-900 transition-all duration-300"
-            >
-              View Detailed Pricing
             </Link>
           </div>
         </motion.div>

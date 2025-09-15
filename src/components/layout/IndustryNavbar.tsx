@@ -244,7 +244,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               <button
-                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
+                onClick={() => handleNavigation(industryKey ? `/${industryKey}/contact` : '/contact', false)}
                 className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
@@ -323,7 +323,7 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
             </Link>
             
             <button
-              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
+              onClick={() => handleNavigation(industryKey ? `/${industryKey}/contact` : '/contact', false)}
               className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
@@ -557,7 +557,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
               </Link>
 
               <button
-                onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
+                onClick={() => handleNavigation(industryKey ? `/${industryKey}/contact` : '/contact', false)}
                 className="inline-block px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90"
               >
                 {universalContent.navigation.buttons.getStarted}
@@ -636,7 +636,7 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
             </Link>
             
             <button
-              onClick={() => handleNavigation(isSeamlessPage ? 'contact' : (industryKey ? `/${industryKey}/contact` : '/contact'), isSeamlessPage)}
+              onClick={() => handleNavigation(industryKey ? `/${industryKey}/contact` : '/contact', false)}
               className="block w-full px-8 py-3 text-white rounded-lg font-medium transition-all duration-300 hover:scale-105 transform bg-secondary hover:opacity-90 text-center"
             >
               {universalContent.navigation.buttons.getStarted}
