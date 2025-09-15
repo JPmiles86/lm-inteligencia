@@ -377,7 +377,7 @@ export const ContactPage: React.FC = () => {
                 {submitStatus === 'success' && (
                   <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
                     <p className="font-semibold">Thank you for your inquiry!</p>
-                    <p className="text-sm mt-1">We've sent you a confirmation email and will be in touch within 24 hours.</p>
+                    <p className="text-sm mt-1">We've received your message and will be in touch soon.</p>
                   </div>
                 )}
 
@@ -443,8 +443,8 @@ export const ContactPage: React.FC = () => {
                         )}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{method.type}</h3>
-                        <p className="text-primary font-medium mb-2">{method.value}</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{method.type}</h3>
+                        <p className="text-lg text-primary font-semibold mb-2">{method.value}</p>
                         <p className="text-gray-600 text-sm">{method.description}</p>
                       </div>
                     </a>
@@ -457,12 +457,16 @@ export const ContactPage: React.FC = () => {
                 <h3 className="text-2xl font-bold mb-4">
                   Prefer to Schedule a Call?
                 </h3>
-                <p className="text-gray-200 mb-4">
+                <p className="text-gray-100 mb-6 text-lg leading-relaxed">
                   Book a 30-minute strategy session to discuss your marketing goals and learn how we can help grow your business.
                 </p>
-                <p className="text-gray-200 text-lg">
-                  <span className="font-semibold">Reach out via WhatsApp</span> using the contact details above to schedule your free consultation at a time that works for you.
-                </p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <p className="text-white text-base">
+                    <span className="font-semibold text-lg">💬 Reach out via WhatsApp</span>
+                    <br />
+                    <span className="text-gray-200">Use the contact details above to schedule your free consultation at a time that works for you.</span>
+                  </p>
+                </div>
               </div>
 
               {/* Office Hours - Hidden per client request */}
