@@ -42,22 +42,38 @@ export const ContactPage: React.FC = () => {
     setErrorMessage('');
 
     try {
-      // Formspree endpoint - uses environment variable or fallback
-      const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT || 'https://formspree.io/f/xkgvaqyl';
+      // Formspree endpoints - submit to both email addresses
+      const formspreeEndpoint1 = import.meta.env.VITE_FORMSPREE_ENDPOINT || 'https://formspree.io/f/xkgvaqyl';
+      const formspreeEndpoint2 = import.meta.env.VITE_FORMSPREE_ENDPOINT_2 || null; // Add second form ID here if you create one
 
-      const response = await fetch(formspreeEndpoint, {
+      const formPayload = {
+        ...formData,
+        industry: config.industry,
+        _replyto: formData.email,
+        _subject: `New Contact Form Submission from ${formData.firstName} ${formData.lastName} - ${formData.company}`,
+      };
+
+      // Submit to first endpoint
+      const response = await fetch(formspreeEndpoint1, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          ...formData,
-          industry: config.industry,
-          _replyto: formData.email,
-          _subject: `New Contact Form Submission from ${formData.firstName} ${formData.lastName} - ${formData.company}`,
-        }),
+        body: JSON.stringify(formPayload),
       });
+
+      // If you have a second endpoint, submit to it as well
+      if (formspreeEndpoint2) {
+        fetch(formspreeEndpoint2, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(formPayload),
+        }).catch(err => console.log('Secondary form submission failed:', err));
+      }
 
       const data = await response.json();
 
