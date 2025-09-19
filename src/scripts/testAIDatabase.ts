@@ -1,9 +1,9 @@
 // Test script for AI Content Generation Database
 // Validates schema, repository functions, and data integrity
 
-import { db, testConnection } from '../db';
-import { aiRepository } from '../repositories/aiRepository';
-import { seedAISystem } from '../db/seeds/aiSeeds';
+import { db, testConnection } from '../db/index.js';
+import { aiRepository } from '../repositories/aiRepository.js';
+import { seedAISystem } from '../db/seeds/aiSeeds.js';
 
 async function testAIDatabase() {
   console.log('🧪 Testing AI Content Generation Database...\n');
