@@ -57,7 +57,7 @@ export class OpenAIAPIHandler {
         res.end();
       } else {
         const result = await openAIService.generateText(prompt, config);
-        
+
         // Track usage
         await usageTracker.trackUsage({
           provider: 'openai',
@@ -69,14 +69,15 @@ export class OpenAIAPIHandler {
           timestamp: new Date(),
           model: config?.model || 'gpt-4-turbo-preview'
         });
-        
-        res.json({ 
-          success: true, 
+
+        res.json({
+          success: true,
           content: result,
           provider: 'openai',
           model: config?.model || 'gpt-4-turbo-preview'
         });
       }
+      */
     } catch (error) {
       console.error('OpenAI text generation error:', error);
       
@@ -102,8 +103,16 @@ export class OpenAIAPIHandler {
   async handleImageGeneration(req: Request, res: Response) {
     const { prompt, config } = req.body;
     const startTime = Date.now();
-    
+
     try {
+      // TODO: Implement OpenAI image generation
+      res.status(501).json({
+        success: false,
+        error: 'OpenAI image generation not yet implemented in production'
+      });
+      return;
+
+      /* Original implementation - needs server-side OpenAI service
       const urls = await openAIImageService.generateImage(prompt, config);
       
       // Track usage
@@ -118,12 +127,13 @@ export class OpenAIAPIHandler {
         model: config?.model || 'dall-e-3'
       });
       
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         urls,
         provider: 'openai',
         model: config?.model || 'dall-e-3'
       });
+      */
     } catch (error) {
       console.error('OpenAI image generation error:', error);
       
@@ -149,7 +159,15 @@ export class OpenAIAPIHandler {
   async handleBlogGeneration(req: Request, res: Response) {
     const { topic, context } = req.body;
     const startTime = Date.now();
-    
+
+    // TODO: Implement OpenAI blog generation
+    res.status(501).json({
+      success: false,
+      error: 'OpenAI blog generation not yet implemented in production'
+    });
+    return;
+
+    /* Original implementation - needs server-side OpenAI service
     try {
       const blog = await openAIService.generateBlog(topic, context);
       
@@ -173,11 +191,12 @@ export class OpenAIAPIHandler {
         model: 'gpt-4-turbo-preview'
       });
       
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         blog: { ...blog, images },
         provider: 'openai'
       });
+      */
     } catch (error) {
       console.error('OpenAI blog generation error:', error);
       
@@ -190,7 +209,15 @@ export class OpenAIAPIHandler {
   
   async handleEmbedding(req: Request, res: Response) {
     const { text, texts, model } = req.body;
-    
+
+    // TODO: Implement OpenAI embeddings
+    res.status(501).json({
+      success: false,
+      error: 'OpenAI embeddings not yet implemented in production'
+    });
+    return;
+
+    /* Original implementation - needs server-side OpenAI service
     try {
       if (texts) {
         const embeddings = await openAIEmbeddingService.createBatchEmbeddings(
@@ -210,6 +237,7 @@ export class OpenAIAPIHandler {
           error: 'Either text or texts must be provided' 
         });
       }
+      */
     } catch (error) {
       console.error('OpenAI embedding error:', error);
       res.status(500).json({ 
@@ -220,13 +248,22 @@ export class OpenAIAPIHandler {
   }
   
   async handleConnectionTest(req: Request, res: Response) {
+    // TODO: Implement OpenAI connection test
+    res.status(501).json({
+      success: false,
+      error: 'OpenAI connection test not yet implemented in production'
+    });
+    return;
+
+    /* Original implementation - needs server-side OpenAI service
     try {
       const isConnected = await openAIService.testConnection();
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         connected: isConnected,
         provider: 'openai'
       });
+      */
     } catch (error) {
       console.error('OpenAI connection test error:', error);
       res.status(500).json({ 
