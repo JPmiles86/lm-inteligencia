@@ -258,7 +258,7 @@ router.get('/meta/tags', asyncHandler(async (req: Request, res: Response) => {
     // Extract and count all tags
     const tagCounts: Record<string, number> = {};
     
-    posts.forEach(post => {
+    posts.forEach((post: any) => {
       if (Array.isArray(post.tags)) {
         post.tags.forEach((tag: any) => {
           tagCounts[tag] = (tagCounts[tag] || 0) + 1;

@@ -196,17 +196,17 @@ export class OpenAIAPIHandler {
         blog: { ...blog, images },
         provider: 'openai'
       });
-      */
     } catch (error) {
       console.error('OpenAI blog generation error:', error);
-      
-      res.status(500).json({ 
-        success: false, 
+
+      res.status(500).json({
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+    */
   }
-  
+
   async handleEmbedding(req: Request, res: Response) {
     const { text, texts, model } = req.body;
 
