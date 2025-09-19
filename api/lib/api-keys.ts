@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { decrypt } from '../../server/utils/encryption';
+import { decrypt } from '../../server/utils/encryption.js';
 
 const sql = neon(process.env.DATABASE_URL!);
 

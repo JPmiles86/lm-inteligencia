@@ -5,7 +5,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import { encrypt } from '../server/utils/encryption';
+import { encrypt } from '../server/utils/encryption.js';
 import OpenAI from 'openai';
 
 const sql = neon(process.env.DATABASE_URL!);

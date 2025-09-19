@@ -5,7 +5,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
-import { getOpenAIKey } from './lib/api-keys';
+import { getOpenAIKey } from './lib/api-keys.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST
