@@ -85,7 +85,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 
     // Build order by
     const orderBy = sortOrder === 'asc' ? asc : desc;
-    let sortColumn = blogPosts.createdAt; // default
+    let sortColumn: any = blogPosts.createdAt; // default
 
     switch (sortBy) {
       case 'title':
@@ -133,7 +133,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     // If tag filter is specified, filter posts by tags (JSON field)
     let filteredPosts = posts;
     if (tag) {
-      filteredPosts = posts.filter(post => {
+      filteredPosts = posts.filter((post: any) => {
         const tags = Array.isArray(post.tags) ? post.tags : [];
         return tags.includes(tag as string);
       });
@@ -260,7 +260,7 @@ router.get('/meta/tags', asyncHandler(async (req: Request, res: Response) => {
     
     posts.forEach(post => {
       if (Array.isArray(post.tags)) {
-        post.tags.forEach(tag => {
+        post.tags.forEach((tag: any) => {
           tagCounts[tag] = (tagCounts[tag] || 0) + 1;
         });
       }
@@ -309,11 +309,11 @@ router.get('/meta/stats', asyncHandler(async (req: Request, res: Response) => {
         draft: draftPosts[0]?.count || 0,
         featured: featuredPosts[0]?.count || 0
       },
-      categories: categories.map(cat => ({
+      categories: categories.map((cat: any) => ({
         name: cat.category,
         count: cat.count
       })),
-      recent: recentPosts.map(post => ({
+      recent: recentPosts.map((post: any) => ({
         id: post.id,
         title: post.title,
         slug: post.slug,
@@ -461,8 +461,8 @@ router.get('/:id/related', asyncHandler(async (req: Request, res: Response) => {
         .limit(limitNum);
 
       // Merge and deduplicate
-      const existingIds = new Set(relatedPosts.map(p => p.id));
-      const newPosts = additionalPosts.filter(p => !existingIds.has(p.id));
+      const existingIds = new Set(relatedPosts.map((p: any) => p.id));
+      const newPosts = additionalPosts.filter((p: any) => !existingIds.has(p.id));
       relatedPosts = [...relatedPosts, ...newPosts].slice(0, limitNum);
     }
 

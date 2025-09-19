@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 // TODO: These imports from src/ don't work in production - need to implement server-side versions
 // import { openAIService } from '../../../src/services/ai/providers/OpenAIService.js';
 // import { openAIImageService } from '../../../src/services/ai/providers/OpenAIImageService.js';
@@ -237,14 +237,14 @@ export class OpenAIAPIHandler {
           error: 'Either text or texts must be provided' 
         });
       }
-      */
     } catch (error) {
       console.error('OpenAI embedding error:', error);
-      res.status(500).json({ 
-        success: false, 
+      res.status(500).json({
+        success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+    */
   }
   
   async handleConnectionTest(req: Request, res: Response) {
@@ -263,15 +263,15 @@ export class OpenAIAPIHandler {
         connected: isConnected,
         provider: 'openai'
       });
-      */
     } catch (error) {
       console.error('OpenAI connection test error:', error);
-      res.status(500).json({ 
-        success: false, 
+      res.status(500).json({
+        success: false,
         connected: false,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
+    */
   }
 }
 
