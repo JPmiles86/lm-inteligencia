@@ -53,9 +53,7 @@ export const AboutPage: React.FC = () => {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl font-bold text-gray-900 mb-2">
-                <a href="https://www.linkedin.com/in/laurie-meiring/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors">
-                  {founderStory.title}
-                </a>
+                {founderStory.title}
               </h2>
               {founderStory.subtitle && (
                 <p className="text-xl text-gray-700 font-medium mb-2">
@@ -66,13 +64,11 @@ export const AboutPage: React.FC = () => {
                 <p className="text-lg text-gray-600 italic mb-6">
                   MBA • Agile Marketing Leader • AI‑Driven Digital Innovator • Hospitality Veteran •
                   <a href="https://www.pbguidecr.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 transition-colors">
-                    Pickleball Pro
+                     Pickleball Pro
                   </a>
                 </p>
               )}
-              <p className="text-lg text-gray-700 mb-6">
-                {founderStory.description}
-              </p>
+              <p className="text-lg text-gray-700 mb-6" dangerouslySetInnerHTML={{ __html: founderStory.description }} />
               <p className="text-lg text-gray-700 mb-6">
                 {founderStory.extendedStory}
               </p>
