@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import { openAIService } from '../../../src/services/ai/providers/OpenAIService.js';
-import { openAIImageService } from '../../../src/services/ai/providers/OpenAIImageService.js';
-import { openAIEmbeddingService } from '../../../src/services/ai/providers/OpenAIEmbeddingService.js';
+// TODO: These imports from src/ don't work in production - need to implement server-side versions
+// import { openAIService } from '../../../src/services/ai/providers/OpenAIService.js';
+// import { openAIImageService } from '../../../src/services/ai/providers/OpenAIImageService.js';
+// import { openAIEmbeddingService } from '../../../src/services/ai/providers/OpenAIEmbeddingService.js';
 
 // Define usage tracking interface to match existing system
 interface UsageRecord {
@@ -29,13 +30,21 @@ export class OpenAIAPIHandler {
   async handleTextGeneration(req: Request, res: Response) {
     const { prompt, config, stream = false } = req.body;
     const startTime = Date.now();
-    
+
     try {
+      // TODO: Implement OpenAI text generation
+      res.status(501).json({
+        success: false,
+        error: 'OpenAI text generation not yet implemented in production'
+      });
+      return;
+
+      /* Original implementation - needs server-side OpenAI service
       if (stream) {
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-        
+
         await openAIService.generateStream(
           prompt,
           config,
@@ -43,7 +52,7 @@ export class OpenAIAPIHandler {
             res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
           }
         );
-        
+
         res.write('data: [DONE]\n\n');
         res.end();
       } else {
