@@ -131,13 +131,17 @@ class BlogDatabaseService {
     }
     
     const data = await response.json();
-    // For blog post endpoints that return pagination, return the full structure
-    // The API returns { success: true, data: [...], pagination: {...} }
-    if (data.success && data.pagination && data.data) {
-      return data as T;
+    // The API now consistently returns { success: true, data: ..., pagination?: {...} }
+    if (data.success) {
+      // For paginated responses, return the full structure
+      if (data.pagination) {
+        return data as T;
+      }
+      // For single items and other responses, return just the data
+      return data.data || data;
     }
-    // For other endpoints, return the data directly
-    return data.data || data;
+    // Fallback for unexpected format
+    return data;
   }
 
   private async apiCall<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
@@ -175,15 +179,23 @@ class BlogDatabaseService {
       const endpoint = `/blog${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<any>(endpoint);
       
-      // Check if response already has the correct structure
-      if (response.posts && response.pagination) {
-        return response;
+      // The API now returns { success: true, data: [...], pagination: {...} }
+      // handleApiResponse will return the full response structure for paginated endpoints
+      if (response.data && response.pagination) {
+        return {
+          posts: response.data,
+          pagination: {
+            currentPage: response.pagination.page,
+            totalPages: response.pagination.totalPages,
+            totalItems: response.pagination.total,
+            itemsPerPage: response.pagination.limit
+          }
+        };
       }
-      
-      // Handle the API response format - response is already the array from data
-      // because handleApiResponse returns data.data || data
+
+      // Fallback for unexpected format
       const posts = Array.isArray(response) ? response : (response.data || []);
-      
+
       return {
         posts: posts,
         pagination: {
@@ -217,11 +229,24 @@ class BlogDatabaseService {
       if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
 
       const endpoint = `/blog${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-      const response = await this.apiCall<BlogPostsResponse>(endpoint);
-      
-      // The handleApiResponse now properly returns the full structure for paginated responses
+      const response = await this.apiCall<any>(endpoint);
+
+      // Handle the consistent API response format
+      if (response.data && response.pagination) {
+        return {
+          posts: response.data,
+          pagination: {
+            currentPage: response.pagination.page,
+            totalPages: response.pagination.totalPages,
+            totalItems: response.pagination.total,
+            itemsPerPage: response.pagination.limit
+          }
+        };
+      }
+
+      // Fallback for unexpected format
       return {
-        posts: response.posts || [],
+        posts: response.posts || response.data || [],
         pagination: response.pagination || {
           currentPage: 1,
           totalPages: 1,

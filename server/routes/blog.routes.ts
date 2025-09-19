@@ -140,7 +140,8 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     }
 
     res.json({
-      posts: filteredPosts,
+      success: true,
+      data: filteredPosts,
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -201,7 +202,10 @@ router.get('/:id', asyncHandler(async (req: Request, res: Response) => {
       result.revisions = revisions;
     }
 
-    res.json(result);
+    res.json({
+      success: true,
+      data: result
+    });
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
     throw new Error(`Failed to fetch blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -226,7 +230,10 @@ router.get('/slug/:slug', asyncHandler(async (req: Request, res: Response) => {
       throw new NotFoundError(`Blog post with slug '${slug}' not found`);
     }
 
-    res.json(post[0]);
+    res.json({
+      success: true,
+      data: post[0]
+    });
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
     throw new Error(`Failed to fetch blog post: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -244,7 +251,10 @@ router.get('/meta/categories', asyncHandler(async (req: Request, res: Response) 
       .groupBy(blogPosts.category)
       .orderBy(desc(sql`count(*)`));
 
-    res.json(categories);
+    res.json({
+      success: true,
+      data: categories
+    });
   } catch (error) {
     throw new Error(`Failed to fetch categories: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -271,7 +281,10 @@ router.get('/meta/tags', asyncHandler(async (req: Request, res: Response) => {
       .map(([tag, count]) => ({ tag, count }))
       .sort((a, b) => b.count - a.count);
 
-    res.json(tags);
+    res.json({
+      success: true,
+      data: tags
+    });
   } catch (error) {
     throw new Error(`Failed to fetch tags: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
@@ -303,23 +316,26 @@ router.get('/meta/stats', asyncHandler(async (req: Request, res: Response) => {
     ]);
 
     res.json({
-      totals: {
-        total: totalPosts[0]?.count || 0,
-        published: publishedPosts[0]?.count || 0,
-        draft: draftPosts[0]?.count || 0,
-        featured: featuredPosts[0]?.count || 0
-      },
-      categories: categories.map((cat: any) => ({
-        name: cat.category,
-        count: cat.count
-      })),
-      recent: recentPosts.map((post: any) => ({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        published: post.published,
-        createdAt: post.createdAt
-      }))
+      success: true,
+      data: {
+        totals: {
+          total: totalPosts[0]?.count || 0,
+          published: publishedPosts[0]?.count || 0,
+          draft: draftPosts[0]?.count || 0,
+          featured: featuredPosts[0]?.count || 0
+        },
+        categories: categories.map((cat: any) => ({
+          name: cat.category,
+          count: cat.count
+        })),
+        recent: recentPosts.map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          slug: post.slug,
+          published: post.published,
+          createdAt: post.createdAt
+        }))
+      }
     });
   } catch (error) {
     throw new Error(`Failed to fetch blog statistics: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -377,10 +393,13 @@ router.get('/search/:query', asyncHandler(async (req: Request, res: Response) =>
       .limit(limitNum);
 
     res.json({
-      query,
-      results,
-      count: results.length,
-      hasMore: results.length === limitNum
+      success: true,
+      data: {
+        query,
+        results,
+        count: results.length,
+        hasMore: results.length === limitNum
+      }
     });
   } catch (error) {
     throw new Error(`Search failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -467,9 +486,12 @@ router.get('/:id/related', asyncHandler(async (req: Request, res: Response) => {
     }
 
     res.json({
-      postId: parseInt(id),
-      related: relatedPosts,
-      count: relatedPosts.length
+      success: true,
+      data: {
+        postId: parseInt(id),
+        related: relatedPosts,
+        count: relatedPosts.length
+      }
     });
   } catch (error) {
     if (error instanceof NotFoundError) throw error;
