@@ -60,6 +60,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
         sortColumn = blogPosts.title;
         break;
       case 'publishedDate':
+      case 'publishedAt': // Support both variations
         sortColumn = blogPosts.publishedDate;
         break;
       case 'updatedAt':
