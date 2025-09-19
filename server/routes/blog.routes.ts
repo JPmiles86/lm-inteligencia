@@ -8,11 +8,22 @@ const router = Router();
 
 // Middleware to check database connection
 const checkDatabase = (req: Request, res: Response, next: Function) => {
+  console.log('[Blog API] Database check:', {
+    hasDb: !!db,
+    dbType: typeof db,
+    path: req.path,
+    method: req.method
+  });
+
   if (!db) {
-    console.error('Database connection not available');
+    console.error('[Blog API] Database connection not available');
     return res.status(503).json({
       error: 'Database connection unavailable',
-      message: 'The database service is currently unavailable. Please try again later.'
+      message: 'The database service is currently unavailable. Please try again later.',
+      details: {
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+        nodeEnv: process.env.NODE_ENV
+      }
     });
   }
   next();
@@ -40,6 +51,12 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const offset = (pageNum - 1) * limitNum;
 
   try {
+    console.log('[Blog API] Request received:', {
+      query: req.query,
+      path: req.path,
+      method: req.method
+    });
+
     // Build where conditions
     const conditions = [];
 
@@ -89,7 +106,15 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
 
     // Get posts with count
     const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-    
+
+    console.log('[Blog API] Executing query with:', {
+      sortBy,
+      sortOrder,
+      limit: limitNum,
+      offset,
+      conditionsCount: conditions.length
+    });
+
     const [posts, countResult] = await Promise.all([
       db.select()
         .from(blogPosts)
@@ -135,6 +160,11 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
+    console.error('[Blog API] Error fetching posts:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      query: req.query
+    });
     throw new Error(`Failed to fetch blog posts: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }));
