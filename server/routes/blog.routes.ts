@@ -6,6 +6,21 @@ import { asyncHandler, ValidationError, NotFoundError } from '../middleware/erro
 
 const router = Router();
 
+// Middleware to check database connection
+const checkDatabase = (req: Request, res: Response, next: Function) => {
+  if (!db) {
+    console.error('Database connection not available');
+    return res.status(503).json({
+      error: 'Database connection unavailable',
+      message: 'The database service is currently unavailable. Please try again later.'
+    });
+  }
+  next();
+};
+
+// Apply database check to all routes
+router.use(checkDatabase);
+
 // Get all blog posts with filtering and pagination
 router.get('/', asyncHandler(async (req: Request, res: Response) => {
   const {

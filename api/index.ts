@@ -6,6 +6,7 @@
 import express from 'express';
 import cors from 'cors';
 import { drizzle } from 'drizzle-orm/postgres-js';
+import { sql } from 'drizzle-orm';
 import postgres from 'postgres';
 
 // Import all route modules
@@ -17,19 +18,43 @@ import providerRoutes from '../server/routes/provider.routes.js';
 
 // Initialize PostgreSQL database
 export let db: any;
-try {
-  const connectionString = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/lm_inteligencia';
-  const sql = postgres(connectionString, {
-    ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
-    max: 1, // Serverless functions should use single connections
-    idle_timeout: 20,
-    connect_timeout: 10
-  });
-  db = drizzle(sql);
-} catch (error) {
-  console.error('Database initialization error:', error);
-  // Continue without database for now
-}
+const initDatabase = () => {
+  try {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+      console.error('DATABASE_URL environment variable is not set');
+      return null;
+    }
+
+    console.log('Initializing database connection...', {
+      hasUrl: !!connectionString,
+      isProduction: process.env.NODE_ENV === 'production',
+      urlPrefix: connectionString?.substring(0, 20)
+    });
+
+    const sql = postgres(connectionString, {
+      ssl: process.env.NODE_ENV === 'production' ? 'require' : false,
+      max: 1, // Serverless functions should use single connections
+      idle_timeout: 20,
+      connect_timeout: 10
+    });
+
+    const database = drizzle(sql);
+    console.log('Database initialized successfully');
+    return database;
+  } catch (error) {
+    console.error('Database initialization error:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      env: process.env.NODE_ENV,
+      hasDatabaseUrl: !!process.env.DATABASE_URL
+    });
+    return null;
+  }
+};
+
+db = initDatabase();
 
 // Create Express app
 const app = express();
@@ -39,13 +64,32 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
+app.get('/api/health', async (req, res) => {
+  let dbStatus = 'not_initialized';
+  let dbError = null;
+
+  if (db) {
+    try {
+      // Try a simple query to test the connection
+      await db.execute(sql`SELECT 1`);
+      dbStatus = 'connected';
+    } catch (error) {
+      dbStatus = 'error';
+      dbError = error instanceof Error ? error.message : 'Unknown error';
+    }
+  }
+
+  res.json({
+    status: dbStatus === 'connected' ? 'healthy' : 'degraded',
     timestamp: new Date().toISOString(),
     env: process.env.NODE_ENV,
-    hasDb: !!db,
-    hasDatabaseUrl: !!process.env.DATABASE_URL
+    database: {
+      initialized: !!db,
+      status: dbStatus,
+      error: dbError,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      urlConfigured: process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + '...' : null
+    }
   });
 });
 
