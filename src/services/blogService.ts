@@ -172,7 +172,7 @@ class BlogDatabaseService {
       if (filters.sortBy) queryParams.append('sortBy', filters.sortBy);
       if (filters.sortOrder) queryParams.append('sortOrder', filters.sortOrder);
 
-      const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const endpoint = `/blog${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<any>(endpoint);
       
       // Check if response already has the correct structure
@@ -216,7 +216,7 @@ class BlogDatabaseService {
       if (publishedFilters.sortBy) queryParams.append('sortBy', publishedFilters.sortBy);
       if (publishedFilters.sortOrder) queryParams.append('sortOrder', publishedFilters.sortOrder);
 
-      const endpoint = `/blog/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+      const endpoint = `/blog${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
       const response = await this.apiCall<BlogPostsResponse>(endpoint);
       
       // The handleApiResponse now properly returns the full structure for paginated responses
@@ -254,7 +254,7 @@ class BlogDatabaseService {
     });
     
     try {
-      const post = await this.apiCall<BlogPost>(`/blog?id=${id}`);
+      const post = await this.apiCall<BlogPost>(`/blog/${id}`);
       console.log('[blogService] getPostById SUCCESS:', {
         id: id,
         post: post,
@@ -282,7 +282,7 @@ class BlogDatabaseService {
   // Get a single post by slug
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      const post = await this.apiCall<BlogPost>(`/blog?slug=${slug}`);
+      const post = await this.apiCall<BlogPost>(`/blog/slug/${slug}`);
       return post;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
@@ -296,7 +296,7 @@ class BlogDatabaseService {
   // Get a published post by slug (for public use)
   async getPublishedPostBySlug(slug: string): Promise<BlogPost | null> {
     try {
-      const post = await this.apiCall<BlogPost>(`/blog/posts/${slug}`);
+      const post = await this.apiCall<BlogPost>(`/blog/slug/${slug}`);
       return post;
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
@@ -405,7 +405,7 @@ class BlogDatabaseService {
   // Delete a blog post
   async deletePost(id: number): Promise<boolean> {
     try {
-      await this.apiCall(`/blog?id=${id}`, {
+      await this.apiCall(`/blog/${id}`, {
         method: 'DELETE',
       });
       return true;
@@ -421,7 +421,7 @@ class BlogDatabaseService {
   // Toggle published status
   async togglePublished(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog?id=${id}`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog/${id}`, {
         method: 'PATCH',
       });
       return response.post || response.data;
@@ -437,7 +437,7 @@ class BlogDatabaseService {
   // Toggle featured status
   async toggleFeatured(id: number): Promise<BlogPost | null> {
     try {
-      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog?id=${id}`, {
+      const response = await this.apiCall<{ post: BlogPost; data: BlogPost; action: string }>(`/blog/${id}`, {
         method: 'PATCH',
       });
       return response.post || response.data;
