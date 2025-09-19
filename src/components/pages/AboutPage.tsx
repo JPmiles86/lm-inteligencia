@@ -62,10 +62,8 @@ export const AboutPage: React.FC = () => {
               )}
               {founderStory.tagline && (
                 <p className="text-lg text-gray-600 italic mb-6">
-                  MBA • Agile Marketing Leader • AI‑Driven Digital Innovator • Hospitality Veteran •
-                  <a href="https://www.pbguidecr.com/" target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:text-blue-700 underline transition-colors">
-                    Pickleball Pro
-                  </a>
+                  MBA • Agile Marketing Leader • AI‑Driven Digital Innovator • Hospitality Veteran •&nbsp;
+                  <a href="https://www.pbguidecr.com/" target="_blank" rel="noopener noreferrer" className="text-blue-900 hover:text-blue-700 underline transition-colors">Pickleball Pro</a>
                 </p>
               )}
               <p className="text-lg text-gray-700 mb-6" dangerouslySetInnerHTML={{ __html: founderStory.description }} />
