@@ -1,7 +1,13 @@
-import { neon } from '@neondatabase/serverless';
-import { decrypt } from '../../server/utils/encryption.js';
+import pg from 'pg';
+import crypto from 'crypto';
 
-const sql = neon(process.env.DATABASE_URL!);
+const { Pool } = pg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 export type Provider = 'openai' | 'anthropic' | 'google' | 'perplexity';
 
@@ -13,6 +19,24 @@ export interface ProviderConfig {
 }
 
 /**
+ * Simple decryption for stored API keys
+ */
+function simpleDecrypt(encryptedData: string, salt: string): string {
+  const algorithm = 'aes-256-cbc';
+  const password = process.env.ENCRYPTION_PASSWORD || 'temp-encryption-key-change-me';
+  const key = crypto.scryptSync(password, salt, 32);
+
+  const [ivHex, encrypted] = encryptedData.split(':');
+  const iv = Buffer.from(ivHex, 'hex');
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
+}
+
+/**
  * Fetches and decrypts API key for a provider from the database
  * @param provider The AI provider name
  * @returns Decrypted provider configuration
@@ -20,31 +44,32 @@ export interface ProviderConfig {
 export async function getProviderConfig(provider: Provider): Promise<ProviderConfig> {
   try {
     // Query the provider_settings table
-    const result = await sql`
-      SELECT 
+    const result = await pool.query(
+      `SELECT
         api_key_encrypted,
         encryption_salt,
         default_model,
         settings,
         active
       FROM provider_settings
-      WHERE provider = ${provider}
+      WHERE provider = $1
       AND active = true
-      LIMIT 1
-    `;
+      LIMIT 1`,
+      [provider]
+    );
 
-    if (!result || result.length === 0) {
+    if (!result || result.rows.length === 0) {
       throw new Error(`No active configuration found for provider: ${provider}`);
     }
 
-    const config = result[0];
-    
+    const config = result.rows[0];
+
     if (!config.api_key_encrypted) {
       throw new Error(`API key not configured for provider: ${provider}`);
     }
 
     // Decrypt the API key
-    const decryptedKey = await decrypt(
+    const decryptedKey = simpleDecrypt(
       config.api_key_encrypted,
       config.encryption_salt
     );

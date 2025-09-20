@@ -1,8 +1,24 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../../api/index.js';
 import { providerSettings } from '../../src/db/schema.js';
-import { decrypt } from '../utils/encryption.js';
+import crypto from 'crypto';
 import { ProviderError } from '../middleware/error.middleware.js';
+
+// Simple decryption for compatibility with provider-save-simple.ts
+function simpleDecrypt(encryptedData: string, salt: string): string {
+  const algorithm = 'aes-256-cbc';
+  const password = process.env.ENCRYPTION_PASSWORD || 'temp-encryption-key-change-me';
+  const key = crypto.scryptSync(password, salt, 32);
+
+  const [ivHex, encrypted] = encryptedData.split(':');
+  const iv = Buffer.from(ivHex, 'hex');
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+
+  return decrypted;
+}
 
 // Provider capabilities mapping
 interface ProviderCapabilities {
@@ -120,31 +136,41 @@ async function getAvailableProviders(): Promise<Record<string, ProviderConfig>> 
     const availableProviders: Record<string, ProviderConfig> = {};
 
     for (const provider of providers) {
+      // Map snake_case columns to camelCase for compatibility
+      const mappedProvider = {
+        ...provider,
+        apiKeyEncrypted: (provider as any).api_key_encrypted || provider.apiKeyEncrypted,
+        encryptionSalt: (provider as any).encryption_salt || provider.encryptionSalt,
+        defaultModel: (provider as any).default_model || provider.defaultModel,
+        testSuccess: (provider as any).test_success || provider.testSuccess,
+        lastTested: (provider as any).last_tested || provider.lastTested
+      };
+
       // Skip inactive providers or those without API keys
-      if (!provider.active || !provider.apiKeyEncrypted) {
+      if (!mappedProvider.active || !mappedProvider.apiKeyEncrypted) {
         continue;
       }
 
       // Skip providers that failed their last test (if tested)
-      if (provider.lastTested && provider.testSuccess === false) {
-        console.warn(`Skipping provider ${provider.provider} due to failed test`);
+      if (mappedProvider.lastTested && mappedProvider.testSuccess === false) {
+        console.warn(`Skipping provider ${mappedProvider.provider} due to failed test`);
         continue;
       }
 
       try {
         // Decrypt API key
-        const apiKey = await decrypt(provider.apiKeyEncrypted, provider.encryptionSalt!);
+        const apiKey = simpleDecrypt(mappedProvider.apiKeyEncrypted, mappedProvider.encryptionSalt!);
         
-        availableProviders[provider.provider] = {
-          provider: provider.provider,
+        availableProviders[mappedProvider.provider] = {
+          provider: mappedProvider.provider,
           apiKey,
-          model: provider.defaultModel || '',
-          settings: provider.settings || {},
-          active: provider.active,
-          testSuccess: provider.testSuccess ?? true
+          model: mappedProvider.defaultModel || '',
+          settings: mappedProvider.settings || {},
+          active: mappedProvider.active,
+          testSuccess: mappedProvider.testSuccess ?? true
         };
       } catch (error) {
-        console.error(`Failed to decrypt API key for provider ${provider.provider}:`, error);
+        console.error(`Failed to decrypt API key for provider ${mappedProvider.provider}:`, error);
       }
     }
 

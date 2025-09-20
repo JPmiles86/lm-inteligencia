@@ -11,21 +11,25 @@ export class GenerationService {
     });
   }
 
-  // Decrypt API key from database
+  // Decrypt API key from database (matching provider-save-simple.ts)
   decryptApiKey(encryptedKey, salt) {
     if (!encryptedKey || !salt) return null;
-    
+
     try {
-      // Use a simple XOR decryption for now (in production, use proper encryption)
-      // This is a placeholder - implement proper decryption based on your encryption method
-      const decipher = crypto.createDecipher('aes-256-cbc', salt);
-      let decrypted = decipher.update(encryptedKey, 'hex', 'utf8');
+      const algorithm = 'aes-256-cbc';
+      const password = process.env.ENCRYPTION_PASSWORD || 'temp-encryption-key-change-me';
+      const key = crypto.scryptSync(password, salt, 32);
+
+      const [ivHex, encrypted] = encryptedKey.split(':');
+      const iv = Buffer.from(ivHex, 'hex');
+
+      const decipher = crypto.createDecipheriv(algorithm, key, iv);
+      let decrypted = decipher.update(encrypted, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       return decrypted;
     } catch (error) {
       console.error('Error decrypting API key:', error);
-      // For now, return the encrypted key as-is (for testing)
-      return encryptedKey;
+      return null;
     }
   }
 
