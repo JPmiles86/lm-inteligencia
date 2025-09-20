@@ -4,11 +4,17 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { neon } from '@neondatabase/serverless';
+import pg from 'pg';
 import OpenAI from 'openai';
 import crypto from 'crypto';
 
-const sql = neon(process.env.DATABASE_URL!);
+const { Pool } = pg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // Simple encryption for now (replace with better encryption later)
 function simpleEncrypt(text: string): { encrypted: string; salt: string } {
@@ -70,15 +76,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Testing provider:', provider);
       
       // For now, just return success if provider exists in DB
-      const result = await sql`
-        SELECT provider
+      const result = await pool.query(
+        `SELECT provider
         FROM provider_settings
-        WHERE provider = ${provider}
+        WHERE provider = $1
         AND active = true
-        LIMIT 1
-      `;
+        LIMIT 1`,
+        [provider]
+      );
 
-      if (result && result.length > 0) {
+      if (result && result.rows.length > 0) {
         return res.status(200).json({
           success: true,
           message: 'Provider configuration exists',
@@ -118,31 +125,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Encrypted key, checking if provider exists...');
 
       // Check if provider settings exist
-      const existing = await sql`
-        SELECT id FROM provider_settings
-        WHERE provider = ${provider}
-        LIMIT 1
-      `;
+      const existing = await pool.query(
+        `SELECT id FROM provider_settings
+        WHERE provider = $1
+        LIMIT 1`,
+        [provider]
+      );
 
-      if (existing && existing.length > 0) {
+      if (existing && existing.rows.length > 0) {
         console.log('Updating existing provider settings...');
         // Update existing
-        await sql`
-          UPDATE provider_settings
-          SET 
-            api_key_encrypted = ${encrypted},
-            encryption_salt = ${salt},
+        await pool.query(
+          `UPDATE provider_settings
+          SET
+            api_key_encrypted = $1,
+            encryption_salt = $2,
             active = true,
             last_tested = NOW(),
             test_success = true,
             updated_at = NOW()
-          WHERE provider = ${provider}
-        `;
+          WHERE provider = $3`,
+          [encrypted, salt, provider]
+        );
       } else {
         console.log('Creating new provider settings...');
         // Insert new
-        await sql`
-          INSERT INTO provider_settings (
+        await pool.query(
+          `INSERT INTO provider_settings (
             provider,
             api_key_encrypted,
             encryption_salt,
@@ -152,16 +161,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             created_at,
             updated_at
           ) VALUES (
-            ${provider},
-            ${encrypted},
-            ${salt},
+            $1,
+            $2,
+            $3,
             true,
             NOW(),
             true,
             NOW(),
             NOW()
-          )
-        `;
+          )`,
+          [provider, encrypted, salt]
+        );
       }
 
       console.log('Provider settings saved successfully');
