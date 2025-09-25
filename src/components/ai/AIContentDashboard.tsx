@@ -11,13 +11,16 @@ import { QuickActions } from './components/QuickActions';
 import { GenerationWorkspace } from './GenerationWorkspace';
 import { NotificationCenter } from './components/NotificationCenter';
 import { ContextManager } from './ContextManager';
-import { ContextSelectionModal } from './modals/ContextSelectionModal';
-import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
-import { MultiVerticalModal } from './modals/MultiVerticalModal';
-import { SocialMediaModal } from './modals/SocialMediaModal';
-import { IdeationModal } from './modals/IdeationModal';
-import { ImageGenerationModal } from './modals/ImageGenerationModal';
-import { ContentPlanningModal } from './modals/ContentPlanningModal';
+// Unified modal import - replaces all individual modals
+import { AIGenerationModal } from './modals/AIGenerationModal';
+// TODO: Remove old modal imports after migration
+// import { ContextSelectionModal } from './modals/ContextSelectionModal';
+// import { StyleGuideModalEnhanced } from './modals/StyleGuideModalEnhanced';
+// import { MultiVerticalModal } from './modals/MultiVerticalModal';
+// import { SocialMediaModal } from './modals/SocialMediaModal';
+// import { IdeationModal } from './modals/IdeationModal';
+// import { ImageGenerationModal } from './modals/ImageGenerationModal';
+// import { ContentPlanningModal } from './modals/ContentPlanningModal';
 import { 
   Brain, 
   Settings, 
@@ -48,7 +51,8 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
     streaming,
     errors,
     modals,
-    
+    unifiedModal,
+
     // Actions
     setMode,
     setProviders,
@@ -58,6 +62,9 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
     clearErrors,
     openModal,
     closeModal,
+    openUnifiedModal,
+    closeUnifiedModal,
+    setUnifiedModalTab,
   } = useAIStore();
 
   // Modal states are now managed in Zustand store
@@ -141,7 +148,7 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
             case 'i':
               event.preventDefault();
               if (!anyModalOpen) {
-                openModal('imageGeneration');
+                openUnifiedModal('imageGeneration');
                 addNotification({
                   type: 'info',
                   title: 'Image Generation',
@@ -349,7 +356,7 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
 
               {/* Settings */}
               <button
-                onClick={() => openModal('styleGuide')}
+                onClick={() => openUnifiedModal('styleGuide')}
                 className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                 title="Settings"
               >
@@ -394,14 +401,14 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Quick Actions
                 </h3>
-                <QuickActions 
-                  onContextModal={() => openModal('context')}
-                  onStyleGuideModal={() => openModal('styleGuide')}
-                  onMultiVerticalModal={() => openModal('multiVertical')}
-                  onSocialMediaModal={() => openModal('socialMedia')}
-                  onIdeationModal={() => openModal('ideation')}
-                  onImageGenerationModal={() => openModal('imageGeneration')}
-                  onContentPlanningModal={() => openModal('contentPlanning')}
+                <QuickActions
+                  onContextModal={() => openUnifiedModal('context')}
+                  onStyleGuideModal={() => openUnifiedModal('styleGuide')}
+                  onMultiVerticalModal={() => openUnifiedModal('multiVertical')}
+                  onSocialMediaModal={() => openUnifiedModal('socialMedia')}
+                  onIdeationModal={() => openUnifiedModal('brainstorming')}
+                  onImageGenerationModal={() => openUnifiedModal('imageGeneration')}
+                  onContentPlanningModal={() => openUnifiedModal('contentPlanning')}
                 />
               </div>
 
@@ -455,7 +462,17 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Unified AI Generation Modal - Replaces all individual modals */}
+      <AIGenerationModal
+        isOpen={unifiedModal.isOpen}
+        onClose={closeUnifiedModal}
+        initialTab={unifiedModal.activeTab}
+        activeVertical={activeVertical}
+      />
+
+      {/* Legacy modals - kept temporarily for safe transition */}
+      {/* TODO: Remove after confirming unified modal works correctly */}
+      {/*
       {modals.context && (
         <ContextSelectionModal
           isOpen={modals.context}
@@ -490,7 +507,6 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
           isOpen={modals.ideation}
           onClose={() => closeModal('ideation')}
           onSelectIdeas={(ideas) => {
-            // Handle selected ideas for blog generation
             addNotification({
               type: 'success',
               title: 'Ideas Selected',
@@ -508,14 +524,17 @@ const AIContentDashboardBase: React.FC<AIContentDashboardProps> = ({
           title="AI Image Generation Studio"
         />
       )}
+      */}
 
-      {/* Content Planning Modal */}
+      {/* Content Planning Modal - Legacy (moved to unified modal) */}
+      {/*
       {modals.contentPlanning && (
         <ContentPlanningModal
           isOpen={modals.contentPlanning}
           onClose={() => closeModal('contentPlanning')}
         />
       )}
+      */}
 
       {/* Notification Center */}
       <NotificationCenter />

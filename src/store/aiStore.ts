@@ -317,6 +317,12 @@ interface AIStore {
     contentPlanning: boolean;
   };
   modalHistory: string[];  // Track modal navigation history
+
+  // Unified modal state
+  unifiedModal: {
+    isOpen: boolean;
+    activeTab: string;
+  };
   
   // Multi-vertical state
   multiVerticalConfig: {
@@ -381,6 +387,11 @@ interface AIStore {
   toggleModal: (modalName: keyof AIStore['modals']) => void;
   pushModalHistory: (modalName: string) => void;
   popModalHistory: () => string | undefined;
+
+  // Unified modal actions
+  openUnifiedModal: (tab?: string) => void;
+  closeUnifiedModal: () => void;
+  setUnifiedModalTab: (tab: string) => void;
   
   // Actions - Multi-vertical
   setMultiVerticalConfig: (config: Partial<AIStore['multiVerticalConfig']>) => void;
@@ -495,7 +506,12 @@ export const useAIStore = create<AIStore>()(
           contentPlanning: false,
         },
         modalHistory: [],
-        
+
+        unifiedModal: {
+          isOpen: false,
+          activeTab: 'context',
+        },
+
         multiVerticalConfig: defaultMultiVerticalConfig,
         
         imageGenerationQueue: [],
@@ -690,7 +706,42 @@ export const useAIStore = create<AIStore>()(
           }
           return undefined;
         },
-        
+
+        // Unified modal actions
+        openUnifiedModal: (tab = 'context') =>
+          set((state) => ({
+            unifiedModal: {
+              isOpen: true,
+              activeTab: tab,
+            },
+            // Close all old modals when opening unified modal
+            modals: {
+              context: false,
+              styleGuide: false,
+              multiVertical: false,
+              socialMedia: false,
+              ideation: false,
+              imageGeneration: false,
+              contentPlanning: false,
+            },
+          })),
+
+        closeUnifiedModal: () =>
+          set((state) => ({
+            unifiedModal: {
+              ...state.unifiedModal,
+              isOpen: false,
+            },
+          })),
+
+        setUnifiedModalTab: (tab) =>
+          set((state) => ({
+            unifiedModal: {
+              ...state.unifiedModal,
+              activeTab: tab,
+            },
+          })),
+
         // Actions - Multi-vertical
         setMultiVerticalConfig: (config) =>
           set((state) => ({
