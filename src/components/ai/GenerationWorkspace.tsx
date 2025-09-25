@@ -4,6 +4,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useAIStore } from '../../store/aiStore';
 import { aiGenerationService } from '../../services/ai/AIGenerationService';
+import { aiDraftsService } from '../../services/ai/AIDraftsService';
 import { withErrorBoundary } from '../ErrorBoundary';
 import { ErrorFallback } from '../errors/ErrorFallback';
 import { ContentEditor } from './components/ContentEditor';
@@ -116,38 +117,49 @@ const GenerationWorkspaceBase: React.FC<GenerationWorkspaceProps> = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSave]);
 
-  // Auto-save functionality
+  // Auto-save functionality using database service
   const handleAutoSave = useCallback(async (content: string) => {
     setSaveStatus('saving');
-    
+
     try {
-      // Save to localStorage for now (in a real app, save to backend)
-      localStorage.setItem('ai-generation-draft', JSON.stringify({
+      const result = await aiDraftsService.saveDraft({
         content,
-        timestamp: new Date().toISOString(),
         activeVertical,
         provider: activeProvider,
         model: activeModel,
-      }));
+        draftType: 'generation_workspace'
+      });
 
-      setSaveStatus('saved');
+      if (result.success) {
+        setSaveStatus('saved');
+      } else {
+        throw new Error(result.error || 'Failed to save draft');
+      }
     } catch (error) {
       console.error('Auto-save failed:', error);
       setSaveStatus('error');
     }
   }, [activeVertical, activeProvider, activeModel]);
 
-  // Load draft on mount
+  // Load draft on mount using database service
   useEffect(() => {
-    try {
-      const draft = localStorage.getItem('ai-generation-draft');
-      if (draft) {
-        const parsed = JSON.parse(draft);
-        setGenerationInput(parsed.content || '');
+    const loadDraft = async () => {
+      try {
+        const result = await aiDraftsService.loadDraft('generation_workspace');
+        if (result.success && result.draft) {
+          setGenerationInput(result.draft.content || '');
+
+          // If loaded from fallback, show a notice
+          if (result.draft.fallback || result.draft.legacy) {
+            console.log('[GenerationWorkspace] Draft loaded from localStorage fallback/legacy');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading draft:', error);
       }
-    } catch (error) {
-      console.error('Error loading draft:', error);
-    }
+    };
+
+    loadDraft();
   }, []);
 
   // Handle content generation

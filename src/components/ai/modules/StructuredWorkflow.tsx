@@ -9,6 +9,7 @@ import { TitleGenerator } from './TitleGenerator';
 import { SynopsisGenerator } from './SynopsisGenerator';
 import { OutlineGenerator } from './OutlineGenerator';
 import { aiGenerationService } from '../../../services/ai/AIGenerationService';
+import { aiDraftsService } from '../../../services/ai/AIDraftsService';
 import { 
   ArrowLeft,
   ArrowRight,
@@ -325,19 +326,51 @@ Create engaging, well-structured content that follows the outline and matches th
     });
   }, [workflow, resetWorkflow, addNotification]);
 
-  // Save workflow progress
-  const handleSaveProgress = useCallback(() => {
+  // Save workflow progress using database service
+  const handleSaveProgress = useCallback(async () => {
     if (!workflow) return;
-    
-    // In a real app, this would save to backend
-    localStorage.setItem(`structured-workflow-${workflow.id}`, JSON.stringify(workflow));
-    
-    addNotification({
-      type: 'success',
-      title: 'Progress Saved',
-      message: 'Workflow progress saved successfully',
-      duration: 3000
-    });
+
+    try {
+      const result = await aiDraftsService.saveDraft({
+        content: JSON.stringify(workflow),
+        activeVertical: workflow.vertical || 'hospitality',
+        provider: 'system',
+        model: 'workflow',
+        draftType: 'structured_workflow',
+        draftId: undefined // Always create new drafts for workflow progress
+      });
+
+      if (result.success) {
+        addNotification({
+          type: 'success',
+          title: 'Progress Saved',
+          message: 'Workflow progress saved to database successfully',
+          duration: 3000
+        });
+      } else {
+        throw new Error(result.error || 'Failed to save progress');
+      }
+    } catch (error) {
+      console.error('Error saving workflow progress:', error);
+
+      // Fallback to localStorage
+      try {
+        localStorage.setItem(`structured-workflow-${workflow.id}`, JSON.stringify(workflow));
+        addNotification({
+          type: 'warning',
+          title: 'Progress Saved Locally',
+          message: 'Workflow saved to local storage (database unavailable)',
+          duration: 4000
+        });
+      } catch (fallbackError) {
+        addNotification({
+          type: 'error',
+          title: 'Save Failed',
+          message: 'Unable to save workflow progress',
+          duration: 5000
+        });
+      }
+    }
   }, [workflow, addNotification]);
 
   // Export final content

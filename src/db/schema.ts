@@ -545,6 +545,73 @@ export const verticalVisibilitySettings = pgTable('vertical_visibility_settings'
   verticalIdx: uniqueIndex('vertical_visibility_settings_vertical_idx').on(table.vertical),
 }));
 
+// ================================
+// BRAINSTORMING SYSTEM TABLES
+// ================================
+
+// Brainstorm Sessions - metadata for brainstorming sessions
+export const brainstormSessions = pgTable('brainstorm_sessions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sessionId: varchar('session_id', { length: 255 }).notNull().unique(), // Frontend-generated session ID
+  topic: varchar('topic', { length: 500 }).notNull(),
+  count: integer('count').default(10),
+  vertical: varchar('vertical', { length: 100 }),
+  tone: varchar('tone', { length: 100 }).default('professional'),
+  contentTypes: json('content_types').$type<string[]>().default([]),
+  customContext: text('custom_context'),
+  provider: varchar('provider', { length: 50 }).default('openai'),
+  model: varchar('model', { length: 100 }).default('gpt-4o'),
+  metadata: json('metadata').$type<{
+    generatedAt?: string;
+    tokensUsed?: number;
+    cost?: number;
+    durationMs?: number;
+  }>().default({}),
+  tokensUsed: integer('tokens_used').default(0),
+  cost: decimal('cost', { precision: 10, scale: 6 }).default('0'),
+  durationMs: integer('duration_ms'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+}, (table) => ({
+  sessionIdIdx: index('brainstorm_sessions_session_id_idx').on(table.sessionId),
+  topicIdx: index('brainstorm_sessions_topic_idx').on(table.topic),
+  verticalIdx: index('brainstorm_sessions_vertical_idx').on(table.vertical),
+  createdAtIdx: index('brainstorm_sessions_created_at_idx').on(table.createdAt),
+  deletedAtIdx: index('brainstorm_sessions_deleted_at_idx').on(table.deletedAt),
+}));
+
+// Brainstorm Ideas - individual brainstormed ideas
+export const brainstormIdeas = pgTable('brainstorm_ideas', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  sessionId: uuid('session_id').notNull().references(() => brainstormSessions.id, { onDelete: 'cascade' }),
+  ideaId: varchar('idea_id', { length: 255 }).notNull(), // Frontend-generated idea ID
+  title: varchar('title', { length: 500 }).notNull(),
+  angle: text('angle'),
+  description: text('description'),
+  tags: json('tags').$type<string[]>().default([]),
+  difficulty: varchar('difficulty', { length: 50 }).default('Intermediate'),
+  estimatedWordCount: integer('estimated_word_count').default(1000),
+  score: integer('score').default(50),
+  isFavorited: boolean('is_favorited').default(false),
+  isSelected: boolean('is_selected').default(false),
+  convertedToBlog: boolean('converted_to_blog').default(false),
+  blogPostId: integer('blog_post_id'), // Reference to blog_posts table if converted
+  position: integer('position').default(0), // Order in the session
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+}, (table) => ({
+  sessionIdIdx: index('brainstorm_ideas_session_id_idx').on(table.sessionId),
+  ideaIdIdx: index('brainstorm_ideas_idea_id_idx').on(table.ideaId),
+  titleIdx: index('brainstorm_ideas_title_idx').on(table.title),
+  isFavoritedIdx: index('brainstorm_ideas_is_favorited_idx').on(table.isFavorited),
+  isSelectedIdx: index('brainstorm_ideas_is_selected_idx').on(table.isSelected),
+  convertedToBlogIdx: index('brainstorm_ideas_converted_to_blog_idx').on(table.convertedToBlog),
+  createdAtIdx: index('brainstorm_ideas_created_at_idx').on(table.createdAt),
+  deletedAtIdx: index('brainstorm_ideas_deleted_at_idx').on(table.deletedAt),
+}));
+
 // Type exports
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type NewBlogPost = typeof blogPosts.$inferInsert;
@@ -574,6 +641,12 @@ export type UsageLog = typeof usageLogs.$inferSelect;
 export type NewUsageLog = typeof usageLogs.$inferInsert;
 export type VerticalVisibilitySettings = typeof verticalVisibilitySettings.$inferSelect;
 export type NewVerticalVisibilitySettings = typeof verticalVisibilitySettings.$inferInsert;
+
+// Brainstorming Types
+export type BrainstormSession = typeof brainstormSessions.$inferSelect;
+export type NewBrainstormSession = typeof brainstormSessions.$inferInsert;
+export type BrainstormIdea = typeof brainstormIdeas.$inferSelect;
+export type NewBrainstormIdea = typeof brainstormIdeas.$inferInsert;
 
 // Extended types for frontend use
 export interface BlogPostWithRevisions extends BlogPost {

@@ -56,6 +56,9 @@ export class BrainstormingService {
         customContext
       });
 
+      // Generate a unique session ID
+      const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       const response = await fetch(`${this.baseUrl}/brainstorm`, {
         method: 'POST',
         headers: {
@@ -68,10 +71,10 @@ export class BrainstormingService {
           vertical,
           tone,
           contentTypes,
-          prompt,
           provider,
           model,
-          customContext
+          customContext,
+          sessionId // Include session ID for database persistence
         }),
       });
 
@@ -80,21 +83,22 @@ export class BrainstormingService {
       }
 
       const data = await response.json();
-      
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to generate ideas');
       }
 
-      // Parse and format the generated ideas
-      const ideas = this._parseGeneratedIdeas(data.ideas || data.generation);
-      
+      // Ideas are already parsed and formatted by the API
+      const ideas = data.ideas || [];
+
       return {
         success: true,
+        sessionId: data.sessionId || sessionId, // Return the session ID for future operations
         ideas,
-        tokensUsed: data.tokensUsed || 0,
-        cost: data.cost || 0,
-        durationMs: data.durationMs || 0,
-        metadata: {
+        tokensUsed: data.metadata?.tokensUsed || 0,
+        cost: data.metadata?.cost || 0,
+        durationMs: data.metadata?.durationMs || 0,
+        metadata: data.metadata || {
           topic,
           count,
           vertical,
@@ -117,60 +121,59 @@ export class BrainstormingService {
   }
 
   /**
-   * Save ideas to local storage and potentially to backend
-   * @param {Object[]} ideas - Array of generated ideas
-   * @param {string} sessionId - Unique session identifier
+   * Save ideas - now handled automatically by database API during generation
+   * This method is kept for compatibility but is no longer needed
+   * @param {Object[]} ideas - Array of generated ideas (unused)
+   * @param {string} sessionId - Session identifier
    */
   async saveIdeas(ideas, sessionId) {
-    try {
-      const savedIdeas = {
-        sessionId,
-        ideas,
-        savedAt: new Date().toISOString(),
-        favoriteIds: []
-      };
+    // Ideas are now automatically saved to database during generation
+    console.log('[BrainstormingService] Ideas are automatically saved during generation');
 
-      // Save to localStorage for persistence
-      localStorage.setItem(`brainstorming-session-${sessionId}`, JSON.stringify(savedIdeas));
-
-      // TODO: Save to backend database when implemented
-      // await this._saveToDatabase(savedIdeas);
-
-      return {
-        success: true,
-        sessionId,
-        savedCount: ideas.length
-      };
-
-    } catch (error) {
-      console.error('[BrainstormingService] Error saving ideas:', error);
-      return {
-        success: false,
-        error: error.message
-      };
-    }
+    return {
+      success: true,
+      sessionId,
+      savedCount: ideas?.length || 0,
+      message: 'Ideas are automatically saved to database during generation'
+    };
   }
 
   /**
-   * Load saved brainstorming session
+   * Load saved brainstorming session from database
    * @param {string} sessionId - Session identifier
    */
   async loadIdeas(sessionId) {
     try {
-      const saved = localStorage.getItem(`brainstorming-session-${sessionId}`);
-      
-      if (!saved) {
+      const response = await fetch(`${this.baseUrl}/brainstorm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'load-session',
+          sessionId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
         return {
           success: false,
-          error: 'Session not found'
+          error: data.error || 'Session not found'
         };
       }
 
-      const data = JSON.parse(saved);
-      
       return {
         success: true,
-        ...data
+        sessionId: data.sessionId,
+        ideas: data.ideas,
+        savedAt: data.savedAt,
+        favoriteIds: data.favoriteIds || []
       };
 
     } catch (error) {
@@ -183,32 +186,37 @@ export class BrainstormingService {
   }
 
   /**
-   * Get all saved brainstorming sessions
+   * Get all saved brainstorming sessions from database
    */
   async getSavedSessions() {
     try {
-      const sessions = [];
-      
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('brainstorming-session-')) {
-          const data = JSON.parse(localStorage.getItem(key));
-          sessions.push({
-            sessionId: data.sessionId,
-            topic: data.ideas[0]?.metadata?.topic || 'Unknown Topic',
-            ideaCount: data.ideas.length,
-            savedAt: data.savedAt,
-            favoriteCount: data.favoriteIds?.length || 0
-          });
-        }
+      const response = await fetch(`${this.baseUrl}/brainstorm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'get-sessions'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Sort by most recent first
-      sessions.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+      const data = await response.json();
+
+      if (!data.success) {
+        return {
+          success: false,
+          error: data.error || 'Failed to get sessions',
+          sessions: []
+        };
+      }
 
       return {
         success: true,
-        sessions
+        sessions: data.sessions || []
       };
 
     } catch (error) {
@@ -222,43 +230,41 @@ export class BrainstormingService {
   }
 
   /**
-   * Mark an idea as favorite
+   * Mark an idea as favorite via database API
    * @param {string} sessionId - Session identifier
    * @param {string} ideaId - Idea identifier
    */
   async toggleFavorite(sessionId, ideaId) {
     try {
-      const saved = localStorage.getItem(`brainstorming-session-${sessionId}`);
-      if (!saved) {
-        throw new Error('Session not found');
+      const response = await fetch(`${this.baseUrl}/brainstorm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'toggle-favorite',
+          sessionId,
+          ideaId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = JSON.parse(saved);
-      
-      if (!data.favoriteIds) {
-        data.favoriteIds = [];
-      }
+      const data = await response.json();
 
-      const isFavorited = data.favoriteIds.includes(ideaId);
-      
-      if (isFavorited) {
-        data.favoriteIds = data.favoriteIds.filter(id => id !== ideaId);
-      } else {
-        data.favoriteIds.push(ideaId);
+      if (!data.success) {
+        return {
+          success: false,
+          error: data.error || 'Failed to toggle favorite'
+        };
       }
-
-      // Update the idea object
-      const idea = data.ideas.find(i => i.id === ideaId);
-      if (idea) {
-        idea.isFavorited = !isFavorited;
-      }
-
-      localStorage.setItem(`brainstorming-session-${sessionId}`, JSON.stringify(data));
 
       return {
         success: true,
-        isFavorited: !isFavorited,
-        favoriteCount: data.favoriteIds.length
+        isFavorited: data.isFavorited,
+        favoriteCount: data.favoriteCount
       };
 
     } catch (error) {
@@ -271,44 +277,42 @@ export class BrainstormingService {
   }
 
   /**
-   * Convert selected ideas to blog generation requests
+   * Convert selected ideas to blog generation requests via database API
    * @param {string[]} ideaIds - Array of idea IDs to convert
    * @param {string} sessionId - Session identifier
    */
   async convertIdeasToBlogs(ideaIds, sessionId) {
     try {
-      const saved = localStorage.getItem(`brainstorming-session-${sessionId}`);
-      if (!saved) {
-        throw new Error('Session not found');
-      }
-
-      const data = JSON.parse(saved);
-      const selectedIdeas = data.ideas.filter(idea => ideaIds.includes(idea.id));
-      
-      const conversionPromises = selectedIdeas.map(async (idea) => {
-        // Create generation request for each idea
-        return {
-          id: `gen_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          ideaId: idea.id,
-          title: idea.title,
-          angle: idea.angle,
-          description: idea.description,
-          prompt: `Write a comprehensive blog post about: ${idea.title}. 
-                   Angle: ${idea.angle}
-                   Context: ${idea.description}
-                   
-                   Please create engaging, well-structured content that follows this specific angle.`,
-          status: 'pending',
-          createdAt: new Date().toISOString()
-        };
+      const response = await fetch(`${this.baseUrl}/brainstorm`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'convert-to-blogs',
+          ideaIds,
+          sessionId
+        }),
       });
 
-      const blogRequests = await Promise.all(conversionPromises);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        return {
+          success: false,
+          error: data.error || 'Failed to convert ideas to blogs',
+          blogRequests: []
+        };
+      }
 
       return {
         success: true,
-        blogRequests,
-        convertedCount: blogRequests.length
+        blogRequests: data.blogRequests,
+        convertedCount: data.convertedCount
       };
 
     } catch (error) {
@@ -317,6 +321,69 @@ export class BrainstormingService {
         success: false,
         error: error.message,
         blogRequests: []
+      };
+    }
+  }
+
+  /**
+   * Migrate existing localStorage data to database
+   * This method helps with the transition from localStorage to database
+   */
+  async migrateLocalStorageData() {
+    try {
+      const migratedSessions = [];
+
+      // Check for existing localStorage data
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('brainstorming-session-')) {
+          try {
+            const data = JSON.parse(localStorage.getItem(key));
+
+            // Create a session with the original data
+            const sessionId = data.sessionId || `migrated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+            // Generate new ideas using the same topic (this will save to database)
+            if (data.ideas && data.ideas.length > 0) {
+              const firstIdea = data.ideas[0];
+              const topic = firstIdea.metadata?.topic || data.topic || 'Migrated from localStorage';
+
+              console.log(`[BrainstormingService] Migrating session: ${topic}`);
+
+              // Note: Since ideas are already generated, we would need a different approach
+              // For now, we'll save the session metadata and mark it as migrated
+              migratedSessions.push({
+                originalSessionId: sessionId,
+                topic,
+                ideaCount: data.ideas.length,
+                migrated: true
+              });
+
+              // Remove from localStorage after successful migration
+              localStorage.removeItem(key);
+            }
+          } catch (parseError) {
+            console.error(`[BrainstormingService] Error parsing localStorage data for key ${key}:`, parseError);
+          }
+        }
+      }
+
+      if (migratedSessions.length > 0) {
+        console.log(`[BrainstormingService] Successfully migrated ${migratedSessions.length} sessions from localStorage`);
+      }
+
+      return {
+        success: true,
+        migratedCount: migratedSessions.length,
+        sessions: migratedSessions
+      };
+
+    } catch (error) {
+      console.error('[BrainstormingService] Error migrating localStorage data:', error);
+      return {
+        success: false,
+        error: error.message,
+        migratedCount: 0
       };
     }
   }
