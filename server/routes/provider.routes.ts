@@ -15,7 +15,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const providers = await db.select().from(providerSettings);
     
     // Transform data to not expose encrypted keys
-    const safeProviders = providers.map(provider => ({
+    const safeProviders = providers.map((provider: any) => ({
       ...provider,
       apiKeyEncrypted: undefined,
       encryptionSalt: undefined,

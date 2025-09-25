@@ -272,14 +272,14 @@ async function loadSession(req: VercelRequest, res: VercelResponse) {
       estimatedWordCount: idea.estimatedWordCount,
       score: idea.score,
       isFavorited: idea.isFavorited,
-      createdAt: idea.createdAt.toISOString()
+      createdAt: idea.createdAt ? idea.createdAt.toISOString() : new Date().toISOString()
     }));
 
     return res.status(200).json({
       success: true,
       sessionId: session.sessionId,
       ideas: formattedIdeas,
-      savedAt: session.createdAt.toISOString(),
+      savedAt: session.createdAt ? session.createdAt.toISOString() : new Date().toISOString(),
       favoriteIds: ideas.filter(idea => idea.isFavorited).map(idea => idea.ideaId)
     });
 
@@ -334,7 +334,7 @@ async function getSessions(req: VercelRequest, res: VercelResponse) {
           topic: session.topic,
           ideaCount: ideas.length,
           favoriteCount: ideas.filter(idea => idea.isFavorited).length,
-          savedAt: session.createdAt.toISOString(),
+          savedAt: session.createdAt ? session.createdAt.toISOString() : new Date().toISOString(),
           vertical: session.vertical
         };
       })

@@ -159,13 +159,13 @@ router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
         .from(characters)
         .where(eq(characters.active, true));
 
-      const selectedCharacters = characterData.filter(char => 
+      const selectedCharacters = characterData.filter((char: any) => 
         characterIds.includes(char.id)
       );
 
       if (selectedCharacters.length > 0) {
         enhancedPrompt += '\n\nCharacter descriptions:\n';
-        selectedCharacters.forEach(char => {
+        selectedCharacters.forEach((char: any) => {
           enhancedPrompt += `- ${char.name}: ${char.physicalDescription || char.description}\n`;
         });
       }
@@ -177,13 +177,13 @@ router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
         .from(referenceImages)
         .where(eq(referenceImages.type, 'style'));
 
-      const selectedStyles = styleImages.filter(img => 
+      const selectedStyles = styleImages.filter((img: any) => 
         styleReferenceIds.includes(img.id)
       );
 
       if (selectedStyles.length > 0) {
         enhancedPrompt += '\n\nStyle references:\n';
-        selectedStyles.forEach(style => {
+        selectedStyles.forEach((style: any) => {
           enhancedPrompt += `- ${style.name}: ${style.description || 'Style reference'}\n`;
         });
       }
@@ -212,7 +212,7 @@ router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
       for (const characterId of characterIds) {
         await db.update(characters)
           .set({
-            usageCount: characters.usageCount + 1,
+            usageCount: sql`${characters.usageCount} + 1`,
             lastUsed: new Date()
           })
           .where(eq(characters.id, characterId));
@@ -223,7 +223,7 @@ router.post('/generate', asyncHandler(async (req: Request, res: Response) => {
       for (const styleId of styleReferenceIds) {
         await db.update(referenceImages)
           .set({
-            usageCount: referenceImages.usageCount + 1,
+            usageCount: sql`${referenceImages.usageCount} + 1`,
             lastUsed: new Date()
           })
           .where(eq(referenceImages.id, styleId));
@@ -273,7 +273,7 @@ router.post('/enhance-prompt', asyncHandler(async (req: Request, res: Response) 
         .from(characters)
         .where(eq(characters.active, true));
 
-      const selectedCharacters = characterData.filter(char => 
+      const selectedCharacters = characterData.filter((char: any) => 
         characterIds.includes(char.id)
       );
 
@@ -292,7 +292,7 @@ router.post('/enhance-prompt', asyncHandler(async (req: Request, res: Response) 
         .from(referenceImages)
         .where(eq(referenceImages.type, 'style'));
 
-      const selectedStyles = styleImages.filter(img => 
+      const selectedStyles = styleImages.filter((img: any) => 
         styleReferenceIds.includes(img.id)
       );
 
@@ -394,7 +394,7 @@ router.get('/stats', asyncHandler(async (req: Request, res: Response) => {
         activeCharacters: totalCharacters[0]?.count || 0,
         totalImagePrompts: totalPrompts[0]?.count || 0
       },
-      recentGenerations: recentGenerations.map(gen => ({
+      recentGenerations: recentGenerations.map((gen: any) => ({
         id: gen.id,
         type: gen.type,
         generated: gen.generated,
