@@ -249,8 +249,12 @@ Create engaging, well-structured content that follows the outline and matches th
         outputCount: 1
       };
 
+      console.log('[StructuredWorkflow] Calling aiGenerationService.generateContent with config:', generationConfig);
+
       const response = await aiGenerationService.generateContent(generationConfig);
-      
+
+      console.log('[StructuredWorkflow] Generation response:', response);
+
       if (response.success && response.data) {
         setFinalContent(response.data.content || '');
         

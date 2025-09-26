@@ -47,8 +47,13 @@ class AIGenerationService {
    * Start a new AI content generation
    */
   async generateContent(config: GenerationConfig): Promise<GenerationResponse> {
+    console.log('[AIGenerationService] Starting content generation with config:', config);
+
     try {
-      const response = await fetch(`${this.baseUrl}/generate`, {
+      const url = `${this.baseUrl}/generate`;
+      console.log('[AIGenerationService] Calling API endpoint:', url);
+
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +61,10 @@ class AIGenerationService {
         body: JSON.stringify(config),
       });
 
+      console.log('[AIGenerationService] Response status:', response.status, response.statusText);
+
       const data = await response.json();
+      console.log('[AIGenerationService] Response data:', data);
       
       if (!response.ok) {
         return {
