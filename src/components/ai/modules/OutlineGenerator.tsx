@@ -138,32 +138,62 @@ export const OutlineGenerator: React.FC<OutlineGeneratorProps> = ({
     }
 
     setLoading(true);
+    console.log('[OutlineGenerator] Starting outline generation with:', {
+      topic,
+      title: blogTitle,
+      synopsis: blogSynopsis,
+      context,
+      count,
+      structure: outlineStructure,
+      sectionCount,
+      targetWordCount: localTargetWordCount,
+      includeIntroConclusion,
+      includeSubsections,
+      includeKeywords,
+      optimizeForSEO,
+      provider: activeProvider,
+      model: activeModel
+    });
+
     try {
+      const requestBody = {
+        action: 'generate-outlines',
+        topic: topic,
+        title: blogTitle,
+        synopsis: blogSynopsis,
+        context: context,
+        count: count,
+        structure: outlineStructure,
+        sectionCount: sectionCount,
+        targetWordCount: localTargetWordCount,
+        includeIntroConclusion: includeIntroConclusion,
+        includeSubsections: includeSubsections,
+        includeKeywords: includeKeywords,
+        optimizeForSEO: optimizeForSEO,
+        provider: activeProvider,
+        model: activeModel
+      };
+
+      console.log('[OutlineGenerator] Sending request to /api/ai/generate-outline with body:', requestBody);
+
       const response = await fetch('/api/ai/generate-outline', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          action: 'generate-outlines',
-          topic: topic,
-          title: blogTitle,
-          synopsis: blogSynopsis,
-          context: context,
-          count: count,
-          structure: outlineStructure,
-          sectionCount: sectionCount,
-          targetWordCount: localTargetWordCount,
-          includeIntroConclusion: includeIntroConclusion,
-          includeSubsections: includeSubsections,
-          includeKeywords: includeKeywords,
-          optimizeForSEO: optimizeForSEO,
-          provider: activeProvider,
-          model: activeModel
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('[OutlineGenerator] Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[OutlineGenerator] Response error text:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('[OutlineGenerator] Response data:', result);
 
       if (result.success) {
         const newOutlines = result.outlines.map((outline: any) => ({

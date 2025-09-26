@@ -132,30 +132,58 @@ export const SynopsisGenerator: React.FC<SynopsisGeneratorProps> = ({
     }
 
     setLoading(true);
+    console.log('[SynopsisGenerator] Starting synopsis generation with:', {
+      topic,
+      title: blogTitle,
+      context: localContext,
+      targetAudience,
+      count,
+      lengthTarget,
+      tones: tonePreferences,
+      hooks: hookEmphasis,
+      includeKeywords,
+      optimizeForSocial,
+      provider: activeProvider,
+      model: activeModel
+    });
+
     try {
+      const requestBody = {
+        action: 'generate-synopses',
+        topic: topic,
+        title: blogTitle,
+        context: localContext,
+        targetAudience: targetAudience,
+        count: count,
+        lengthTarget: lengthTarget,
+        tones: tonePreferences,
+        hooks: hookEmphasis,
+        includeKeywords: includeKeywords,
+        optimizeForSocial: optimizeForSocial,
+        provider: activeProvider,
+        model: activeModel
+      };
+
+      console.log('[SynopsisGenerator] Sending request to /api/ai/generate-synopsis with body:', requestBody);
+
       const response = await fetch('/api/ai/generate-synopsis', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          action: 'generate-synopses',
-          topic: topic,
-          title: blogTitle,
-          context: localContext,
-          targetAudience: targetAudience,
-          count: count,
-          lengthTarget: lengthTarget,
-          tones: tonePreferences,
-          hooks: hookEmphasis,
-          includeKeywords: includeKeywords,
-          optimizeForSocial: optimizeForSocial,
-          provider: activeProvider,
-          model: activeModel
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('[SynopsisGenerator] Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[SynopsisGenerator] Response error text:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('[SynopsisGenerator] Response data:', result);
 
       if (result.success) {
         const newSynopses = result.synopses.map((synopsis: any) => ({

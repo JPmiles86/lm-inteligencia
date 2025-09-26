@@ -114,27 +114,52 @@ export const TitleGenerator: React.FC<TitleGeneratorProps> = ({
     }
 
     setLoading(true);
+    console.log('[TitleGenerator] Starting title generation with:', {
+      topic,
+      context,
+      count,
+      templates: includeTemplates,
+      keywords: targetKeywords,
+      seoTarget,
+      abTestMode,
+      provider: activeProvider,
+      model: activeModel
+    });
+
     try {
+      const requestBody = {
+        action: 'generate-titles',
+        topic: topic,
+        context: context,
+        count: count,
+        templates: includeTemplates,
+        keywords: targetKeywords,
+        seoTarget: seoTarget,
+        abTestMode: abTestMode,
+        provider: activeProvider,
+        model: activeModel
+      };
+
+      console.log('[TitleGenerator] Sending request to /api/ai/generate-titles with body:', requestBody);
+
       const response = await fetch('/api/ai/generate-titles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          action: 'generate-titles',
-          topic: topic,
-          context: context,
-          count: count,
-          templates: includeTemplates,
-          keywords: targetKeywords,
-          seoTarget: seoTarget,
-          abTestMode: abTestMode,
-          provider: activeProvider,
-          model: activeModel
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('[TitleGenerator] Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[TitleGenerator] Response error text:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('[TitleGenerator] Response data:', result);
 
       if (result.success) {
         const newTitles = result.titles.map((title: any) => ({
