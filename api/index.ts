@@ -93,6 +93,57 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
+// Vertical visibility settings endpoint
+app.get('/api/vertical-visibility', async (req, res) => {
+  // Default settings for each vertical
+  const defaultSettings = {
+    hospitality: {
+      showStaffSection: false,
+      showBlog: false,
+      showTestimonials: true,
+      showCaseStudies: true,
+      showOptionalAddOns: true,
+    },
+    healthcare: {
+      showStaffSection: false,
+      showBlog: false,
+      showTestimonials: false,
+      showCaseStudies: false,
+      showOptionalAddOns: false,
+    },
+    tech: {
+      showStaffSection: true,
+      showBlog: true,
+      showTestimonials: true,
+      showCaseStudies: true,
+      showOptionalAddOns: true,
+    },
+    athletics: {
+      showStaffSection: true,
+      showBlog: true,
+      showTestimonials: true,
+      showCaseStudies: true,
+      showOptionalAddOns: true,
+    },
+  };
+
+  const vertical = req.query.vertical as string;
+
+  if (vertical && vertical in defaultSettings) {
+    return res.json({
+      data: {
+        vertical,
+        ...defaultSettings[vertical as keyof typeof defaultSettings],
+      }
+    });
+  }
+
+  // Return all settings
+  res.json({
+    data: defaultSettings
+  });
+});
+
 // Mount all routes under /api
 app.use('/api/ai', aiRoutes);
 app.use('/api/blog', blogRoutes);
@@ -101,7 +152,7 @@ app.use('/api/images', imageRoutes);
 app.use('/api/providers', providerRoutes);
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('API Error:', err);
   res.status(err.status || 500).json({
     error: err.message || 'Internal server error',

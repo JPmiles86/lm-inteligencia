@@ -122,23 +122,26 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
 
   const handleIndustryClick = async (industry: IndustryType) => {
     if (landingAreaState !== 'undecided') return;
-    
+
     setSelectedIndustry(industry);
     setLandingAreaState('decided');
-    
-    // On main domain, redirect to appropriate subdomain
+
+    // On main domain, decide whether to use subdomain or path
     if (!subdomain || subdomain === 'main') {
-      // In production, redirect to subdomain
-      if (process.env.NODE_ENV === 'production') {
+      const currentHostname = window.location.hostname;
+      const isVercelPreview = currentHostname.includes('vercel.app');
+      const isProductionDomain = currentHostname.includes('inteligenciadm.com') && !isVercelPreview;
+
+      // Only use subdomains on actual production domain
+      if (isProductionDomain && process.env.NODE_ENV === 'production') {
         const targetSubdomain = industryToSubdomain[industry];
-        const currentDomain = window.location.hostname;
-        const baseDomain = currentDomain.includes('inteligenciadm.com') ? 'inteligenciadm.com' : currentDomain;
+        const baseDomain = 'inteligenciadm.com';
         const targetUrl = `https://${targetSubdomain}.${baseDomain}`;
-        
+
         // Redirect to subdomain
         window.location.href = targetUrl;
       } else {
-        // In development, just update URL path for testing
+        // In development, localhost, or Vercel preview: use path-based navigation
         const pathMap: Record<IndustryType, string> = {
           'hospitality': '/hospitality',
           'healthcare': '/healthcare',
@@ -147,6 +150,7 @@ export const LandingArea: React.FC<LandingAreaProps> = ({ onScrollToContent }) =
           'main': '/'
         };
         window.history.pushState({}, '', pathMap[industry]);
+        window.location.reload(); // Reload to show the correct industry content
       }
     }
   };
