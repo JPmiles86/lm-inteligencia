@@ -127,22 +127,28 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
           <div>
             <h4 className="font-bold mb-4">Industries</h4>
             <ul className="space-y-2 text-gray-400">
-              {industries.map((ind) => (
-                <li key={ind.industry}>
-                  {ind.industry === 'hospitality' || ind.industry === 'healthcare' ? (
+              {industries.map((ind) => {
+                // Map all industries to their subdomains
+                const subdomainMap: Record<string, string> = {
+                  'hospitality': 'https://hospitality.inteligenciadm.com',
+                  'healthcare': 'https://healthcare.inteligenciadm.com',
+                  'tech': 'https://tech.inteligenciadm.com',
+                  'athletics': 'https://athletics.inteligenciadm.com'
+                };
+
+                const url = subdomainMap[ind.industry];
+
+                return (
+                  <li key={ind.industry}>
                     <a
-                      href={ind.industry === 'healthcare' ? 'https://healthcare.inteligenciadm.com' : (ind.industry === 'hospitality' ? 'https://hospitality.inteligenciadm.com' : '/')}
+                      href={url}
                       className="hover:text-white transition-colors text-left block capitalize"
                     >
                       {ind.title}
                     </a>
-                  ) : (
-                    <span className="text-gray-500 text-left block capitalize">
-                      {ind.title} <span className="text-xs">(Coming Soon)</span>
-                    </span>
-                  )}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           </div>
           
