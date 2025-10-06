@@ -160,20 +160,33 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       // Show all verticals except main and current industry - all are accessible
                       if (ind === 'main' || ind === industry || !urlPath) return null;
-                      
-                      // Map to subdomain URLs
-                      const subdomainMap: Record<string, string> = {
-                        'hospitality': 'hospitality.inteligenciadm.com',
-                        'healthcare': 'healthcare.inteligenciadm.com',
-                        'tech': 'tech.inteligenciadm.com',
-                        'athletics': 'athletics.inteligenciadm.com'
-                      };
-                      
-                      const targetSubdomain = subdomainMap[ind];
-                      if (!targetSubdomain) return null;
-                      
-                      // Always go to homepage when switching industries
-                      const targetUrl = `https://${targetSubdomain}`;
+
+                      // Detect environment
+                      const currentHostname = window.location.hostname;
+                      const isVercelPreview = currentHostname.includes('vercel.app');
+                      const isProductionDomain = currentHostname.includes('inteligenciadm.com') && !isVercelPreview;
+
+                      let targetUrl: string;
+
+                      if (isProductionDomain) {
+                        // On production, use subdomains
+                        const subdomainMap: Record<string, string> = {
+                          'hospitality': 'https://hospitality.inteligenciadm.com',
+                          'healthcare': 'https://healthcare.inteligenciadm.com',
+                          'tech': 'https://tech.inteligenciadm.com',
+                          'athletics': 'https://athletics.inteligenciadm.com'
+                        };
+                        targetUrl = subdomainMap[ind];
+                      } else {
+                        // On preview/localhost, use paths
+                        const pathMap: Record<string, string> = {
+                          'hospitality': '/hospitality',
+                          'healthcare': '/healthcare',
+                          'tech': '/tech',
+                          'athletics': '/sports'
+                        };
+                        targetUrl = pathMap[ind];
+                      }
                       
                       return (
                         <a
@@ -472,20 +485,33 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
                       // Show all verticals except main and current industry - all are accessible
                       if (ind === 'main' || ind === industry || !urlPath) return null;
-                      
-                      // Map to subdomain URLs
-                      const subdomainMap: Record<string, string> = {
-                        'hospitality': 'hospitality.inteligenciadm.com',
-                        'healthcare': 'healthcare.inteligenciadm.com',
-                        'tech': 'tech.inteligenciadm.com',
-                        'athletics': 'athletics.inteligenciadm.com'
-                      };
-                      
-                      const targetSubdomain = subdomainMap[ind];
-                      if (!targetSubdomain) return null;
-                      
-                      // Always go to homepage when switching industries
-                      const targetUrl = `https://${targetSubdomain}`;
+
+                      // Detect environment
+                      const currentHostname = window.location.hostname;
+                      const isVercelPreview = currentHostname.includes('vercel.app');
+                      const isProductionDomain = currentHostname.includes('inteligenciadm.com') && !isVercelPreview;
+
+                      let targetUrl: string;
+
+                      if (isProductionDomain) {
+                        // On production, use subdomains
+                        const subdomainMap: Record<string, string> = {
+                          'hospitality': 'https://hospitality.inteligenciadm.com',
+                          'healthcare': 'https://healthcare.inteligenciadm.com',
+                          'tech': 'https://tech.inteligenciadm.com',
+                          'athletics': 'https://athletics.inteligenciadm.com'
+                        };
+                        targetUrl = subdomainMap[ind];
+                      } else {
+                        // On preview/localhost, use paths
+                        const pathMap: Record<string, string> = {
+                          'hospitality': '/hospitality',
+                          'healthcare': '/healthcare',
+                          'tech': '/tech',
+                          'athletics': '/sports'
+                        };
+                        targetUrl = pathMap[ind];
+                      }
                       
                       return (
                         <a

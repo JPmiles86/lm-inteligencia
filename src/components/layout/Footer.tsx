@@ -128,15 +128,32 @@ export const Footer: React.FC<FooterProps> = ({ selectedIndustry }) => {
             <h4 className="font-bold mb-4">Industries</h4>
             <ul className="space-y-2 text-gray-400">
               {industries.map((ind) => {
-                // Map all industries to their subdomains
-                const subdomainMap: Record<string, string> = {
-                  'hospitality': 'https://hospitality.inteligenciadm.com',
-                  'healthcare': 'https://healthcare.inteligenciadm.com',
-                  'tech': 'https://tech.inteligenciadm.com',
-                  'athletics': 'https://athletics.inteligenciadm.com'
-                };
+                // Detect if we're on Vercel preview or localhost
+                const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
+                const isVercelPreview = currentHostname.includes('vercel.app');
+                const isProductionDomain = currentHostname.includes('inteligenciadm.com') && !isVercelPreview;
 
-                const url = subdomainMap[ind.industry];
+                let url: string;
+
+                if (isProductionDomain) {
+                  // On production, use subdomains
+                  const subdomainMap: Record<string, string> = {
+                    'hospitality': 'https://hospitality.inteligenciadm.com',
+                    'healthcare': 'https://healthcare.inteligenciadm.com',
+                    'tech': 'https://tech.inteligenciadm.com',
+                    'athletics': 'https://athletics.inteligenciadm.com'
+                  };
+                  url = subdomainMap[ind.industry];
+                } else {
+                  // On preview/localhost, use paths
+                  const pathMap: Record<string, string> = {
+                    'hospitality': '/hospitality',
+                    'healthcare': '/healthcare',
+                    'tech': '/tech',
+                    'athletics': '/sports'
+                  };
+                  url = pathMap[ind.industry];
+                }
 
                 return (
                   <li key={ind.industry}>
