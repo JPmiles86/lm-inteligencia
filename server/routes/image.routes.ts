@@ -350,7 +350,7 @@ router.get('/history', asyncHandler(async (req: Request, res: Response) => {
       .limit(Math.min(100, parseInt(limit as string)));
 
     // Filter out sensitive data if needed
-    const filteredHistory = history.map(item => ({
+    const filteredHistory = history.map((item: any) => ({
       ...item,
       // Include or exclude prompts based on request
       originalText: includePrompts === 'true' ? item.originalText : undefined,
