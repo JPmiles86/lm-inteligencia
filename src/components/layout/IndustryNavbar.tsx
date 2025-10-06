@@ -10,7 +10,7 @@ import { universalContent } from '../../config/universal-content';
 import { IndustryContext, useIndustryContext } from '../../contexts/IndustryContext';
 import { getIndustryFromPath, industryToUrlMap } from '../../utils/industryMapping';
 import { isSectionVisibleSync } from '../../utils/verticalVisibility';
-import { getEnabledVerticalCount } from '../../config/enabled-verticals';
+import { getEnabledVerticals, getEnabledVerticalCount } from '../../config/enabled-verticals';
 
 interface IndustryNavbarProps {
   // Support both prop formats for backward compatibility
@@ -42,7 +42,8 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
   const industry = contextIndustry || industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
   
-  // Get enabled vertical count for showing/hiding industry switcher
+  // Get enabled verticals configuration
+  const enabledVerticals = getEnabledVerticals();
   const enabledVerticalCount = getEnabledVerticalCount();
 
   // Get subdomain helper
@@ -158,8 +159,8 @@ const IndustryNavbarWithContext: React.FC<IndustryNavbarProps> = ({
                 {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
-                      // Show all verticals except main and current industry - all are accessible
-                      if (ind === 'main' || ind === industry || !urlPath) return null;
+                      // Only show enabled verticals, skip main and current industry
+                      if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
                       
                       // Map to subdomain URLs
                       const subdomainMap: Record<string, string> = {
@@ -354,7 +355,8 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
   const industry = industryProp || config?.industry || currentIndustry || 'main';
   const industryName = industryNameProp || config?.name || IndustryNames[industry];
   
-  // Get enabled vertical count for showing/hiding industry switcher
+  // Get enabled verticals configuration
+  const enabledVerticals = getEnabledVerticals();
   const enabledVerticalCount = getEnabledVerticalCount();
 
   // Get subdomain helper
@@ -470,8 +472,8 @@ const IndustryNavbarWithoutContext: React.FC<IndustryNavbarProps> = ({
                 {isIndustryDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-50">
                     {Object.entries(industryToUrlMap).map(([ind, urlPath]) => {
-                      // Show all verticals except main and current industry - all are accessible
-                      if (ind === 'main' || ind === industry || !urlPath) return null;
+                      // Only show enabled verticals, skip main and current industry
+                      if (ind === 'main' || ind === industry || !urlPath || !enabledVerticals.includes(ind as any)) return null;
                       
                       // Map to subdomain URLs
                       const subdomainMap: Record<string, string> = {
